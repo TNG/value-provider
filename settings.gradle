@@ -1,0 +1,2 @@
+include 'core', 'junit4', 'junit5', 'example'
+

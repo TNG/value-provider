@@ -1,0 +1,43 @@
+@startuml
+participant "JVM\nJUnit\nRuntime" as JVM
+participant "Test A" as T_A
+
+== Test A class-loading ==
+JVM --> T_A : class-loading
+note left of T_A #lightgreen: static initialization
+JVM -> T_A : before class methods
+
+== Test A test method <1> ==
+JVM --> T_A : instantiation for test method <1>
+activate T_A
+
+note left of T_A #lightgreen: instance variables
+JVM -> T_A : before methods
+
+JVM -> T_A : test method <1>
+note left of T_A #lightgreen: test method
+
+T_A --> JVM : return
+JVM -> T_A : after methods
+JVM --> T_A : destruction for test method <1>
+destroy T_A
+newpage
+
+== Test A test method <2> ==
+JVM --> T_A : instantiation for test method <2>
+activate T_A
+
+note left of T_A #lightgreen: instance variables
+JVM -> T_A : before methods
+
+JVM -> T_A : test method <2>
+note left of T_A #lightgreen: test method
+
+T_A --> JVM : return
+
+JVM -> T_A : after methods
+JVM -> T_A : after class methods
+JVM --> T_A : destruction for test method <2>
+destroy T_A
+
+@enduml

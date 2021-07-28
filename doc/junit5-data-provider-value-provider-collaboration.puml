@@ -1,0 +1,93 @@
+@startuml
+participant "JVM\nJUnit\nRuntime" as JVM
+participant "UseDataProviderExtension\n(JUnit5)" as UDP_X #lightgreen
+participant "Test\nusing DataProvider" as TEST
+
+participant "VPExtension\n(JUnit5)" as VPF_X #lightblue
+participant "ValueProviderFactory" as VPF
+participant "DefaultVPICreator" as D_VPC
+participant "TestClassVPICreator" as C_VPC
+participant "TestMethodVPICreator" as M_VPC
+
+JVM --> VPF : class-loading & instantiation
+activate VPF
+VPF -> D_VPC : instantiation
+activate D_VPC
+VPF -> M_VPC : instantiation
+activate M_VPC
+VPF -> VPF : activateCreator(DefaultVPICreator)
+
+== Test class-loading ==
+JVM --> VPF_X : instantiation
+activate VPF_X #lightblue
+JVM -> VPF_X : beforeAll
+VPF_X -> VPF : startTestClassCycle
+VPF -> C_VPC : instantiation
+activate C_VPC
+VPF -> C_VPC : startTestCycle
+C_VPC -> C_VPC : initialize seed &\n reference date/time
+note right of C_VPC #lightgreen: using system properties
+VPF -> VPF : activateCreator(TestClassVPICreator)
+
+TEST -> VPF : createRandomValueProvider
+note left #lightgreen: static initialization
+VPF -> C_VPC : createRandomValueProvider
+
+== Test @UseDataProvider method <1> ==
+UDP_X -> TEST : run @DataProvider <1> method
+TEST -> VPF : createRandomValueProvider
+VPF -> C_VPC : createRandomValueProvider
+
+JVM --> TEST : instantiation for @UseDataProvider method <1>
+JVM -> VPF_X : interceptTestClassConstructor
+VPF_X -> VPF : startTestMethodCycle
+VPF -> VPF : startTestMethodCycle
+VPF -> VPF : activateCreator(TestMethodVPICreator)
+VPF -> M_VPC : startTestCycle(TestClassVPICreator)
+M_VPC -> M_VPC : initialize seed &\n reference date/time
+note right of M_VPC #lightgreen: using system properties
+M_VPC -> M_VPC : copyValueProviderSuffixes(TestClassVPICreator)
+note right of M_VPC #lightgreen: required to ensure unique suffixes
+M_VPC -> M_VPC : copyReferenceDateTime(TestClassVPICreator)
+note right of M_VPC #lightgreen: required to ensure reproducible\ndate/time related test data
+
+TEST -> VPF : createRandomValueProvider
+activate TEST
+note left #lightgreen: instance variables\nbefore methods\ntest method
+VPF -> M_VPC : createRandomValueProvider
+
+TEST --> JVM : return
+JVM -> VPF_X : afterEach
+VPF_X -> VPF : finishTestMethodCycle
+VPF -> M_VPC : finishTestCycle
+M_VPC -> M_VPC : resetValueProviderSuffixes
+VPF -> VPF : activateCreator(TestClassVPICreator)
+
+JVM --> TEST : destruction for  @UseDataProvider method <1>
+destroy TEST
+newpage
+
+== Test @UseDataProvider method <2> ==
+UDP_X -> TEST : run @DataProvider <2> method
+TEST -> VPF : createRandomValueProvider
+VPF -> C_VPC : createRandomValueProvider
+
+JVM --> TEST : instantiation for @UseDataProvider method <2>
+JVM -> VPF_X : interceptTestClassConstructor
+VPF_X -> VPF : startTestMethodCycle
+VPF -> VPF : startTestMethodCycle
+VPF -> VPF : activateCreator(TestMethodVPICreator)
+VPF -> M_VPC : startTestCycle(TestClassVPICreator)
+M_VPC -> M_VPC : initialize seed &\n reference date/time
+M_VPC -> M_VPC : copyValueProviderSuffixes(TestClassVPICreator)
+note right of M_VPC #lightgreen: additional suffix(es)\ndue to @DataProvider <2> method execution
+M_VPC -> M_VPC : copyReferenceDateTime(TestClassVPICreator)
+
+TEST -> VPF : createRandomValueProvider
+activate TEST
+note left #lightgreen: instance variables\nbefore methods\ntest method
+VPF -> M_VPC : createRandomValueProvider
+
+... continued as shown above for @UseDataProvider method <1> ...
+
+@enduml

@@ -1,0 +1,172 @@
+@startuml
+participant "JVM\nJUnit\nRuntime" as JVM
+participant "Test A" as T_A
+participant "Test B" as T_B
+
+participant "<b><size:20>      ?      </size></b>" as TBI #lightblue
+activate TBI #lightblue
+participant "ValueProviderFactory" as VPF
+note over VPF: Just shown for single thread,\nimplemented as ThreadLocal\nfor parallel test execution
+participant "DefaultVPICreator" as D_VPC
+note over D_VPC: 1. Uses arbitrary/random seed\n2. Does NOT ensure unique suffixes
+participant "TestClassVPICreator" as C_VPC
+participant "TestMethodVPICreator" as M_VPC
+note over C_VPC, M_VPC: 1. Seed and reference date/time\n    controllable via system properties\n2. Ensures unique suffixes\n    (as far as possible)
+
+JVM --> VPF : class-loading & instantiation
+activate VPF
+VPF -> D_VPC : instantiation
+activate D_VPC
+VPF -> M_VPC : instantiation
+activate M_VPC
+VPF -> VPF : activateCreator(DefaultVPICreator)
+
+== Test A class-loading ==
+JVM --> T_A : class-loading
+TBI -> VPF : startTestClassCycle
+note left #lightblue : <b>trigger required</b>
+VPF -> C_VPC : instantiation
+activate C_VPC
+note right of C_VPC #lightgreen: different lifecycle required\nfor tests with JUnit4 DataProvider
+VPF -> C_VPC : startTestCycle
+C_VPC -> C_VPC : initialize seed &\n reference date/time
+note right of C_VPC #lightgreen: using system properties
+VPF -> VPF : activateCreator(TestClassVPICreator)
+
+T_A -> VPF : createRandomValueProvider
+note left #lightgreen: static initialization
+VPF -> C_VPC : createRandomValueProvider
+
+== Test A test method <1> ==
+JVM --> T_A : instantiation for test method <1>
+activate T_A
+
+TBI -> VPF : startTestMethodCycle
+note left #lightblue : <b>trigger required</b>
+VPF -> VPF : activateCreator(TestMethodVPICreator)
+VPF -> M_VPC : startTestCycle(TestClassVPICreator)
+M_VPC -> M_VPC : initialize seed &\n reference date/time
+note right of M_VPC #lightgreen: using system properties
+M_VPC -> M_VPC : copyValueProviderSuffixes(TestClassVPICreator)
+note right of M_VPC #lightgreen: required to ensure unique suffixes
+M_VPC -> M_VPC : copyReferenceDateTime(TestClassVPICreator)
+note right of M_VPC #lightgreen: required to ensure reproducible\ndate/time related test data
+
+T_A -> VPF : createRandomValueProvider
+note left #lightgreen: instance variables
+VPF -> M_VPC : createRandomValueProvider
+
+T_A -> VPF : createRandomValueProvider
+note left #lightgreen: before methods
+VPF -> M_VPC : createRandomValueProvider
+
+JVM -> T_A : test method <1>
+T_A -> VPF : createRandomValueProvider
+note left #lightgreen: test method
+VPF -> M_VPC : createRandomValueProvider
+
+T_A --> JVM : return
+TBI -> VPF : finishTestMethodCycle
+note left #lightblue : <b>trigger required</b>
+VPF -> M_VPC : finishTestCycle
+M_VPC -> M_VPC : resetValueProviderSuffixes
+VPF -> VPF : activateCreator(TestClassVPICreator)
+
+JVM --> T_A : destruction for test method <1>
+destroy T_A
+newpage
+
+== Test A test method <2> ==
+JVM --> T_A : instantiation for test method <2>
+activate T_A
+
+TBI -> VPF : startTestMethodCycle
+note left #lightblue : <b>trigger required</b>
+VPF -> VPF : activateCreator(TestMethodVPICreator)
+VPF -> M_VPC : startTestCycle(TestClassVPICreator)
+M_VPC -> M_VPC : initialize seed &\n reference date/time
+note right of M_VPC #lightgreen: using system properties
+M_VPC -> M_VPC : copyValueProviderSuffixes(TestClassVPICreator)
+note right of M_VPC #lightgreen: required to ensure unique suffixes
+M_VPC -> M_VPC : copyReferenceDateTime(TestClassVPICreator)
+note right of M_VPC #lightgreen: required to ensure reproducible\ndate/time related test data
+
+T_A -> VPF : createRandomValueProvider
+note left #lightgreen: instance variables
+VPF -> M_VPC : createRandomValueProvider
+
+T_A -> VPF : createRandomValueProvider
+note left #lightgreen: before methods
+VPF -> M_VPC : createRandomValueProvider
+
+JVM -> T_A : test method <2>
+T_A -> VPF : createRandomValueProvider
+note left #lightgreen: test method
+VPF -> M_VPC : createRandomValueProvider
+
+T_A --> JVM : return
+TBI -> VPF : finishTestMethodCycle
+note left #lightblue : <b>trigger required</b>
+VPF -> M_VPC : finishTestCycle
+M_VPC -> M_VPC : resetValueProviderSuffixes
+VPF -> VPF : activateCreator(TestClassVPICreator)
+
+TBI -> VPF : finishTestClassCycle
+note left #lightblue : <b>trigger required</b>
+VPF -> C_VPC : finishTestCycle
+C_VPC -> C_VPC : resetValueProviderSuffixes
+VPF -> VPF : delete TestClassVPICreator
+destroy C_VPC
+VPF -> VPF : activateCreator(DefaultVPICreator)
+
+JVM --> T_A : destruction for test method <2>
+destroy T_A
+newpage
+
+== Test B class-loading ==
+JVM --> T_B : class-loading
+TBI -> VPF : startTestClassCycle
+note left #lightblue : <b>trigger required</b>
+VPF -> C_VPC : instantiation
+activate C_VPC
+note right of C_VPC #lightgreen: different lifecycle required\nfor tests with JUnit4 DataProvider
+VPF -> C_VPC : startTestCycle
+C_VPC -> C_VPC : initialize seed &\n reference date/time
+note right of C_VPC #lightgreen: using system properties
+VPF -> VPF : activateCreator(TestClassVPICreator)
+
+T_B -> VPF : createRandomValueProvider
+note left #lightgreen: static initialization
+VPF -> C_VPC : createRandomValueProvider
+
+== Test B test method <1> ==
+JVM --> T_B : instantiation for test method <1>
+activate T_B
+
+TBI -> VPF : startTestMethodCycle
+note left #lightblue : <b>trigger required</b>
+VPF -> VPF : activateCreator(TestMethodVPICreator)
+VPF -> M_VPC : startTestCycle(TestClassVPICreator)
+M_VPC -> M_VPC : initialize seed &\n reference date/time
+note right of M_VPC #lightgreen: using system properties
+M_VPC -> M_VPC : copyValueProviderSuffixes(TestClassVPICreator)
+note right of M_VPC #lightgreen: required to ensure unique suffixes
+M_VPC -> M_VPC : copyReferenceDateTime(TestClassVPICreator)
+note right of M_VPC #lightgreen: required to ensure reproducible\ndate/time related test data
+
+T_B -> VPF : createRandomValueProvider
+note left #lightgreen: instance variables
+VPF -> M_VPC : createRandomValueProvider
+
+T_B -> VPF : createRandomValueProvider
+note left #lightgreen: before methods
+VPF -> M_VPC : createRandomValueProvider
+
+JVM -> T_B : test method <1>
+T_B -> VPF : createRandomValueProvider
+note left #lightgreen: test method
+VPF -> M_VPC : createRandomValueProvider
+
+... continued as shown above for Test A ...
+
+@enduml

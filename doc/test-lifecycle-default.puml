@@ -1,0 +1,84 @@
+@startuml
+participant "JVM\nJUnit\nRuntime" as JVM
+participant "Test A" as T_A
+participant "Test B" as T_B
+
+participant "ValueProviderFactory" as VPF
+note over VPF: Just shown for single thread,\nimplemented as ThreadLocal\nfor parallel test execution
+participant "DefaultVPICreator" as D_VPC
+note over D_VPC: 1. Uses arbitrary/random seed and reference date/time\n2. Does NOT ensure unique suffixes
+
+JVM --> VPF : class-loading & instantiation
+activate VPF
+VPF -> D_VPC : instantiation
+activate D_VPC
+
+== Test A class-loading ==
+JVM --> T_A : class-loading
+T_A -> VPF : createRandomValueProvider
+note left #lightgreen: static initialization
+VPF -> D_VPC : createRandomValueProvider
+
+== Test A test method <1> ==
+JVM --> T_A : instantiation for test method <1>
+activate T_A
+
+T_A -> VPF : createRandomValueProvider
+note left #lightgreen: instance variables
+VPF -> D_VPC : createRandomValueProvider
+
+T_A -> VPF : createRandomValueProvider
+note left #lightgreen: before methods
+VPF -> D_VPC : createRandomValueProvider
+
+JVM -> T_A : test method <1> 
+T_A -> VPF : createRandomValueProvider
+note left #lightgreen: test method
+VPF -> D_VPC : createRandomValueProvider
+
+T_A --> JVM : return
+
+JVM --> T_A : destruction for test method <1> 
+destroy T_A
+newpage
+
+== Test A test method <2> ==
+JVM --> T_A : instantiation for test method <2>
+activate T_A
+
+T_A -> VPF : createRandomValueProvider
+note left #lightgreen: instance variables
+VPF -> D_VPC : createRandomValueProvider
+
+T_A -> VPF : createRandomValueProvider
+note left #lightgreen: before methods
+VPF -> D_VPC : createRandomValueProvider
+
+JVM -> T_A : test method <2> 
+T_A -> VPF : createRandomValueProvider
+note left #lightgreen: test method
+VPF -> D_VPC : createRandomValueProvider
+
+T_A --> JVM : return
+
+JVM --> T_A : destruction for test method <2> 
+destroy T_A
+newpage
+
+== Test B class-loading ==
+JVM --> T_B : class-loading
+T_B -> VPF : createRandomValueProvider
+note left #lightgreen: static initialization
+VPF -> D_VPC : createRandomValueProvider
+
+== Test B test method <1> ==
+JVM -> T_B : instantiation for test method <1> 
+activate T_B
+
+T_B -> VPF : createRandomValueProvider
+note left #lightgreen: instance variables
+VPF -> D_VPC : createRandomValueProvider
+
+... continued as shown above for Test A ...
+
+@enduml

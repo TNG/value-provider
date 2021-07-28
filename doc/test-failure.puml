@@ -1,0 +1,34 @@
+@startuml
+participant "JVM\nJUnit\nRuntime" as JVM
+note right of JVM : omitted most of the sequence as shown in other diagrams
+participant "Test" as T_A
+participant "<b><size:20>      ?      </size></b>" as TBI #lightblue
+activate TBI #lightblue
+participant "ValueProviderFactory" as VPF
+participant "VPFactoryException" as EX
+...
+
+JVM --> VPF : class-loading & instantiation
+activate VPF
+
+JVM --> T_A : class-loading & instantiation for test method
+activate T_A
+...
+JVM -> T_A : test method
+...
+T_A --> JVM : throw exception\n(e.g. test failure)
+TBI -> EX : instantiation(exception)
+note left #lightblue : <b>trigger required</b>
+activate EX
+EX -> VPF : getTestClassSeed
+VPF -> C_VPC : getSeed
+EX -> VPF : getTestMethodSeed
+VPF -> M_VPC : getSeed
+EX -> VPF : getFormattedReferenceDateTime
+VPF -> M_VPC : getFormattedReferenceDateTime
+EX -> EX : 1. store original exception as cause\n2. extend original failure message\n     to reflect seed & reference date/time values
+EX --> TBI
+TBI -> JVM: throw VPFactoryException
+...
+
+@enduml
