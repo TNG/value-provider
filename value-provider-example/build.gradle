@@ -1,10 +1,10 @@
 dependencies {
     compileOnly dependency.lombok
     annotationProcessor dependency.lombok
-    implementation project(':core')
+    implementation project(':value-provider-core')
 
     testImplementation dependency.junit_jupiter_api
-    testImplementation project(':junit5')
+    testImplementation project(':value-provider-junit5')
 
     testRuntimeOnly dependency.junit_jupiter_engine
 }

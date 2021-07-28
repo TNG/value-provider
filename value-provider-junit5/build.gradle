@@ -1,9 +1,9 @@
 dependencies {
     implementation dependency.junit_jupiter_api
 
-    implementation project(':core')
+    implementation project(':value-provider-core')
 
-    testImplementation project(path: ':core', configuration: 'tests')
+    testImplementation project(path: ':value-provider-core', configuration: 'tests')
     testImplementation dependency.junit5_dataprovider
     testImplementation dependency.junit_jupiter_params
     testImplementation dependency.junit_jupiter_testkit
