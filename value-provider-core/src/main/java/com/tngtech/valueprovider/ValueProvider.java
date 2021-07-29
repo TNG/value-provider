@@ -734,8 +734,7 @@ public class ValueProvider {
      * @param elements the elements to draw from.
      * @return the drawn elements (none / some / all).
      */
-    @SafeVarargs
-    final public <T> Collection<T> someOf(T... elements) {
+    @SafeVarargs final public <T> Collection<T> someOf(T... elements) {
         return someOf(asList(elements));
     }
 
@@ -898,7 +897,7 @@ public class ValueProvider {
         for (int i = 0; i < 6; i++) {
             blocks.add(createIPv6Block());
         }
-        blocks.add(ipAddress());
+        blocks.add(ipV4Address());
         return blocks;
     }
 
