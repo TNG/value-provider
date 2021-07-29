@@ -8,62 +8,6 @@ value-provider consists of two major parts:
 * the [ValueProvider](core/src/main/java/com/tngtech/valueprovider/ValueProvider.java) class which populates properties of test data objects with random values
 * infrastructure for reproducing said random data in case of test failures (JUnit5 extension, JUnit4 rules)
 
-## Installation
-
-value-provider has the following prerequisites:
-
-* Java 8 and above
-* JUnit 5.5 and above for the JUnit5 infrastructure
-* JUnit 4.12 and above for the JUnit4 infrastructure
-
-### Gradle
-
-```groovy
-// core library
-testImplementation "com.tngtech.valueprovider:valueprovider-core:1.1.2"
-
-// infrastructure
-// for JUnit 5
-testImplementation "com.tngtech.valueprovider:valueprovider-junit5:1.1.2"
-// alternatively, for JUnit 4
-testImplementation "com.tngtech.valueprovider:valueprovider-junit4:1.1.2"
-```
-
-### Maven
-
-```xml
-<!-- ... -->
-<dependencies>
-    <!-- ... -->
-
-    <!-- core library -->
-    <dependency>
-        <groupId>com.tngtech.valueprovider</groupId>
-        <artifactId>valueprovider-core</artifactId>
-        <version>1.1.2</version>
-        <scope>test</scope>
-    </dependency>
-
-    <!-- infrastructure -->
-    <!-- for JUnit 5 -->
-    <dependency>
-        <groupId>com.tngtech.valueprovider</groupId>
-        <artifactId>valueprovider-junit5</artifactId>
-        <version>1.1.2</version>
-        <scope>test</scope>
-    </dependency>
-    <!-- alternatively, for JUnit 4 -->
-    <dependency>
-        <groupId>com.tngtech.valueprovider</groupId>
-        <artifactId>valueprovider-junit4</artifactId>
-        <version>1.1.2</version>
-        <scope>test</scope>
-    </dependency>
-
-    <!-- ... -->
-</dependencies>
-```
-
 ## Usage
 
 We strongly recommend implementing reusable __test data factories__ that encapsulate creating valid instances for your test data objects.
