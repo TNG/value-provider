@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 import static com.tngtech.valueprovider.InitializationCreator.Type.DEFAULT;
 import static com.tngtech.valueprovider.InitializationCreator.Type.TEST_CLASS;
 import static com.tngtech.valueprovider.InitializationCreator.Type.TEST_METHOD;
-import static com.tngtech.valueprovider.InitializationCreatorSnapshot.TIME_RESOLUTION;
+import static com.tngtech.valueprovider.InitializationCreatorSnapshot.truncateToSupportedResolution;
 import static com.tngtech.valueprovider.ValueProvider.Builder.createSuffix;
 import static java.lang.System.identityHashCode;
 import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME;
@@ -94,7 +94,7 @@ abstract class InitializationCreator {
     }
 
     private void calculateReferenceDateTime() {
-        referenceDateTime = getReferenceDateTimeProperty().orElse(LocalDateTime.now().truncatedTo(TIME_RESOLUTION));
+        referenceDateTime = truncateToSupportedResolution(getReferenceDateTimeProperty().orElse(LocalDateTime.now()));
         logger.debug("{} calculateReferenceDateTime({})", creatorId, getFormattedReferenceDateTime());
     }
 

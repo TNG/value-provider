@@ -18,8 +18,12 @@ class InitializationCreatorSnapshot implements TestCycleSnapshot {
     private final long referenceDateTimeEpochMills;
     private final long sequenceCounter;
 
-    public InitializationCreatorSnapshot(long seed, LocalDateTime referenceDateTime, long sequenceCounter) {
-        LocalDateTime truncatedToMilliseconds = referenceDateTime.truncatedTo(TIME_RESOLUTION);
+    static LocalDateTime truncateToSupportedResolution(LocalDateTime input) {
+        return input.truncatedTo(TIME_RESOLUTION);
+    }
+
+    InitializationCreatorSnapshot(long seed, LocalDateTime referenceDateTime, long sequenceCounter) {
+        LocalDateTime truncatedToMilliseconds = truncateToSupportedResolution(referenceDateTime);
         checkArgument(referenceDateTime.equals(truncatedToMilliseconds),
                 "Illegal referenceDateTime %s, must be truncated to milliseconds", referenceDateTime);
         this.seed = seed;
