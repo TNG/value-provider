@@ -14,6 +14,7 @@ import static com.tngtech.valueprovider.InitializationCreator.TestMethodInitiali
 import static com.tngtech.valueprovider.InitializationCreator.VALUE_PROVIDER_FACTORY_REFERENCE_DATE_TIME_PROPERTY;
 import static com.tngtech.valueprovider.InitializationCreator.VALUE_PROVIDER_FACTORY_TEST_CLASS_SEED_PROPERTY;
 import static com.tngtech.valueprovider.InitializationCreator.VALUE_PROVIDER_FACTORY_TEST_METHOD_SEED_PROPERTY;
+import static com.tngtech.valueprovider.InitializationCreatorSnapshot.truncateToSupportedResolution;
 import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 import static java.util.Optional.empty;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -136,10 +137,6 @@ class InitializationCreatorTest {
         assertThat(fromTestMethodCreator.getReferenceLocalDateTime()).isEqualTo(fromTestClassCreator.getReferenceLocalDateTime());
     }
 
-    private static void setReferenceDateTimeProperty(LocalDateTime reference) {
-        System.setProperty(VALUE_PROVIDER_FACTORY_REFERENCE_DATE_TIME_PROPERTY, reference.format(ISO_LOCAL_DATE_TIME));
-    }
-
     @Test
     void finishTestCycle_should_NOT_clear_suffixes_for_ValueProviders_for_TestClassInitializationCreator() {
         InitializationCreator creator = new TestClassInitializationCreator();
@@ -182,5 +179,28 @@ class InitializationCreatorTest {
         assertThat(recreated.getSeed()).isEqualTo(creator.getSeed());
         assertThat(recreated.getReferenceDateTime()).isEqualTo(creator.getReferenceDateTime());
         assertThat(recreatedInitializations).isEqualTo(originalInitializationsAfterSnapshot);
+    }
+
+    @Test
+    void TestClassInitializationCreator_should_truncate_referenceDateTime_to_allow_taking_snapshot() {
+        LocalDateTime referenceDateTime = LocalDateTime.now();
+        setReferenceDateTimeProperty(referenceDateTime);
+
+        TestClassInitializationCreator initializedViaProperty = new TestClassInitializationCreator();
+        assertThat(initializedViaProperty.getReferenceDateTime()).isEqualTo(truncateToSupportedResolution(referenceDateTime));
+        initializedViaProperty.takeSnapshot();
+
+        clearReferenceDateTimeProperty();
+        TestClassInitializationCreator initializedToDefault = new TestClassInitializationCreator();
+        assertThat(initializedToDefault.getReferenceDateTime()).isEqualTo(truncateToSupportedResolution(initializedToDefault.getReferenceDateTime()));
+        initializedToDefault.takeSnapshot();
+    }
+
+    private static void clearReferenceDateTimeProperty() {
+        System.clearProperty(VALUE_PROVIDER_FACTORY_REFERENCE_DATE_TIME_PROPERTY);
+    }
+
+    private static void setReferenceDateTimeProperty(LocalDateTime reference) {
+        System.setProperty(VALUE_PROVIDER_FACTORY_REFERENCE_DATE_TIME_PROPERTY, reference.format(ISO_LOCAL_DATE_TIME));
     }
 }
