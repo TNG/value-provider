@@ -68,14 +68,14 @@ ext {
     tempJar = { File jarFile -> postfixedJar(jarFile, 'tmp') }
 
     productionProjects = [
-            project(':value-provider-core'),
-            project(':value-provider-example'),
-            project(':value-provider-junit4'),
-            project(':value-provider-junit5')]
+            project(':core'),
+            project(':example'),
+            project(':junit4'),
+            project(':junit5')]
     releaseProjects = [
-            project(':value-provider-core'),
-            project(':value-provider-junit4'),
-            project(':value-provider-junit5')]
+            project(':core'),
+            project(':junit4'),
+            project(':junit5')]
     createModuleDescription = { description, proj -> "${description} - Module '${proj.name}'" }
 
     currentScriptRootOf = { it.buildscript.sourceFile.parentFile }
