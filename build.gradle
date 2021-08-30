@@ -17,18 +17,17 @@ plugins {
 def appAndSourceUrl = 'https://github.com/TNG/value-provider'
 
 ext {
-    year = "${Calendar.getInstance().get(Calendar.YEAR)}"
-    description = 'A library that facilitates writing realistic test data and in turn better tests for your Java application.'
     app = [
-            name   : 'value-provider',
-            urls   : [
+            description: 'A library that facilitates writing realistic test data and in turn better tests for your Java application.',
+            name       : 'value-provider',
+            urls       : [
                     entry : appAndSourceUrl,
                     doc   : appAndSourceUrl,
                     issues: "${appAndSourceUrl}/issues",
                     source: appAndSourceUrl
             ],
-            gitRepo: 'git@github.com:TNG/value-provider.git',
-            license: [
+            gitRepo    : 'git@github.com:TNG/value-provider.git',
+            license    : [
                     name: 'The Apache Software License, Version 2.0',
                     url : 'http://www.apache.org/licenses/LICENSE-2.0.txt'
             ]
@@ -83,7 +82,7 @@ ext {
 
 allprojects {
     group = 'com.tngtech.valueprovider'
-    version = '1.0.1'
+    version = '1.0.0'
 
     repositories {
         mavenCentral()
@@ -172,6 +171,55 @@ releaseProjects*.with {
         }
     }
 
+    project(":core") {
+        archivesBaseName = 'value-provider-core'
+        description = app.description
+    }
+
+    project(":junit4") {
+        archivesBaseName = 'value-provider-junit4'
+        description = 'JUnit 4 test infrastructure to reproduce random test data in case of test failures.'
+    }
+
+    project(":junit5") {
+        archivesBaseName = 'value-provider-junit5'
+        description = 'JUnit 5 test infrastructure to reproduce random test data in case of test failures.'
+    }
+
+    project(":example") {
+        archivesBaseName = 'value-provider-example'
+        description = 'Examples for test data factories using the value-provider library.'
+    }
+
+    tasks.withType(Jar) {
+        from(rootProject.rootDir) {
+            include("LICENSE", "NOTICE")
+            into("META-INF")
+        }
+
+        manifest {
+            def title = project.archivesBaseName
+            def now = java.time.LocalDate.now()
+            def today = now.format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+            def companyName = company.name
+            def copyright = "${now.year} ${companyName}"
+
+            attributes(
+                    'Built-By': "Gradle ${gradle.gradleVersion}",
+                    'Built-Date': today,
+                    'Specification-Title': project.archivesBaseName,
+                    'Specification-Version': archiveVersion,
+                    'Specification-Vendor': companyName,
+                    'Implementation-Title': title,
+                    'Implementation-Version': archiveVersion,
+                    'Implementation-Vendor': company.name,
+                    'Issue-Tracker': "https://github.com/TNG/value-provider/issues",
+                    'Documentation-URL': "https://github.com/TNG/value-provider",
+                    'Copyright': copyright,
+                    'License': app.license.name,
+            )
+        }
+    }
     tasks.withType(AbstractPublishToMaven) {
         it.dependsOn(build)
     }
@@ -188,9 +236,9 @@ releaseProjects*.with {
                 artifactId = project.archivesBaseName
                 from components.java
                 pom {
-                    name = app.name
+                    name = project.archivesBaseName
                     packaging = "jar"
-                    description = 'A library that facilitates writing realistic test data and in turn better tests for your Java application.'
+                    description = project.description
                     url = app.urls.entry
 
                     developers {
@@ -208,8 +256,8 @@ releaseProjects*.with {
 
                     licenses {
                         license {
-                            name = 'The Apache Software License, Version 2.0'
-                            url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                            name = app.license.name
+                            url = app.license.url
                             distribution = 'repo'
                         }
                     }

@@ -29,5 +29,4 @@ echo Building and testing...
 ./gradlew build
 
 echo Publishing to Sonatype, closing repository, checking uploaded artifacts and releasing repository...
-# ./gradlew publishToSonatype closeSonatypeStagingRepository releaseSonatypeStagingRepository --no-parallel -PsonatypeUsername="$SONATYPE_USERNAME" -PsonatypePassword="$SONATYPE_PASSWORD" -PsigningKey="$GPG_SIGNING_KEY" -PsigningPassword="$GPG_SIGNING_PASSWORD"
-./gradlew publishToSonatype closeSonatypeStagingRepository --no-parallel -PsonatypeUsername="$SONATYPE_USERNAME" -PsonatypePassword="$SONATYPE_PASSWORD" -PsigningKey="$GPG_SIGNING_KEY" -PsigningPassword="$GPG_SIGNING_PASSWORD"
+./gradlew publishToSonatype closeSonatypeStagingRepository releaseSonatypeStagingRepository --no-parallel -PsonatypeUsername="$SONATYPE_USERNAME" -PsonatypePassword="$SONATYPE_PASSWORD" -PsigningKey="$GPG_SIGNING_KEY" -PsigningPassword="$GPG_SIGNING_PASSWORD"
