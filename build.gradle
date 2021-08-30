@@ -161,6 +161,12 @@ releaseProjects*.with {
         allprojects {
             tasks.withType(Javadoc) {
                 options.addStringOption('Xdoclint:none', '-quiet')
+            }
+        }
+    }
+    if (JavaVersion.current().isJava9Compatible()) {
+        allprojects {
+            tasks.withType(Javadoc) {
                 options.addBooleanOption('html5', true)
             }
         }
