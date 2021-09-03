@@ -5,7 +5,7 @@ dependencies {
 }
 
 task testJar(type: Jar) {
-    classifier = 'tests'
+    archiveClassifier = 'tests'
     from sourceSets.test.output
 }
 

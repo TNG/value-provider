@@ -1,2 +1,2 @@
-include 'value-provider-core', 'value-provider-junit4', 'value-provider-junit5', 'value-provider-example'
+include 'core', 'junit4', 'junit5', 'example'
 
