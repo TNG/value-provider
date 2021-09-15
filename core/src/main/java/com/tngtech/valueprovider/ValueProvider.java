@@ -239,7 +239,7 @@ public class ValueProvider {
      * @param max    the upper limit (inclusive) of the generated number (as String).
      * @return the generated String.
      * @throws IllegalArgumentException if {@code min} > {@code max}.
-     * @throws IllegalArgumentException if {@code min} <= 0.
+     * @throws IllegalArgumentException if {@code min} &lt;= 0.
      * @throws IllegalArgumentException if the requested length of the String is smaller than the number of digits of {@code min}.
      * @see #numericString(int)
      */
@@ -579,7 +579,7 @@ public class ValueProvider {
      * @param begin minimum year to draw from.
      * @param end   maximum year to draw from.
      * @return the drawn {@link LocalDate}.
-     * @throws IllegalArgumentException if {@code end} < {@code begin}.
+     * @throws IllegalArgumentException if {@code end} &lt; {@code begin}.
      */
     public LocalDate localDateBetweenYears(int begin, int end) {
         checkArgument(begin <= end, "begin %s must be before end %s", begin, end);
