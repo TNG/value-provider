@@ -931,12 +931,7 @@ public class ValueProvider {
      * @return the generated URL.
      */
     public URL url() {
-        try {
-            return url(fixedDecoratedString("domain"));
-        } catch (MalformedURLException e) {
-            // won't happen. 'domain' yields valid URL.
-        }
-        return null; // won't happen. 'domain' yields valid URL.
+        return url(fixedDecoratedString("domain"));
     }
 
     /**
@@ -951,9 +946,9 @@ public class ValueProvider {
      *
      * @param domain the domain of the {@link URL}.
      * @return the generated URL.
-     * @throws MalformedURLException if {@code domain} yields an invalid {@link URL}.
+     * @throws IllegalArgumentException if {@code domain} yields an invalid {@link URL}.
      */
-    public URL url(String domain) throws MalformedURLException {
+    public URL url(String domain) {
         return booleanValue() ? httpUrl(domain) : httpsUrl(domain);
     }
 
@@ -970,12 +965,7 @@ public class ValueProvider {
      * @return the generated URL.
      */
     public URL httpUrl() {
-        try {
-            return httpUrl(fixedDecoratedString("domain"));
-        } catch (MalformedURLException e) {
-            // won't happen. 'domain' yields valid URL.
-        }
-        return null; // won't happen. 'domain' yields valid URL.
+        return httpUrl(fixedDecoratedString("domain"));
     }
 
     /**
@@ -990,9 +980,9 @@ public class ValueProvider {
      *
      * @param domain the domain of the {@link URL}.
      * @return the generated URL.
-     * @throws MalformedURLException if {@code domain} yields an invalid {@link URL}.
+     * @throws IllegalArgumentException if {@code domain} yields an invalid {@link URL}.
      */
-    public URL httpUrl(String domain) throws MalformedURLException {
+    public URL httpUrl(String domain) {
         return createUrl("http", domain);
     }
 
@@ -1009,12 +999,7 @@ public class ValueProvider {
      * @return the generated URL.
      */
     public URL httpsUrl() {
-        try {
-            return httpsUrl(fixedDecoratedString("domain"));
-        } catch (MalformedURLException e) {
-            // won't happen. 'domain' yields valid URL.
-        }
-        return null; // won't happen. 'domain' yields valid URL.
+        return httpsUrl(fixedDecoratedString("domain"));
     }
 
     /**
@@ -1028,19 +1013,23 @@ public class ValueProvider {
      * </p>
      *
      * @return the generated URL.
-     * @throws MalformedURLException if {@code domain} yields an invalid {@link URL}.
+     * @throws IllegalArgumentException if {@code domain} yields an invalid {@link URL}.
      */
-    public URL httpsUrl(String domain) throws MalformedURLException {
+    public URL httpsUrl(String domain) {
         return createUrl("https", domain);
     }
 
-    private URL createUrl(String scheme, String domain) throws MalformedURLException {
+    private URL createUrl(String scheme, String domain) {
         String optionalWWWPrefix = "";
         if (!domain.startsWith("www")) {
             optionalWWWPrefix = booleanValue() ? "www." : "";
         }
         String countrySuffix = oneOf("de", "com", "net", "co.uk");
-        return new URL(String.format("%s://%s%s.%s", scheme, optionalWWWPrefix, domain, countrySuffix));
+        try {
+            return new URL(String.format("%s://%s%s.%s", scheme, optionalWWWPrefix, domain, countrySuffix));
+        } catch (MalformedURLException e) {
+            throw new IllegalArgumentException(String.format("Illegal domain %s", domain));
+        }
     }
 
     String getPrefix() {

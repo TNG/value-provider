@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.Inet6Address;
 import java.net.InetAddress;
+import java.net.URL;
 import java.net.UnknownHostException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -579,6 +580,22 @@ class ValueProviderTest {
         InetAddress address = InetAddress.getByName(random.ipV6Address());
 
         assertThat(address).isInstanceOf(Inet6Address.class);
+    }
+
+    @Test
+    void url_related_methods_should_fail_on_malformed_urls() {
+        ValueProvider random = withRandomValues();
+
+        assertFailsOnMalformedUrl(random::url);
+        assertFailsOnMalformedUrl(random::httpUrl);
+        assertFailsOnMalformedUrl(random::httpsUrl);
+    }
+
+    private void assertFailsOnMalformedUrl(Function<String, URL> urlCreator) {
+        String illegalDomain = ":";
+        assertThatThrownBy(() -> urlCreator.apply(illegalDomain))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining(illegalDomain);
     }
 
     private static ValueProvider withRandomValues() {
