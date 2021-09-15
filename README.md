@@ -8,6 +8,70 @@ value-provider consists of two major parts:
 * the [ValueProvider](core/src/main/java/com/tngtech/valueprovider/ValueProvider.java) class which populates properties of test data objects with random values
 * infrastructure for reproducing said random data in case of test failures (JUnit5 extension, JUnit4 rules)
 
+## Contributing
+
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+
+Please make sure to update the tests as appropriate.
+
+For further information, please refer to [CONTRIBUTING.md](CONTRIBUTING.md). For technical details, you may find the sequence diagrams in the `doc` directory helpful.
+
+## Installation
+
+value-provider has the following prerequisites:
+
+* Java 8 and above
+* JUnit 5.5 and above for the JUnit5 infrastructure
+* JUnit 4.12 and above for the JUnit4 infrastructure
+
+### Gradle
+
+```groovy
+// core library
+testImplementation "com.tngtech.valueprovider:valueprovider-core:1.0.0"
+
+// infrastructure
+// for JUnit 5
+testImplementation "com.tngtech.valueprovider:valueprovider-junit5:1.0.0"
+// alternatively, for JUnit 4
+testImplementation "com.tngtech.valueprovider:valueprovider-junit4:1.0.0"
+```
+
+### Maven
+
+```xml
+<!-- ... -->
+<dependencies>
+    <!-- ... -->
+
+    <!-- core library -->
+    <dependency>
+        <groupId>com.tngtech.valueprovider</groupId>
+        <artifactId>valueprovider-core</artifactId>
+        <version>1.0.0</version>
+        <scope>test</scope>
+    </dependency>
+
+    <!-- infrastructure -->
+    <!-- for JUnit 5 -->
+    <dependency>
+        <groupId>com.tngtech.valueprovider</groupId>
+        <artifactId>valueprovider-junit5</artifactId>
+        <version>1.0.0</version>
+        <scope>test</scope>
+    </dependency>
+    <!-- alternatively, for JUnit 4 -->
+    <dependency>
+        <groupId>com.tngtech.valueprovider</groupId>
+        <artifactId>valueprovider-junit4</artifactId>
+        <version>1.0.0</version>
+        <scope>test</scope>
+    </dependency>
+
+    <!-- ... -->
+</dependencies>
+```
+
 ## Usage
 
 We strongly recommend implementing reusable __test data factories__ that encapsulate creating valid instances for your test data objects.
@@ -23,12 +87,12 @@ Consider a simple [Product](example/src/main/java/com/tngtech/valueprovider/exam
 @EqualsAndHashCode
 @RequiredArgsConstructor(staticName = "of")
 public class Product {
-  @NonNull
-  private final ProductCategory category;
-  @NonNull
-  private final String name;
-  @NonNull
-  private final String description;
+    @NonNull
+    private final ProductCategory category;
+    @NonNull
+    private final String name;
+    @NonNull
+    private final String description;
 }
 ```
 
@@ -41,19 +105,19 @@ import static com.tngtech.valueprovider.ValueProviderFactory.createRandomValuePr
 
 public class ProductTestDataFactory {
 
-  private ProductTestDataFactory() {
-  }
+    private ProductTestDataFactory() {
+    }
 
-  public static Product createProduct() {
-    return createProduct(createRandomValueProvider());
-  }
+    public static Product createProduct() {
+        return createProduct(createRandomValueProvider());
+    }
 
-  public static Product createProduct(ValueProvider values) {
-    return Product.of(
-            values.oneOf(ProductCategory.class),
-            values.fixedDecoratedString("name"),
-            values.fixedDecoratedString("description"));
-  }
+    public static Product createProduct(ValueProvider values) {
+        return Product.of(
+                values.oneOf(ProductCategory.class),
+                values.fixedDecoratedString("name"),
+                values.fixedDecoratedString("description"));
+    }
 }
 ```
 
@@ -88,20 +152,20 @@ Having seen the basics, let's move on to a more complex example. Consider an [Or
 @EqualsAndHashCode
 @Builder(toBuilder = true)
 public class Order {
-  @Singular
-  @NonNull
-  private final ImmutableList<OrderItem> orderItems;
-  @NonNull
-  private final Customer customer;
-  @NonNull
-  private final Address shippingAddress;
-  @NonNull
-  private final Optional<Address> billingAddress;
+    @Singular
+    @NonNull
+    private final ImmutableList<OrderItem> orderItems;
+    @NonNull
+    private final Customer customer;
+    @NonNull
+    private final Address shippingAddress;
+    @NonNull
+    private final Optional<Address> billingAddress;
 
-  public Address getBillingAddress() {
-    return billingAddress.orElse(shippingAddress);
-  }
-  // ...
+    public Address getBillingAddress() {
+        return billingAddress.orElse(shippingAddress);
+    }
+    // ...
 }
 ```
 
@@ -158,50 +222,50 @@ import static com.tngtech.valueprovider.ValueProviderFactory.createRandomValuePr
 
 public final class OrderTestDataFactory {
 
-  private OrderTestDataFactory() {
-  }
-
-  public static Order createOrder() {
-    return createOrder(createRandomValueProvider());
-  }
-
-  public static Order createOrder(ValueProvider values) {
-    return createOrderBuilder(values).build();
-  }
-
-  public static OrderBuilder createOrderBuilder() {
-    return createOrderBuilder(createRandomValueProvider());
-  }
-
-  public static OrderBuilder createOrderBuilder(ValueProvider values) {
-    OrderBuilder builder = Order.builder()
-            .customer(createCustomer(values));
-    setAddress(builder, values);
-    addItems(builder, values);
-    return builder;
-  }
-
-  private static void setAddress(OrderBuilder builder, ValueProvider values) {
-    boolean useDifferentBillingAddress = values.booleanValue();
-    if (useDifferentBillingAddress) {
-      builder
-              .shippingAddress(createAddress(copyWithChangedPrefix(values, "S-")))
-              .billingAddress(createAddress(copyWithChangedPrefix(values, "B-")));
-
-    } else {
-      builder
-              .shippingAddress(createAddress(values));
+    private OrderTestDataFactory() {
     }
-  }
 
-  private static void addItems(OrderBuilder builder, ValueProvider values) {
-    int numOrderItems = values.intNumber(1, 5);
-    for (int i = 0; i < numOrderItems; i++) {
-      char prefix = (char) ('A' + i);
-      ValueProvider prefixedProvider = copyWithChangedPrefix(values, "" + prefix + "-");
-      builder.orderItem(createOrderItem(prefixedProvider));
+    public static Order createOrder() {
+        return createOrder(createRandomValueProvider());
     }
-  }
+
+    public static Order createOrder(ValueProvider values) {
+        return createOrderBuilder(values).build();
+    }
+
+    public static OrderBuilder createOrderBuilder() {
+        return createOrderBuilder(createRandomValueProvider());
+    }
+
+    public static OrderBuilder createOrderBuilder(ValueProvider values) {
+        OrderBuilder builder = Order.builder()
+                .customer(createCustomer(values));
+        setAddress(builder, values);
+        addItems(builder, values);
+        return builder;
+    }
+
+    private static void setAddress(OrderBuilder builder, ValueProvider values) {
+        boolean useDifferentBillingAddress = values.booleanValue();
+        if (useDifferentBillingAddress) {
+            builder
+                    .shippingAddress(createAddress(copyWithChangedPrefix(values, "S-")))
+                    .billingAddress(createAddress(copyWithChangedPrefix(values, "B-")));
+
+        } else {
+            builder
+                    .shippingAddress(createAddress(values));
+        }
+    }
+
+    private static void addItems(OrderBuilder builder, ValueProvider values) {
+        int numOrderItems = values.intNumber(1, 5);
+        for (int i = 0; i < numOrderItems; i++) {
+            char prefix = (char) ('A' + i);
+            ValueProvider prefixedProvider = copyWithChangedPrefix(values, "" + prefix + "-");
+            builder.orderItem(createOrderItem(prefixedProvider));
+        }
+    }
 }
 ```
 
@@ -211,14 +275,14 @@ factory as in:
 ```java
 // ...
 public final class OrderTestDataFactory {
-  // ...
-  public static OrderBuilder createOrderBuilder(ValueProvider values) {
-    OrderBuilder builder = Order.builder()
-            .customer(createCustomer(values));
     // ...
-    return builder;
-  }
-  // ...
+    public static OrderBuilder createOrderBuilder(ValueProvider values) {
+        OrderBuilder builder = Order.builder()
+                .customer(createCustomer(values));
+        // ...
+        return builder;
+    }
+    // ...
 }
 ```
 
@@ -227,16 +291,16 @@ If you need multiple objects of the same type, add a prefix, like for the order 
 ```java
 // ...
 public final class OrderTestDataFactory {
-  // ...
-  private static void addItems(OrderBuilder builder, ValueProvider values) {
-    int numOrderItems = values.intNumber(1, 5);
-    for (int i = 0; i < numOrderItems; i++) {
-      char prefix = (char) ('A' + i);
-      ValueProvider prefixedProvider = copyWithChangedPrefix(values, "" + prefix + "-");
-      builder.orderItem(createOrderItem(prefixedProvider));
+    // ...
+    private static void addItems(OrderBuilder builder, ValueProvider values) {
+        int numOrderItems = values.intNumber(1, 5);
+        for (int i = 0; i < numOrderItems; i++) {
+            char prefix = (char) ('A' + i);
+            ValueProvider prefixedProvider = copyWithChangedPrefix(values, "" + prefix + "-");
+            builder.orderItem(createOrderItem(prefixedProvider));
+        }
     }
-  }
-  // ...
+    // ...
 }
 ```
 
@@ -260,18 +324,18 @@ import static com.tngtech.valueprovider.example.OrderTestDataFactory.createOrder
 // ...
 
 class MyOrderTest {
-  @Test
-  void do_something_with_a_single_order() {
-    Order anOrder = createOrder();
-    // ...
-  }
+    @Test
+    void do_something_with_a_single_order() {
+        Order anOrder = createOrder();
+        // ...
+    }
 
-  @Test
-  void do_something_with_two_different_orders() {
-    Order anOrder = createOrder();
-    Order anotherOrder = createOrder();
-    // ...
-  }
+    @Test
+    void do_something_with_two_different_orders() {
+        Order anOrder = createOrder();
+        Order anotherOrder = createOrder();
+        // ...
+    }
 }
 ```
 
@@ -282,14 +346,14 @@ import static com.tngtech.valueprovider.example.OrderTestDataFactory.createOrder
 // ...
 
 class MyOrderTest {
-  // ...
-  @Test
-  void shipping_address_is_used_as_default_for_billing_address() {
-    Order useShippingAddressAsBillingAddress = createOrderBuilder()
-            .billingAddress(empty())
-            .build();
     // ...
-  }
+    @Test
+    void shipping_address_is_used_as_default_for_billing_address() {
+        Order useShippingAddressAsBillingAddress = createOrderBuilder()
+                .billingAddress(empty())
+                .build();
+        // ...
+    }
 }
 ```
 
@@ -317,7 +381,7 @@ import com.tngtech.valueprovider.ValueProviderExtension;
 
 @ExtendWith(ValueProviderExtension.class)
 class MyOrderTest {
-  // ...
+    // ...
 }
 ```
 
@@ -334,9 +398,9 @@ import com.tngtech.valueprovider.ValueProviderRule;
 // ...
 
 public class MyOrderTest {
-  @Rule
-  public ValueProviderRule valueProviderRule = new ValueProviderRule();
-  // ...
+    @Rule
+    public ValueProviderRule valueProviderRule = new ValueProviderRule();
+    // ...
 }
 ```
 
@@ -351,14 +415,14 @@ import static com.tngtech.valueprovider.example.OrderTestDataFactory.createOrder
 // ...
 
 public class MyOrderTest {
-  @ClassRule
-  public static final ValueProviderClassRule staticProviders = new ValueProviderClassRule();
-  @Rule
-  public ValueProviderRule instanceProviders = new ValueProviderRule();
+    @ClassRule
+    public static final ValueProviderClassRule staticProviders = new ValueProviderClassRule();
+    @Rule
+    public ValueProviderRule instanceProviders = new ValueProviderRule();
 
-  // static test data
-  private static final Order DEFAULT_ORDER = createOrder();
-  // ...
+    // static test data
+    private static final Order DEFAULT_ORDER = createOrder();
+    // ...
 }
 ```
 
@@ -419,8 +483,8 @@ We advise the following approach:
 * Create your own [ValueProvider](core/src/main/java/com/tngtech/valueprovider/ValueProvider.java) class. Let it extend the one provided by this library, and add the methods you need
 * Create your own [ValueProviderFactory](core/src/main/java/com/tngtech/valueprovider/ValueProviderFactory.java) class and implement 2 static methods that create instances of
   your [ValueProvider](core/src/main/java/com/tngtech/valueprovider/ValueProvider.java) class
-  * `createRandomValueProvider()`
-  * `createReproducibleValueProvider()`
+    * `createRandomValueProvider()`
+    * `createReproducibleValueProvider()`
 * Use your own classes instead of the ones provided by this library in your test data factories and other test code.
 
 Refer to [CustomValueProvider](example/src/main/java/com/tngtech/valueprovider/example/customprovider/CustomValueProvider.java)
@@ -434,14 +498,6 @@ for a fully functional example.
 The infrastructure uses thread-local data to store the seed values and can therefore be used in parallel CI builds without any problems.
 
 Neither the infrastructure nor the [ValueProvider](core/src/main/java/com/tngtech/valueprovider/ValueProvider.java) are thread-safe. They are __not suited for multithreaded test code__.
-
-## Contributing
-
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
-
-Please make sure to update the tests as appropriate.
-
-For further information, please refer to [CONTRIBUTING.md](CONTRIBUTING.md). For technical details, you may find the sequence diagrams in the `doc` directory helpful.
 
 ## License
 

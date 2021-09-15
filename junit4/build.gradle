@@ -1,9 +1,9 @@
 dependencies {
     implementation dependency.junit4
 
-    implementation project(':value-provider-core')
+    implementation project(':core')
 
-    testImplementation project(path: ':value-provider-core', configuration: 'tests')
+    testImplementation project(path: ':core', configuration: 'tests')
     testImplementation dependency.junit4_dataprovider
     testRuntimeOnly dependency.junit4_engine
 }
