@@ -29,6 +29,7 @@ import static com.google.common.collect.Lists.asList;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Lists.newArrayListWithCapacity;
 import static com.google.common.collect.Sets.newHashSet;
+import static java.lang.String.format;
 import static java.time.LocalDateTime.now;
 import static java.time.temporal.ChronoUnit.DAYS;
 import static java.time.temporal.ChronoUnit.SECONDS;
@@ -199,7 +200,7 @@ public class ValueProvider {
     public List<String> fixedDecoratedStrings(int number, String base) {
         List<String> strings = newArrayListWithCapacity(number);
         for (int i = 0; i < number; i++) {
-            strings.add(String.format("%s %d", fixedDecoratedString(base), i));
+            strings.add(format("%s %d", fixedDecoratedString(base), i));
         }
         return strings;
     }
@@ -252,7 +253,7 @@ public class ValueProvider {
                 length, min, minLength);
 
         int number = intNumber(min, max);
-        return String.format("%0" + length + "d", number);
+        return format("%0" + length + "d", number);
     }
 
     /**
@@ -902,7 +903,7 @@ public class ValueProvider {
     }
 
     private String createIPv6Block() {
-        return String.format("%04x", intNumber(0, 0xFFFF));
+        return format("%04x", intNumber(0, 0xFFFF));
     }
 
     private List<String> truncateLeadingZerosFromBlocks(List<String> blocks) {
@@ -1026,9 +1027,9 @@ public class ValueProvider {
         }
         String countrySuffix = oneOf("de", "com", "net", "co.uk");
         try {
-            return new URL(String.format("%s://%s%s.%s", scheme, optionalWWWPrefix, domain, countrySuffix));
+            return new URL(format("%s://%s%s.%s", scheme, optionalWWWPrefix, domain, countrySuffix));
         } catch (MalformedURLException e) {
-            throw new IllegalArgumentException(String.format("Illegal domain %s", domain));
+            throw new IllegalArgumentException(format("Illegal domain %s", domain));
         }
     }
 
