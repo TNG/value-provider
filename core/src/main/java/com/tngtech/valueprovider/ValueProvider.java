@@ -932,7 +932,7 @@ public class ValueProvider {
      * @return the generated URL.
      */
     public URL url() {
-        return url(fixedDecoratedString("domain"));
+        return url("domain");
     }
 
     /**
@@ -941,7 +941,7 @@ public class ValueProvider {
      * Example:
      * <pre>
      *         ValueProvider vp = ValueProviderFactory.createRandomValueProvider();
-     *         vp.url("foo"); // -> "http://foo.com"
+     *         vp.url("foo"); // -> "http://fooeFg.com"
      * </pre>
      * </p>
      *
@@ -966,7 +966,7 @@ public class ValueProvider {
      * @return the generated URL.
      */
     public URL httpUrl() {
-        return httpUrl(fixedDecoratedString("domain"));
+        return httpUrl("domain");
     }
 
     /**
@@ -975,7 +975,7 @@ public class ValueProvider {
      * Example:
      * <pre>
      *         ValueProvider vp = ValueProviderFactory.createRandomValueProvider();
-     *         vp.httpUrl("mydomain"); // -> "http://www.mydomain.com"
+     *         vp.httpUrl("mydomain"); // -> "http://www.mydomainStu.com"
      * </pre>
      * </p>
      *
@@ -1000,7 +1000,7 @@ public class ValueProvider {
      * @return the generated URL.
      */
     public URL httpsUrl() {
-        return httpsUrl(fixedDecoratedString("domain"));
+        return httpsUrl("domain");
     }
 
     /**
@@ -1009,7 +1009,7 @@ public class ValueProvider {
      * Example:
      * <pre>
      *         ValueProvider vp = ValueProviderFactory.createRandomValueProvider();
-     *         vp.httpsUrl("somedomain"); // -> "https://somedomain.co.uk"
+     *         vp.httpsUrl("somedomain"); // -> "https://somedomainUVw.co.uk"
      * </pre>
      * </p>
      *
@@ -1021,13 +1021,14 @@ public class ValueProvider {
     }
 
     private URL createUrl(String scheme, String domain) {
+        String decoratedDomain = fixedDecoratedString(domain);
         String optionalWWWPrefix = "";
         if (!domain.startsWith("www")) {
             optionalWWWPrefix = booleanValue() ? "www." : "";
         }
         String countrySuffix = oneOf("de", "com", "net", "co.uk");
         try {
-            return new URL(format("%s://%s%s.%s", scheme, optionalWWWPrefix, domain, countrySuffix));
+            return new URL(format("%s://%s%s.%s", scheme, optionalWWWPrefix, decoratedDomain, countrySuffix));
         } catch (MalformedURLException e) {
             throw new IllegalArgumentException(format("Illegal domain %s", domain));
         }
