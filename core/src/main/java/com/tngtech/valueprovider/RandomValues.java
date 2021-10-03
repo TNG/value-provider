@@ -40,19 +40,19 @@ public class RandomValues {
         return seed == other.seed;
     }
 
-    boolean nextBoolean() {
+    public boolean nextBoolean() {
         return random.nextBoolean();
     }
 
-    int nextInt(int bound) {
+    public int nextInt(int bound) {
         return random.nextInt(bound);
     }
 
-    double nextDouble() {
+    public double nextDouble() {
         return random.nextDouble();
     }
 
-    long nextLong() {
+    public long nextLong() {
         return random.nextLong();
     }
 }

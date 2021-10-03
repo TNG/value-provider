@@ -1034,15 +1034,15 @@ public class ValueProvider {
         }
     }
 
-    String getPrefix() {
+    protected String getPrefix() {
         return prefix;
     }
 
-    String getSuffix() {
+    protected String getSuffix() {
         return suffix;
     }
 
-    RandomValues getRandom() {
+    protected RandomValues getRandom() {
         return random;
     }
 
