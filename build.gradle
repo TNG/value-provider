@@ -48,9 +48,9 @@ ext {
             junit5_dataprovider  : [group: 'com.tngtech.junit.dataprovider', name: 'junit-jupiter-dataprovider', version: '2.7'],
             assertj_core         : [group: 'org.assertj', name: 'assertj-core', version: '3.19.0'],
             mockito              : [group: 'org.mockito', name: 'mockito-core', version: '3.7.7'],
-            log4j_api            : [group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.14.0'],
-            log4j_core           : [group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.14.0'],
-            log4j_slf4j          : [group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.14.0'],
+            log4j_api            : [group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.16.0'],
+            log4j_core           : [group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.16.0'],
+            log4j_slf4j          : [group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.16.0'],
 
             junit4_engine        : [group: 'org.junit.vintage', name: 'junit-vintage-engine', version: '5.7.0'],
             junit_platform_runner: [group: 'org.junit.platform', name: 'junit-platform-runner', version: '5.7.0'],
