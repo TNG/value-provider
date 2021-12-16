@@ -28,13 +28,13 @@ value-provider has the following prerequisites:
 
 ```groovy
 // core library
-testImplementation 'com.tngtech.valueprovider:value-provider-core:1.0.1'
+testImplementation 'com.tngtech.valueprovider:value-provider-core:1.0.2'
 
 // infrastructure
 // for JUnit 5
-testImplementation 'com.tngtech.valueprovider:value-provider-junit5:1.0.1'
+testImplementation 'com.tngtech.valueprovider:value-provider-junit5:1.0.2'
 // alternatively, for JUnit 4
-testImplementation 'com.tngtech.valueprovider:value-provider-junit4:1.0.1'
+testImplementation 'com.tngtech.valueprovider:value-provider-junit4:1.0.2'
 ```
 
 ### Maven
