@@ -47,25 +47,25 @@ testImplementation 'com.tngtech.valueprovider:value-provider-junit4:1.0.2'
     <!-- core library -->
     <dependency>
         <groupId>com.tngtech.valueprovider</groupId>
-        <artifactId>value-provider-core</artifactId>
-        <version>1.0.1</version>
-        <scope>test</scope>
+      <artifactId>value-provider-core</artifactId>
+      <version>1.0.2</version>
+      <scope>test</scope>
     </dependency>
 
     <!-- infrastructure -->
     <!-- for JUnit 5 -->
     <dependency>
         <groupId>com.tngtech.valueprovider</groupId>
-        <artifactId>value-provider-junit5</artifactId>
-        <version>1.0.1</version>
-        <scope>test</scope>
+      <artifactId>value-provider-junit5</artifactId>
+      <version>1.0.2</version>
+      <scope>test</scope>
     </dependency>
     <!-- alternatively, for JUnit 4 -->
     <dependency>
         <groupId>com.tngtech.valueprovider</groupId>
-        <artifactId>value-provider-junit4</artifactId>
-        <version>1.0.1</version>
-        <scope>test</scope>
+      <artifactId>value-provider-junit4</artifactId>
+      <version>1.0.2</version>
+      <scope>test</scope>
     </dependency>
 
     <!-- ... -->
