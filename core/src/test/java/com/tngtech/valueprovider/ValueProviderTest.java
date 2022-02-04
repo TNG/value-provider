@@ -42,7 +42,7 @@ import static com.tngtech.valueprovider.ValueProviderTest.TestEnum.SEVEN;
 import static com.tngtech.valueprovider.ValueProviderTest.TestEnum.SIX;
 import static com.tngtech.valueprovider.ValueProviderTest.TestEnum.TEN;
 import static com.tngtech.valueprovider.ValueProviderTest.TestEnum.THREE;
-import static com.tngtech.valueprovider.ValueProviderTest.TestEnum.TWELFE;
+import static com.tngtech.valueprovider.ValueProviderTest.TestEnum.TWELVE;
 import static com.tngtech.valueprovider.ValueProviderTest.TestEnum.TWO;
 import static java.time.LocalDateTime.now;
 import static java.util.Arrays.stream;
@@ -481,7 +481,7 @@ class ValueProviderTest {
         assertThat(random.oneOfExcluding(newArrayList("1", "2", "3", "4"), "3", "4")).isIn("1", "2").isNotIn("3", "4");
 
         assertThat(random.oneOfExcluding(ONE, THREE, FIVE, SEVEN, NINE, ELEVEN))
-                .isIn(TWO, FOUR, SIX, EIGHT, TEN, TWELFE)
+                .isIn(TWO, FOUR, SIX, EIGHT, TEN, TWELVE)
                 .isNotIn(ONE, THREE, FIVE, SEVEN, NINE, ELEVEN);
     }
 
@@ -611,7 +611,7 @@ class ValueProviderTest {
     }
 
     enum TestEnum {
-        ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, TEN, ELEVEN, TWELFE
+        ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, TEN, ELEVEN, TWELVE
     }
 
     enum EmptyTestEnum {
