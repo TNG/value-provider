@@ -20,6 +20,9 @@ import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
+import lombok.Data;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
@@ -32,6 +35,7 @@ import static com.tngtech.valueprovider.ValueProviderInitialization.createReprod
 import static com.tngtech.valueprovider.ValueProviderTest.MethodInvocation.assertDifferentResultAsFarAsPossible;
 import static com.tngtech.valueprovider.ValueProviderTest.MethodInvocation.assertEqualResult;
 import static com.tngtech.valueprovider.ValueProviderTest.MethodInvocation.invoke;
+import static com.tngtech.valueprovider.ValueProviderTest.MyBeanTestData.myBeanContained;
 import static com.tngtech.valueprovider.ValueProviderTest.TestEnum.EIGHT;
 import static com.tngtech.valueprovider.ValueProviderTest.TestEnum.ELEVEN;
 import static com.tngtech.valueprovider.ValueProviderTest.TestEnum.FIVE;
@@ -574,6 +578,44 @@ class ValueProviderTest {
     }
 
     @Test
+    void listOf_should_return_a_sensible_number_of_elements() {
+        // given
+        ValueProvider random = withRandomValues();
+
+        // when
+        List<MyBean> myBeans = random.listOf(MyBeanTestData::myBean);
+
+        // then
+        assertThat(myBeans).size().isLessThanOrEqualTo(5); // 5 is the default
+    }
+
+    @Test
+    void nonEmptyListOf_should_return_at_least_one_element() {
+        // given
+        ValueProvider random = withRandomValues();
+
+        // when
+        List<MyBean> myBeans = random.nonEmptyListOf(MyBeanTestData::myBean);
+
+        // then
+        assertThat(myBeans).size().isGreaterThanOrEqualTo(1);
+        assertThat(myBeans).size().isLessThanOrEqualTo(5); // 5 is the default
+    }
+
+    @Test
+    void listOfContaining_should_return_the_provided_elements_plus_some_randomly_generated_elements() {
+        // given
+        ValueProvider random = withRandomValues();
+
+        // when
+        List<MyBean> myBeans = random.listOfContaining(MyBeanTestData::myBean, myBeanContained(1), myBeanContained(2), myBeanContained(3));
+
+        // then
+        assertThat(myBeans).size().isLessThanOrEqualTo(7); // 3 contained beans + max. 1 random 'spacing' bean between each + max. 1 random bean at the beginning/end
+        assertThat(myBeans).contains(myBeanContained(1), myBeanContained(2), myBeanContained(3));
+    }
+
+    @Test
     void ipV6Address_should_return_valid_IPv6_address() throws UnknownHostException {
         ValueProvider random = withRandomValues();
 
@@ -672,5 +714,34 @@ class ValueProviderTest {
         assertThat(provider.bigDecimalNumberWithScale(min, max, 2))
                 .isGreaterThanOrEqualTo(new BigDecimal(min.doubleValue() - 0.01))
                 .isLessThanOrEqualTo(new BigDecimal(max.doubleValue() + 0.01));
+    }
+
+    static class MyBeanTestData {
+        public static MyBean myBean(ValueProvider valueProvider) {
+            return new MyBean("randomly generated");
+        }
+
+        public static MyBean myBeanContained(int counter) {
+            return new MyBean("contained" + counter);
+        }
+    }
+
+    @Data
+    static class MyBean {
+        String value;
+
+        public MyBean(String value) {
+            this.value = value;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            return EqualsBuilder.reflectionEquals(this, o, true);
+        }
+
+        @Override
+        public int hashCode() {
+            return HashCodeBuilder.reflectionHashCode(this, true);
+        }
     }
 }

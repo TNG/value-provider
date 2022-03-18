@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.Month;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
@@ -735,7 +736,8 @@ public class ValueProvider {
      * @param elements the elements to draw from.
      * @return the drawn elements (none / some / all).
      */
-    @SafeVarargs final public <T> Collection<T> someOf(T... elements) {
+    @SafeVarargs
+    final public <T> Collection<T> someOf(T... elements) {
         return someOf(asList(elements));
     }
 
@@ -827,6 +829,136 @@ public class ValueProvider {
         Set<T> allElements = newHashSet(elements);
         allElements.removeAll(newHashSet(elementsToExclude));
         return oneOf(allElements);
+    }
+
+    /**
+     * Generates a {@link List} of &lt;T&gt; (by means of {@code generator}) and includes {@code containedElements} in the {@link List}.
+     * <p>
+     * Example:
+     * <pre>
+     *          static class MyBeanTestData {
+     *              public static MyBean myBean(ValueProvider valueProvider) {
+     *                  // builds and returns your bean
+     *              }
+     *          }
+     *
+     *         ValueProvider vp = ValueProviderFactory.createRandomValueProvider();
+     *         vp.listOfContaining(MyBeanTestData::myBean, myBean(), myBean(), myBean()); // -> List[myBean_1, myBean_2, myBean_random, myBean_3, myBean_random]
+     * </pre>
+     * </p>
+     *
+     * @param generator           a generator {@link Function} to generate T given a {@link ValueProvider}.
+     * @param containedElements   elements that should be contained in the generated list.
+     *
+     * @return the generated {@link List}.
+     *
+     * @see #listOf(Function)
+     */
+    @SafeVarargs
+    public final <T, V extends ValueProvider> List<T> listOfContaining(Function<V, T> generator, T... containedElements) {
+        return listOfContaining(generator, Arrays.asList(containedElements));
+    }
+
+    /**
+     * see {@link #listOfContaining(Function, Object[])}
+     */
+    public final <T, V extends ValueProvider> List<T> listOfContaining(Function<V, T> generator, Collection<T> containedElements) {
+        int maxNumberOfRandomElements = maxNumberOfRandomElements(containedElements);
+
+        List<T> generatedElements = new ArrayList<>();
+        for (T containedValue : containedElements) {
+            generatedElements.addAll(listOf(intNumber(0, maxNumberOfRandomElements), generator));
+            generatedElements.add(containedValue);
+        }
+        generatedElements.addAll(listOf(intNumber(0, maxNumberOfRandomElements), generator));
+        return generatedElements;
+    }
+
+    private <T> int maxNumberOfRandomElements(Collection<T> containedElements) {
+        if (containedElements.size() == 0) {
+            return 5;
+        }
+        if (containedElements.size() == 1) {
+            return 2;
+        }
+        return 1;
+    }
+
+    /**
+     * Generates a {@link List} of &lt;T&gt; (by means of {@code generator}). Ensures that the {@link List} contains at least one element.
+     * <p>
+     * Example:
+     * <pre>
+     *          static class MyBeanTestData {
+     *              public static MyBean myBean(ValueProvider valueProvider) {
+     *                  // builds and returns your bean
+     *              }
+     *          }
+     *
+     *         ValueProvider vp = ValueProviderFactory.createRandomValueProvider();
+     *         vp.nonEmptyListOf(MyBeanTestData::myBean); // -> List[myBean_generated_1, myBean_generated_2]
+     * </pre>
+     * </p>
+     *
+     * @param generator           a generator {@link Function} to generate T given a {@link ValueProvider}.
+     *
+     * @return the generated {@link List}.
+     */
+    public <T, V extends ValueProvider> List<T> nonEmptyListOf(Function<V, T> generator) {
+        return listOf(intNumber(1, 5), generator);
+    }
+
+    /**
+     * Generates a {@link List} of &lt;T&gt; (by means of {@code generator}). Might return the empty list.
+     * <p>
+     * Example:
+     * <pre>
+     *          static class MyBeanTestData {
+     *              public static MyBean myBean(ValueProvider valueProvider) {
+     *                  // builds and returns your bean
+     *              }
+     *          }
+     *
+     *         ValueProvider vp = ValueProviderFactory.createRandomValueProvider();
+     *         vp.listOf(MyBeanTestData::myBean); // -> List[myBean_generated_1, myBean_generated_2]
+     *         vp.listOf(MyBeanTestData::myBean); // -> List[]
+     * </pre>
+     * </p>
+     *
+     * @param generator           a generator {@link Function} to generate T given a {@link ValueProvider}.
+     *
+     * @return the generated {@link List}.
+     */
+    public <T, V extends ValueProvider> List<T> listOf(Function<V, T> generator) {
+        return listOf(intNumber(0, 5), generator);
+    }
+
+    /**
+     * Generates a {@link List} of &lt;T&gt; (by means of {@code generator}). Containing exactly {@code numberOfElements} elements.
+     * <p>
+     * Example:
+     * <pre>
+     *          static class MyBeanTestData {
+     *              public static MyBean myBean(ValueProvider valueProvider) {
+     *                  // builds and returns your bean
+     *              }
+     *          }
+     *
+     *         ValueProvider vp = ValueProviderFactory.createRandomValueProvider();
+     *         vp.listOf(4, MyBeanTestData::myBean); // -> List[myBean_generated_1, myBean_generated_2, myBean_generated_3, myBean_generated_4]
+     * </pre>
+     * </p>
+     *
+     * @param generator           a generator {@link Function} to generate T given a {@link ValueProvider}.
+     *
+     * @return the generated {@link List}.
+     */
+    public <T, V extends ValueProvider> List<T> listOf(int numberOfElements, Function<V, T> generator) {
+        List<T> generatedElements = new ArrayList<>();
+        for (int i = 0; i < numberOfElements; i++) {
+            generatedElements.add(generator.apply((V) this));
+        }
+        return generatedElements;
     }
 
     /**
