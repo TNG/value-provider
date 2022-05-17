@@ -585,7 +585,7 @@ class ValueProviderTest {
         List<MyBean> myBeans = random.listOf(MyBeanTestData::myBean);
 
         // then
-        assertThat(myBeans).size().isLessThanOrEqualTo(5); // 5 is the default
+        assertThat(myBeans).hasSizeLessThanOrEqualTo(5); // 5 is the default
     }
 
     @Test
@@ -597,8 +597,8 @@ class ValueProviderTest {
         List<MyBean> myBeans = random.nonEmptyListOf(MyBeanTestData::myBean);
 
         // then
-        assertThat(myBeans).size().isGreaterThanOrEqualTo(1);
-        assertThat(myBeans).size().isLessThanOrEqualTo(5); // 5 is the default
+        assertThat(myBeans).isNotEmpty()
+                .hasSizeLessThanOrEqualTo(5); // 5 is the default
     }
 
     @Test
@@ -610,8 +610,9 @@ class ValueProviderTest {
         List<MyBean> myBeans = random.listOfContaining(MyBeanTestData::myBean, myBeanContained(1), myBeanContained(2), myBeanContained(3));
 
         // then
-        assertThat(myBeans).size().isLessThanOrEqualTo(7); // 3 contained beans + max. 1 random 'spacing' bean between each + max. 1 random bean at the beginning/end
-        assertThat(myBeans).contains(myBeanContained(1), myBeanContained(2), myBeanContained(3));
+        assertThat(myBeans).hasSizeLessThanOrEqualTo(7)
+                // 3 contained beans + max. 1 random 'spacing' bean between each + max. 1 random bean at the beginning/end
+                .contains(myBeanContained(1), myBeanContained(2), myBeanContained(3));
     }
 
     @Test
