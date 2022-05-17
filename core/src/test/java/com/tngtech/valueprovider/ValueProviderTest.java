@@ -21,8 +21,6 @@ import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
 import lombok.Data;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
@@ -408,8 +406,9 @@ class ValueProviderTest {
         return DynamicTest.dynamicTest(name, () -> {
             String numericString = withRandomValues().numericString(length, min, max);
 
-            assertThat(Integer.valueOf(numericString)).isGreaterThanOrEqualTo(min);
-            assertThat(Integer.valueOf(numericString)).isLessThanOrEqualTo(max);
+            assertThat(Integer.valueOf(numericString))
+                    .isGreaterThanOrEqualTo(min)
+                    .isLessThanOrEqualTo(max);
         });
     }
 
@@ -728,20 +727,6 @@ class ValueProviderTest {
 
     @Data
     static class MyBean {
-        String value;
-
-        public MyBean(String value) {
-            this.value = value;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            return EqualsBuilder.reflectionEquals(this, o, true);
-        }
-
-        @Override
-        public int hashCode() {
-            return HashCodeBuilder.reflectionHashCode(this, true);
-        }
+        private final String value;
     }
 }
