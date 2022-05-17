@@ -718,7 +718,7 @@ class ValueProviderTest {
 
     static class MyBeanTestData {
         public static MyBean myBean(ValueProvider valueProvider) {
-            return new MyBean("randomly generated");
+            return new MyBean("randomly generated" + valueProvider.intNumber(0, Integer.MAX_VALUE));
         }
 
         public static MyBean myBeanContained(int counter) {
