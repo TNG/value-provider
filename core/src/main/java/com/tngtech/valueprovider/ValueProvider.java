@@ -12,7 +12,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.Month;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
@@ -833,7 +832,7 @@ public class ValueProvider {
     }
 
     /**
-     * Generates a {@link List} of &lt;T&gt; (by means of {@code generator}) and includes {@code containedElements} in the {@link List}.
+     * Generates a {@link List} of &lt;T&gt; (by means of {@code generator}) and includes {@code furtherContainedElements} in the {@link List}.
      * <p>
      * Example:
      * <pre>
@@ -849,19 +848,20 @@ public class ValueProvider {
      * </p>
      *
      * @param generator           a generator {@link Function} to generate T given a {@link ValueProvider}.
-     * @param containedElements   elements that should be contained in the generated list.
+     * @param firstContainedElement   first element that should be contained in the generated list.
+     * @param furtherContainedElements   further elements that should be contained in the generated list.
      *
      * @return the generated {@link List}.
      *
      * @see #listOf(Function)
      */
     @SafeVarargs
-    public final <T, V extends ValueProvider> List<T> listOfContaining(Function<V, T> generator, T... containedElements) {
-        return listOfContaining(generator, Arrays.asList(containedElements));
+    public final <T, V extends ValueProvider> List<T> listOfContaining(Function<V, T> generator, T firstContainedElement, T... furtherContainedElements) {
+        return listOfContaining(generator, asList(firstContainedElement, furtherContainedElements));
     }
 
     /**
-     * see {@link #listOfContaining(Function, Object[])}
+     * see {@link #listOfContaining(Function, Object, Object[])}
      */
     public final <T, V extends ValueProvider> List<T> listOfContaining(Function<V, T> generator, Collection<T> containedElements) {
         int maxNumberOfRandomElements = maxNumberOfRandomElements(containedElements);
