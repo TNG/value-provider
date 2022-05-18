@@ -21,6 +21,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import com.google.common.collect.Iterables;
 
@@ -35,6 +36,7 @@ import static java.time.LocalDateTime.now;
 import static java.time.temporal.ChronoUnit.DAYS;
 import static java.time.temporal.ChronoUnit.SECONDS;
 import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toList;
 
 @SuppressWarnings("WeakerAccess")
 public class ValueProvider {
@@ -736,8 +738,7 @@ public class ValueProvider {
      * @param elements the elements to draw from.
      * @return the drawn elements (none / some / all).
      */
-    @SafeVarargs
-    final public <T> Collection<T> someOf(T... elements) {
+    @SafeVarargs final public <T> Collection<T> someOf(T... elements) {
         return someOf(asList(elements));
     }
 
@@ -954,12 +955,10 @@ public class ValueProvider {
      * @return the generated {@link List}.
      */
     public <T, V extends ValueProvider> List<T> listOf(Function<V, T> generator, int numberOfElements) {
-        List<T> generatedElements = new ArrayList<>();
-        for (int i = 0; i < numberOfElements; i++) {
-            //noinspection unchecked
-            generatedElements.add(generator.apply((V) this));
-        }
-        return generatedElements;
+        //noinspection unchecked
+        return IntStream.range(0, numberOfElements)
+                .mapToObj(i -> generator.apply((V) this))
+                .collect(toList());
     }
 
     /**
@@ -1040,7 +1039,7 @@ public class ValueProvider {
     }
 
     private List<String> truncateLeadingZerosFromBlocks(List<String> blocks) {
-        return blocks.stream().map(this::truncateLeadingZerosFromBlock).collect(Collectors.toList());
+        return blocks.stream().map(this::truncateLeadingZerosFromBlock).collect(toList());
     }
 
     private String truncateLeadingZerosFromBlock(String block) {

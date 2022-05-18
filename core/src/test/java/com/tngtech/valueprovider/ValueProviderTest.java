@@ -626,6 +626,19 @@ class ValueProviderTest {
     }
 
     @Test
+    void listOf_should_return_provided_number_of_elements() {
+        // given
+        ValueProvider random = withRandomValues();
+        int numberOfElements = random.intNumber(5, 10);
+
+        // when
+        List<MyBean> myBeans = random.listOf(MyBeanTestData::myBean, numberOfElements);
+
+        // then
+        assertThat(myBeans).hasSize(numberOfElements);
+    }
+
+    @Test
     void listOf_should_return_a_sensible_number_of_elements() {
         // given
         ValueProvider random = withRandomValues();
