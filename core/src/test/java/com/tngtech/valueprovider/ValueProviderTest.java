@@ -220,6 +220,17 @@ class ValueProviderTest {
         assertIntNumber(Integer.MAX_VALUE, Integer.MAX_VALUE);
     }
 
+    private void assertIntNumber(int min, int max) {
+        assertIntNumber(withRandomValues(), min, max);
+        assertIntNumber(withFixedValues(), min, max);
+    }
+
+    private void assertIntNumber(ValueProvider provider, int min, int max) {
+        assertThat(provider.intNumber(min, max))
+                .isGreaterThanOrEqualTo(min)
+                .isLessThanOrEqualTo(max);
+    }
+
     @Test
     void longNumber_should_create_number_between_min_and_max_and_outside_integer_range() {
         for (long i = 0; i < 1000; i++) {
@@ -243,6 +254,18 @@ class ValueProviderTest {
         assertLongNumber(Long.MAX_VALUE - 2L, Long.MAX_VALUE);
         assertLongNumber(Long.MAX_VALUE - 1L, Long.MAX_VALUE);
         assertLongNumber(Long.MAX_VALUE, Long.MAX_VALUE);
+    }
+
+    private void assertLongNumber(long min, long max) {
+        assertLongNumber(withRandomValues(), min, max);
+        assertLongNumber(withFixedValues(), min, max);
+    }
+
+    private void assertLongNumber(ValueProvider provider, long min, long max) {
+        long longNumber = provider.longNumber(min, max);
+        assertThat(longNumber)
+                .isGreaterThanOrEqualTo(min)
+                .isLessThanOrEqualTo(max);
     }
 
     @Test
@@ -290,6 +313,16 @@ class ValueProviderTest {
             BigInteger maxLongAsBigInteger = BigInteger.valueOf(Long.MAX_VALUE);
             assertBigIntegerNumber(min.subtract(maxLongAsBigInteger), max.add(maxLongAsBigInteger));
         }
+    }
+
+    private void assertBigIntegerNumber(BigInteger min, BigInteger max) {
+        assertBigIntegerNumber(withRandomValues(), min, max);
+        assertBigIntegerNumber(withFixedValues(), min, max);
+    }
+
+    private void assertBigIntegerNumber(ValueProvider provider, BigInteger min, BigInteger max) {
+        assertThat(provider.bigIntegerNumber(min, max))
+                .isBetween(min, max);
     }
 
     @SuppressWarnings("unchecked")
@@ -388,9 +421,27 @@ class ValueProviderTest {
         }
     }
 
+    private void assertBigDecimalNumber(double min, double max) {
+        assertBigDecimalNumber(withRandomValues(), min, max);
+        assertBigDecimalNumber(withFixedValues(), min, max);
+    }
+
+    private void assertBigDecimalNumber(ValueProvider provider, double min, double max) {
+        assertThat(provider.bigDecimalNumber(min, max))
+                .isBetween(BigDecimal.valueOf(min), BigDecimal.valueOf(max));
+    }
+
     @Test
     void bigDecimalNumberWithScale_should_return_numbers_within_specified_range_as_long_as_scale_allows_it() {
-        assertBigDecimalNumberWithScale2(1.001, 1.004);
+        double min = 1.001;
+        double max = 1.004;
+        int scale = 2;
+        double offsetForScale = 0.01;
+
+        assertThat(withRandomValues().bigDecimalNumberWithScale(min, max, scale))
+                .isBetween(BigDecimal.valueOf(min - offsetForScale), BigDecimal.valueOf(max + offsetForScale));
+        assertThat(withFixedValues().bigDecimalNumberWithScale(min, max, scale))
+                .isBetween(BigDecimal.valueOf(min - offsetForScale), BigDecimal.valueOf(max + offsetForScale));
     }
 
     @TestFactory
@@ -398,7 +449,7 @@ class ValueProviderTest {
         return newArrayList(
                 lengthMinMax("unrestricted", 3, 100, 200),
                 lengthMinMax("restricted to range", 3, 120, 180),
-                lengthMinMax("restricted to single value", 3, 150, 150)
+                lengthMinMax("restricted to single value", 4, 1234, 1234)
         );
     }
 
@@ -406,9 +457,7 @@ class ValueProviderTest {
         return DynamicTest.dynamicTest(name, () -> {
             String numericString = withRandomValues().numericString(length, min, max);
 
-            assertThat(Integer.valueOf(numericString))
-                    .isGreaterThanOrEqualTo(min)
-                    .isLessThanOrEqualTo(max);
+            assertThat(Integer.valueOf(numericString)).isBetween(min, max);
         });
     }
 
@@ -573,7 +622,7 @@ class ValueProviderTest {
 
         assertThat(random.someOf(valueList, valueList.size()))
                 .isSubsetOf(valueSet)
-                .hasSize(valueList.size());
+                .hasSameSizeAs(valueList);
     }
 
     @Test
@@ -645,11 +694,7 @@ class ValueProviderTest {
     }
 
     private ValueProvider withFixedValues() {
-        return withFixedValues(0L);
-    }
-
-    private ValueProvider withFixedValues(long seed) {
-        return new ValueProvider(createReproducibleInitialization(seed));
+        return new ValueProvider(createReproducibleInitialization(0L));
     }
 
     enum TestEnum {
@@ -657,63 +702,6 @@ class ValueProviderTest {
     }
 
     enum EmptyTestEnum {
-
-    }
-
-    private void assertIntNumber(int min, int max) {
-        assertIntNumber(withRandomValues(), min, max);
-        assertIntNumber(withFixedValues(), min, max);
-    }
-
-    private void assertIntNumber(ValueProvider provider, int min, int max) {
-        assertThat(provider.intNumber(min, max))
-                .isGreaterThanOrEqualTo(min)
-                .isLessThanOrEqualTo(max);
-    }
-
-    private void assertLongNumber(long min, long max) {
-        assertLongNumber(withRandomValues(), min, max);
-        assertLongNumber(withFixedValues(), min, max);
-    }
-
-    private void assertLongNumber(ValueProvider provider, long min, long max) {
-        long longNumber = provider.longNumber(min, max);
-        assertThat(longNumber)
-                .isGreaterThanOrEqualTo(min)
-                .isLessThanOrEqualTo(max);
-    }
-
-    private void assertBigIntegerNumber(BigInteger min, BigInteger max) {
-        assertBigIntegerNumber(withRandomValues(), min, max);
-        assertBigIntegerNumber(withFixedValues(), min, max);
-    }
-
-    private void assertBigIntegerNumber(ValueProvider provider, BigInteger min, BigInteger max) {
-        assertThat(provider.bigIntegerNumber(min, max))
-                .isGreaterThanOrEqualTo(min)
-                .isLessThanOrEqualTo(max);
-    }
-
-    private void assertBigDecimalNumber(Number min, Number max) {
-        assertBigDecimalNumber(withRandomValues(), min, max);
-        assertBigDecimalNumber(withFixedValues(), min, max);
-    }
-
-    private void assertBigDecimalNumber(ValueProvider provider, Number min, Number max) {
-        assertThat(provider.bigDecimalNumber(min, max))
-                .isGreaterThanOrEqualTo(new BigDecimal(min.doubleValue()))
-                .isLessThanOrEqualTo(new BigDecimal(max.doubleValue()));
-    }
-
-    private void assertBigDecimalNumberWithScale2(Number min, Number max) {
-        assertBigDecimalNumberWithScale2(withRandomValues(), min, max);
-        assertBigDecimalNumberWithScale2(withFixedValues(), min, max);
-    }
-
-    private void assertBigDecimalNumberWithScale2(ValueProvider provider, Number min, Number max) {
-        assertThat(provider.bigDecimalNumberWithScale(min, max, 2))
-                .isGreaterThanOrEqualTo(new BigDecimal(min.doubleValue() - 0.01))
-                .isLessThanOrEqualTo(new BigDecimal(max.doubleValue() + 0.01));
     }
 
     static class MyBeanTestData {
