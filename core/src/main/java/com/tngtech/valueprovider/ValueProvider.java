@@ -867,10 +867,10 @@ public class ValueProvider {
 
         List<T> generatedElements = new ArrayList<>();
         for (T containedValue : containedElements) {
-            generatedElements.addAll(listOf(intNumber(0, maxNumberOfRandomElements), generator));
+            generatedElements.addAll(listOf(generator, intNumber(0, maxNumberOfRandomElements)));
             generatedElements.add(containedValue);
         }
-        generatedElements.addAll(listOf(intNumber(0, maxNumberOfRandomElements), generator));
+        generatedElements.addAll(listOf(generator, intNumber(0, maxNumberOfRandomElements)));
         return generatedElements;
     }
 
@@ -905,7 +905,7 @@ public class ValueProvider {
      * @return the generated {@link List}.
      */
     public <T, V extends ValueProvider> List<T> nonEmptyListOf(Function<V, T> generator) {
-        return listOf(intNumber(1, 5), generator);
+        return listOf(generator, intNumber(1, 5));
     }
 
     /**
@@ -930,7 +930,7 @@ public class ValueProvider {
      * @return the generated {@link List}.
      */
     public <T, V extends ValueProvider> List<T> listOf(Function<V, T> generator) {
-        return listOf(intNumber(0, 5), generator);
+        return listOf(generator, intNumber(0, 5));
     }
 
     /**
@@ -945,7 +945,7 @@ public class ValueProvider {
      *          }
      *
      *         ValueProvider vp = ValueProviderFactory.createRandomValueProvider();
-     *         vp.listOf(4, MyBeanTestData::myBean); // -> List[myBean_generated_1, myBean_generated_2, myBean_generated_3, myBean_generated_4]
+     *         vp.listOf(MyBeanTestData::myBean, 4); // -> List[myBean_generated_1, myBean_generated_2, myBean_generated_3, myBean_generated_4]
      * </pre>
      * </p>
      *
@@ -953,7 +953,7 @@ public class ValueProvider {
      *
      * @return the generated {@link List}.
      */
-    public <T, V extends ValueProvider> List<T> listOf(int numberOfElements, Function<V, T> generator) {
+    public <T, V extends ValueProvider> List<T> listOf(Function<V, T> generator, int numberOfElements) {
         List<T> generatedElements = new ArrayList<>();
         for (int i = 0; i < numberOfElements; i++) {
             generatedElements.add(generator.apply((V) this));
