@@ -956,6 +956,7 @@ public class ValueProvider {
     public <T, V extends ValueProvider> List<T> listOf(Function<V, T> generator, int numberOfElements) {
         List<T> generatedElements = new ArrayList<>();
         for (int i = 0; i < numberOfElements; i++) {
+            //noinspection unchecked
             generatedElements.add(generator.apply((V) this));
         }
         return generatedElements;
