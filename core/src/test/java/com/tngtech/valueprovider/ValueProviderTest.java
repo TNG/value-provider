@@ -20,6 +20,7 @@ import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
+import lombok.Data;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
@@ -32,6 +33,7 @@ import static com.tngtech.valueprovider.ValueProviderInitialization.createReprod
 import static com.tngtech.valueprovider.ValueProviderTest.MethodInvocation.assertDifferentResultAsFarAsPossible;
 import static com.tngtech.valueprovider.ValueProviderTest.MethodInvocation.assertEqualResult;
 import static com.tngtech.valueprovider.ValueProviderTest.MethodInvocation.invoke;
+import static com.tngtech.valueprovider.ValueProviderTest.MyBeanTestData.myBeanContained;
 import static com.tngtech.valueprovider.ValueProviderTest.TestEnum.EIGHT;
 import static com.tngtech.valueprovider.ValueProviderTest.TestEnum.ELEVEN;
 import static com.tngtech.valueprovider.ValueProviderTest.TestEnum.FIVE;
@@ -42,7 +44,7 @@ import static com.tngtech.valueprovider.ValueProviderTest.TestEnum.SEVEN;
 import static com.tngtech.valueprovider.ValueProviderTest.TestEnum.SIX;
 import static com.tngtech.valueprovider.ValueProviderTest.TestEnum.TEN;
 import static com.tngtech.valueprovider.ValueProviderTest.TestEnum.THREE;
-import static com.tngtech.valueprovider.ValueProviderTest.TestEnum.TWELFE;
+import static com.tngtech.valueprovider.ValueProviderTest.TestEnum.TWELVE;
 import static com.tngtech.valueprovider.ValueProviderTest.TestEnum.TWO;
 import static java.time.LocalDateTime.now;
 import static java.util.Arrays.stream;
@@ -218,6 +220,17 @@ class ValueProviderTest {
         assertIntNumber(Integer.MAX_VALUE, Integer.MAX_VALUE);
     }
 
+    private void assertIntNumber(int min, int max) {
+        assertIntNumber(withRandomValues(), min, max);
+        assertIntNumber(withFixedValues(), min, max);
+    }
+
+    private void assertIntNumber(ValueProvider provider, int min, int max) {
+        assertThat(provider.intNumber(min, max))
+                .isGreaterThanOrEqualTo(min)
+                .isLessThanOrEqualTo(max);
+    }
+
     @Test
     void longNumber_should_create_number_between_min_and_max_and_outside_integer_range() {
         for (long i = 0; i < 1000; i++) {
@@ -241,6 +254,18 @@ class ValueProviderTest {
         assertLongNumber(Long.MAX_VALUE - 2L, Long.MAX_VALUE);
         assertLongNumber(Long.MAX_VALUE - 1L, Long.MAX_VALUE);
         assertLongNumber(Long.MAX_VALUE, Long.MAX_VALUE);
+    }
+
+    private void assertLongNumber(long min, long max) {
+        assertLongNumber(withRandomValues(), min, max);
+        assertLongNumber(withFixedValues(), min, max);
+    }
+
+    private void assertLongNumber(ValueProvider provider, long min, long max) {
+        long longNumber = provider.longNumber(min, max);
+        assertThat(longNumber)
+                .isGreaterThanOrEqualTo(min)
+                .isLessThanOrEqualTo(max);
     }
 
     @Test
@@ -288,6 +313,16 @@ class ValueProviderTest {
             BigInteger maxLongAsBigInteger = BigInteger.valueOf(Long.MAX_VALUE);
             assertBigIntegerNumber(min.subtract(maxLongAsBigInteger), max.add(maxLongAsBigInteger));
         }
+    }
+
+    private void assertBigIntegerNumber(BigInteger min, BigInteger max) {
+        assertBigIntegerNumber(withRandomValues(), min, max);
+        assertBigIntegerNumber(withFixedValues(), min, max);
+    }
+
+    private void assertBigIntegerNumber(ValueProvider provider, BigInteger min, BigInteger max) {
+        assertThat(provider.bigIntegerNumber(min, max))
+                .isBetween(min, max);
     }
 
     @SuppressWarnings("unchecked")
@@ -386,9 +421,27 @@ class ValueProviderTest {
         }
     }
 
+    private void assertBigDecimalNumber(double min, double max) {
+        assertBigDecimalNumber(withRandomValues(), min, max);
+        assertBigDecimalNumber(withFixedValues(), min, max);
+    }
+
+    private void assertBigDecimalNumber(ValueProvider provider, double min, double max) {
+        assertThat(provider.bigDecimalNumber(min, max))
+                .isBetween(BigDecimal.valueOf(min), BigDecimal.valueOf(max));
+    }
+
     @Test
     void bigDecimalNumberWithScale_should_return_numbers_within_specified_range_as_long_as_scale_allows_it() {
-        assertBigDecimalNumberWithScale2(1.001, 1.004);
+        double min = 1.001;
+        double max = 1.004;
+        int scale = 2;
+        double offsetForScale = 0.01;
+
+        assertThat(withRandomValues().bigDecimalNumberWithScale(min, max, scale))
+                .isBetween(BigDecimal.valueOf(min - offsetForScale), BigDecimal.valueOf(max + offsetForScale));
+        assertThat(withFixedValues().bigDecimalNumberWithScale(min, max, scale))
+                .isBetween(BigDecimal.valueOf(min - offsetForScale), BigDecimal.valueOf(max + offsetForScale));
     }
 
     @TestFactory
@@ -396,7 +449,7 @@ class ValueProviderTest {
         return newArrayList(
                 lengthMinMax("unrestricted", 3, 100, 200),
                 lengthMinMax("restricted to range", 3, 120, 180),
-                lengthMinMax("restricted to single value", 3, 150, 150)
+                lengthMinMax("restricted to single value", 4, 1234, 1234)
         );
     }
 
@@ -404,8 +457,7 @@ class ValueProviderTest {
         return DynamicTest.dynamicTest(name, () -> {
             String numericString = withRandomValues().numericString(length, min, max);
 
-            assertThat(Integer.valueOf(numericString)).isGreaterThanOrEqualTo(min);
-            assertThat(Integer.valueOf(numericString)).isLessThanOrEqualTo(max);
+            assertThat(Integer.valueOf(numericString)).isBetween(min, max);
         });
     }
 
@@ -481,7 +533,7 @@ class ValueProviderTest {
         assertThat(random.oneOfExcluding(newArrayList("1", "2", "3", "4"), "3", "4")).isIn("1", "2").isNotIn("3", "4");
 
         assertThat(random.oneOfExcluding(ONE, THREE, FIVE, SEVEN, NINE, ELEVEN))
-                .isIn(TWO, FOUR, SIX, EIGHT, TEN, TWELFE)
+                .isIn(TWO, FOUR, SIX, EIGHT, TEN, TWELVE)
                 .isNotIn(ONE, THREE, FIVE, SEVEN, NINE, ELEVEN);
     }
 
@@ -570,7 +622,59 @@ class ValueProviderTest {
 
         assertThat(random.someOf(valueList, valueList.size()))
                 .isSubsetOf(valueSet)
-                .hasSize(valueList.size());
+                .hasSameSizeAs(valueList);
+    }
+
+    @Test
+    void listOf_should_return_provided_number_of_elements() {
+        // given
+        ValueProvider random = withRandomValues();
+        int numberOfElements = random.intNumber(5, 10);
+
+        // when
+        List<MyBean> myBeans = random.listOf(MyBeanTestData::myBean, numberOfElements);
+
+        // then
+        assertThat(myBeans).hasSize(numberOfElements);
+    }
+
+    @Test
+    void listOf_should_return_a_sensible_number_of_elements() {
+        // given
+        ValueProvider random = withRandomValues();
+
+        // when
+        List<MyBean> myBeans = random.listOf(MyBeanTestData::myBean);
+
+        // then
+        assertThat(myBeans).hasSizeLessThanOrEqualTo(5); // 5 is the default
+    }
+
+    @Test
+    void nonEmptyListOf_should_return_at_least_one_element() {
+        // given
+        ValueProvider random = withRandomValues();
+
+        // when
+        List<MyBean> myBeans = random.nonEmptyListOf(MyBeanTestData::myBean);
+
+        // then
+        assertThat(myBeans).isNotEmpty()
+                .hasSizeLessThanOrEqualTo(5); // 5 is the default
+    }
+
+    @Test
+    void listOfContaining_should_return_the_provided_elements_plus_some_randomly_generated_elements() {
+        // given
+        ValueProvider random = withRandomValues();
+
+        // when
+        List<MyBean> myBeans = random.listOfContaining(MyBeanTestData::myBean, myBeanContained(1), myBeanContained(2), myBeanContained(3));
+
+        // then
+        assertThat(myBeans).hasSizeLessThanOrEqualTo(7)
+                // 3 contained beans + max. 1 random 'spacing' bean between each + max. 1 random bean at the beginning/end
+                .contains(myBeanContained(1), myBeanContained(2), myBeanContained(3));
     }
 
     @Test
@@ -603,74 +707,28 @@ class ValueProviderTest {
     }
 
     private ValueProvider withFixedValues() {
-        return withFixedValues(0L);
-    }
-
-    private ValueProvider withFixedValues(long seed) {
-        return new ValueProvider(createReproducibleInitialization(seed));
+        return new ValueProvider(createReproducibleInitialization(0L));
     }
 
     enum TestEnum {
-        ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, TEN, ELEVEN, TWELFE
+        ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, TEN, ELEVEN, TWELVE
     }
 
     enum EmptyTestEnum {
-
     }
 
-    private void assertIntNumber(int min, int max) {
-        assertIntNumber(withRandomValues(), min, max);
-        assertIntNumber(withFixedValues(), min, max);
+    static class MyBeanTestData {
+        public static MyBean myBean(ValueProvider valueProvider) {
+            return new MyBean("randomly generated" + valueProvider.intNumber(0, Integer.MAX_VALUE));
+        }
+
+        public static MyBean myBeanContained(int counter) {
+            return new MyBean("contained" + counter);
+        }
     }
 
-    private void assertIntNumber(ValueProvider provider, int min, int max) {
-        assertThat(provider.intNumber(min, max))
-                .isGreaterThanOrEqualTo(min)
-                .isLessThanOrEqualTo(max);
-    }
-
-    private void assertLongNumber(long min, long max) {
-        assertLongNumber(withRandomValues(), min, max);
-        assertLongNumber(withFixedValues(), min, max);
-    }
-
-    private void assertLongNumber(ValueProvider provider, long min, long max) {
-        long longNumber = provider.longNumber(min, max);
-        assertThat(longNumber)
-                .isGreaterThanOrEqualTo(min)
-                .isLessThanOrEqualTo(max);
-    }
-
-    private void assertBigIntegerNumber(BigInteger min, BigInteger max) {
-        assertBigIntegerNumber(withRandomValues(), min, max);
-        assertBigIntegerNumber(withFixedValues(), min, max);
-    }
-
-    private void assertBigIntegerNumber(ValueProvider provider, BigInteger min, BigInteger max) {
-        assertThat(provider.bigIntegerNumber(min, max))
-                .isGreaterThanOrEqualTo(min)
-                .isLessThanOrEqualTo(max);
-    }
-
-    private void assertBigDecimalNumber(Number min, Number max) {
-        assertBigDecimalNumber(withRandomValues(), min, max);
-        assertBigDecimalNumber(withFixedValues(), min, max);
-    }
-
-    private void assertBigDecimalNumber(ValueProvider provider, Number min, Number max) {
-        assertThat(provider.bigDecimalNumber(min, max))
-                .isGreaterThanOrEqualTo(new BigDecimal(min.doubleValue()))
-                .isLessThanOrEqualTo(new BigDecimal(max.doubleValue()));
-    }
-
-    private void assertBigDecimalNumberWithScale2(Number min, Number max) {
-        assertBigDecimalNumberWithScale2(withRandomValues(), min, max);
-        assertBigDecimalNumberWithScale2(withFixedValues(), min, max);
-    }
-
-    private void assertBigDecimalNumberWithScale2(ValueProvider provider, Number min, Number max) {
-        assertThat(provider.bigDecimalNumberWithScale(min, max, 2))
-                .isGreaterThanOrEqualTo(new BigDecimal(min.doubleValue() - 0.01))
-                .isLessThanOrEqualTo(new BigDecimal(max.doubleValue() + 0.01));
+    @Data
+    static class MyBean {
+        private final String value;
     }
 }

@@ -1,5 +1,7 @@
 dependencies {
     testImplementation dependency.junit_jupiter_api
+    testCompileOnly dependency.lombok
+    testAnnotationProcessor dependency.lombok
 
     testRuntimeOnly dependency.junit_jupiter_engine
 }

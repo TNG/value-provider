@@ -20,6 +20,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import com.google.common.collect.Iterables;
 
@@ -34,6 +35,7 @@ import static java.time.LocalDateTime.now;
 import static java.time.temporal.ChronoUnit.DAYS;
 import static java.time.temporal.ChronoUnit.SECONDS;
 import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toList;
 
 @SuppressWarnings("WeakerAccess")
 public class ValueProvider {
@@ -830,6 +832,136 @@ public class ValueProvider {
     }
 
     /**
+     * Generates a {@link List} of &lt;T&gt; (by means of {@code generator}) and includes {@code furtherContainedElements} in the {@link List}.
+     * <p>
+     * Example:
+     * <pre>
+     *          static class MyBeanTestData {
+     *              public static MyBean myBean(ValueProvider valueProvider) {
+     *                  // builds and returns your bean
+     *              }
+     *          }
+     *
+     *         ValueProvider vp = ValueProviderFactory.createRandomValueProvider();
+     *         vp.listOfContaining(MyBeanTestData::myBean, myBean(), myBean(), myBean()); // -> List[myBean_1, myBean_2, myBean_random, myBean_3, myBean_random]
+     * </pre>
+     * </p>
+     *
+     * @param generator           a generator {@link Function} to generate T given a {@link ValueProvider}.
+     * @param firstContainedElement   first element that should be contained in the generated list.
+     * @param furtherContainedElements   further elements that should be contained in the generated list.
+     *
+     * @return the generated {@link List}.
+     *
+     * @see #listOf(Function)
+     */
+    @SafeVarargs
+    public final <T, V extends ValueProvider> List<T> listOfContaining(Function<V, T> generator, T firstContainedElement, T... furtherContainedElements) {
+        return listOfContaining(generator, asList(firstContainedElement, furtherContainedElements));
+    }
+
+    /**
+     * see {@link #listOfContaining(Function, Object, Object[])}
+     */
+    public final <T, V extends ValueProvider> List<T> listOfContaining(Function<V, T> generator, Collection<T> containedElements) {
+        int maxNumberOfRandomElements = maxNumberOfRandomElements(containedElements);
+
+        List<T> generatedElements = new ArrayList<>();
+        for (T containedValue : containedElements) {
+            generatedElements.addAll(listOf(generator, intNumber(0, maxNumberOfRandomElements)));
+            generatedElements.add(containedValue);
+        }
+        generatedElements.addAll(listOf(generator, intNumber(0, maxNumberOfRandomElements)));
+        return generatedElements;
+    }
+
+    private <T> int maxNumberOfRandomElements(Collection<T> containedElements) {
+        if (containedElements.size() == 0) {
+            return 5;
+        }
+        if (containedElements.size() == 1) {
+            return 2;
+        }
+        return 1;
+    }
+
+    /**
+     * Generates a {@link List} of &lt;T&gt; (by means of {@code generator}). Ensures that the {@link List} contains at least one element.
+     * <p>
+     * Example:
+     * <pre>
+     *          static class MyBeanTestData {
+     *              public static MyBean myBean(ValueProvider valueProvider) {
+     *                  // builds and returns your bean
+     *              }
+     *          }
+     *
+     *         ValueProvider vp = ValueProviderFactory.createRandomValueProvider();
+     *         vp.nonEmptyListOf(MyBeanTestData::myBean); // -> List[myBean_generated_1, myBean_generated_2]
+     * </pre>
+     * </p>
+     *
+     * @param generator           a generator {@link Function} to generate T given a {@link ValueProvider}.
+     *
+     * @return the generated {@link List}.
+     */
+    public <T, V extends ValueProvider> List<T> nonEmptyListOf(Function<V, T> generator) {
+        return listOf(generator, intNumber(1, 5));
+    }
+
+    /**
+     * Generates a {@link List} of &lt;T&gt; (by means of {@code generator}). Might return the empty list.
+     * <p>
+     * Example:
+     * <pre>
+     *          static class MyBeanTestData {
+     *              public static MyBean myBean(ValueProvider valueProvider) {
+     *                  // builds and returns your bean
+     *              }
+     *          }
+     *
+     *         ValueProvider vp = ValueProviderFactory.createRandomValueProvider();
+     *         vp.listOf(MyBeanTestData::myBean); // -> List[myBean_generated_1, myBean_generated_2]
+     *         vp.listOf(MyBeanTestData::myBean); // -> List[]
+     * </pre>
+     * </p>
+     *
+     * @param generator           a generator {@link Function} to generate T given a {@link ValueProvider}.
+     *
+     * @return the generated {@link List}.
+     */
+    public <T, V extends ValueProvider> List<T> listOf(Function<V, T> generator) {
+        return listOf(generator, intNumber(0, 5));
+    }
+
+    /**
+     * Generates a {@link List} of &lt;T&gt; (by means of {@code generator}). Containing exactly {@code numberOfElements} elements.
+     * <p>
+     * Example:
+     * <pre>
+     *          static class MyBeanTestData {
+     *              public static MyBean myBean(ValueProvider valueProvider) {
+     *                  // builds and returns your bean
+     *              }
+     *          }
+     *
+     *         ValueProvider vp = ValueProviderFactory.createRandomValueProvider();
+     *         vp.listOf(MyBeanTestData::myBean, 4); // -> List[myBean_generated_1, myBean_generated_2, myBean_generated_3, myBean_generated_4]
+     * </pre>
+     * </p>
+     *
+     * @param generator           a generator {@link Function} to generate T given a {@link ValueProvider}.
+     *
+     * @return the generated {@link List}.
+     */
+    public <T, V extends ValueProvider> List<T> listOf(Function<V, T> generator, int numberOfElements) {
+        //noinspection unchecked
+        return IntStream.range(0, numberOfElements)
+                .mapToObj(i -> generator.apply((V) this))
+                .collect(toList());
+    }
+
+    /**
      * Randomly draws true or false.
      *
      * @return true or false (at random).
@@ -907,7 +1039,7 @@ public class ValueProvider {
     }
 
     private List<String> truncateLeadingZerosFromBlocks(List<String> blocks) {
-        return blocks.stream().map(this::truncateLeadingZerosFromBlock).collect(Collectors.toList());
+        return blocks.stream().map(this::truncateLeadingZerosFromBlock).collect(toList());
     }
 
     private String truncateLeadingZerosFromBlock(String block) {
