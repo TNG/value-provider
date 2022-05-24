@@ -6,6 +6,7 @@ import com.tngtech.valueprovider.ValueProviderExtension;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import static com.tngtech.valueprovider.example.customprovider.CustomValueProviderFactoryTest.MyBeanTestData.myBean;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SuppressWarnings("JoinAssertThatStatements")
@@ -38,4 +39,30 @@ class CustomValueProviderFactoryTest {
         assertThat(customReproducible1.myCustomValue()).isEqualTo(customReproducible2.myCustomValue());
         assertThat(customReproducible1.myCustomValue()).isEqualTo(customReproducible2.myCustomValue());
     }
+
+    @Test
+    void type_inference_should_work_for_listOf_in_a_custom_ValueProvider() {
+        CustomValueProvider customValueProvider = CustomValueProviderFactory.createRandomValueProvider();
+        customValueProvider.listOf(vp -> myBean());
+        customValueProvider.listOf(MyBeanTestData::myBean);
+    }
+
+    static class MyBeanTestData {
+        public static MyBean myBean() {
+            return new MyBean("not using VP");
+        }
+
+        public static MyBean myBean(CustomValueProvider valueProvider) {
+            return new MyBean(valueProvider.fixedDecoratedString("using VP"));
+        }
+    }
+
+    static class MyBean {
+        String value;
+
+        public MyBean(String value) {
+            this.value = value;
+        }
+    }
+
 }

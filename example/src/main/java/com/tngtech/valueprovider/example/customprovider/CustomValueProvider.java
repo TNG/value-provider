@@ -1,13 +1,13 @@
 package com.tngtech.valueprovider.example.customprovider;
 
-import com.tngtech.valueprovider.ValueProvider;
+import com.tngtech.valueprovider.AbstractValueProvider;
 import com.tngtech.valueprovider.ValueProviderInitialization;
 
 /**
  * @see CustomValueProviderFactory
  */
 @SuppressWarnings("WeakerAccess")
-public class CustomValueProvider extends ValueProvider {
+public class CustomValueProvider extends AbstractValueProvider<CustomValueProvider> {
     CustomValueProvider(ValueProviderInitialization initialization) {
         super(initialization);
     }
