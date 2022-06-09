@@ -30,7 +30,9 @@ import static com.google.common.collect.Lists.asList;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Lists.newArrayListWithCapacity;
 import static com.google.common.collect.Sets.newHashSet;
+import static com.tngtech.valueprovider.ValueProviderInitialization.truncateReferenceLocalDateTime;
 import static java.lang.String.format;
+import static java.time.LocalDateTime.now;
 import static java.time.temporal.ChronoUnit.DAYS;
 import static java.time.temporal.ChronoUnit.SECONDS;
 import static java.util.Arrays.asList;
@@ -64,7 +66,7 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
         this.random = random;
         this.prefix = prefix;
         this.suffix = suffix;
-        this.referenceLocalDateTime = referenceLocalDateTime;
+        this.referenceLocalDateTime = truncateReferenceLocalDateTime(referenceLocalDateTime);
     }
 
     /**
@@ -86,7 +88,7 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
     }
 
     /**
-     * Decorates {@code base} with prefix {@link Builder#withConstantPrefix(String)} and suffix {@link Builder#withConstantSuffix(String)}.
+     * Decorates {@code base} with prefix {@link AbstractBuilder#withConstantPrefix(String)} and suffix {@link AbstractBuilder#withConstantSuffix(String)}.
      * <p>
      * Example:
      * <pre>
@@ -115,7 +117,7 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
     }
 
     /**
-     * Decorates {@code base} with prefix {@link Builder#withConstantPrefix(String)} and suffix {@link Builder#withConstantSuffix(String)}.
+     * Decorates {@code base} with prefix {@link AbstractBuilder#withConstantPrefix(String)} and suffix {@link AbstractBuilder#withConstantSuffix(String)}.
      * <p>
      * If the resulting string is longer than the requested {@code maxLength},
      * the result is shortened as follows: The suffix is shortened first,
@@ -1207,5 +1209,67 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
                 Objects.equals(prefix, other.prefix) &&
                 Objects.equals(suffix, other.suffix) &&
                 Objects.equals(referenceLocalDateTime, other.referenceLocalDateTime);
+    }
+
+    protected abstract static class AbstractBuilder<
+            VP extends AbstractValueProvider<VP>,
+            BUILDER extends AbstractBuilder<VP, BUILDER>> {
+        private static final String DEFAULT_PREFIX = "";
+        protected final RandomValues random;
+        protected String prefix;
+        protected String suffix;
+        protected LocalDateTime referenceLocalDateTime;
+
+        protected AbstractBuilder(AbstractValueProvider<VP> from) {
+            this(from.random, from.prefix, from.suffix, from.referenceLocalDateTime);
+        }
+
+        protected AbstractBuilder(long seed) {
+            this(new RandomValues(seed));
+        }
+
+        protected AbstractBuilder(RandomValues random) {
+            this(random, DEFAULT_PREFIX, createSuffix(random), now());
+        }
+
+        protected AbstractBuilder(ValueProviderInitialization initialization) {
+            this(initialization.getRandom(), DEFAULT_PREFIX, initialization.getSuffix(), initialization.getReferenceLocalDateTime());
+        }
+
+        protected AbstractBuilder(RandomValues random,
+                String prefix,
+                String suffix,
+                LocalDateTime referenceLocalDateTime) {
+            this.random = random;
+            this.prefix = prefix;
+            this.suffix = suffix;
+            this.referenceLocalDateTime = truncateReferenceLocalDateTime(referenceLocalDateTime);
+        }
+
+        static String createSuffix(RandomValues random) {
+            return randomCharacters(MIXED_CASE_STRING, SUFFIX_LENGTH, random);
+        }
+
+        public BUILDER withConstantPrefix(String prefix) {
+            this.prefix = prefix;
+            return derivedBuilder();
+        }
+
+        public BUILDER withConstantSuffix(String suffix) {
+            this.suffix = suffix;
+            return derivedBuilder();
+        }
+
+        public BUILDER withReferenceLocalDateTime(LocalDateTime referenceLocalDateTime) {
+            this.referenceLocalDateTime = referenceLocalDateTime;
+            return derivedBuilder();
+        }
+
+        protected abstract VP build();
+
+        @SuppressWarnings("unchecked")
+        protected BUILDER derivedBuilder() {
+            return (BUILDER) this;
+        }
     }
 }

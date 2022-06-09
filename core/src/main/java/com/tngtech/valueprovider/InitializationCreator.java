@@ -10,14 +10,15 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.tngtech.valueprovider.AbstractValueProvider.AbstractBuilder.createSuffix;
 import static com.tngtech.valueprovider.InitializationCreator.Type.DEFAULT;
 import static com.tngtech.valueprovider.InitializationCreator.Type.TEST_CLASS;
 import static com.tngtech.valueprovider.InitializationCreator.Type.TEST_METHOD;
 import static com.tngtech.valueprovider.InitializationCreatorSnapshot.truncateToSupportedResolution;
-import static com.tngtech.valueprovider.ValueProvider.Builder.createSuffix;
 import static java.lang.System.identityHashCode;
 import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 abstract class InitializationCreator {
     static final String VALUE_PROVIDER_FACTORY_TEST_CLASS_SEED_PROPERTY = "value.provider.factory.test.class.seed";
     static final String VALUE_PROVIDER_FACTORY_TEST_METHOD_SEED_PROPERTY = "value.provider.factory.test.method.seed";

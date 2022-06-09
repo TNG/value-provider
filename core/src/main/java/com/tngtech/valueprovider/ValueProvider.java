@@ -2,9 +2,6 @@ package com.tngtech.valueprovider;
 
 import java.time.LocalDateTime;
 
-import static java.time.LocalDateTime.now;
-import static java.time.temporal.ChronoUnit.SECONDS;
-
 public class ValueProvider extends AbstractValueProvider<ValueProvider> {
     protected ValueProvider(ValueProviderInitialization initialization) {
         super(initialization);
@@ -14,56 +11,24 @@ public class ValueProvider extends AbstractValueProvider<ValueProvider> {
         super(random, prefix, suffix, referenceLocalDateTime);
     }
 
-    public static class Builder {
-        private final RandomValues random;
-        private String prefix;
-        private String suffix;
-        private LocalDateTime referenceLocalDateTime;
-
+    public static class Builder extends AbstractBuilder<ValueProvider, Builder> {
         public Builder(ValueProvider from) {
-            random = from.random;
-            prefix = from.prefix;
-            suffix = from.suffix;
-            referenceLocalDateTime = from.referenceLocalDateTime;
+            super(from);
         }
 
         public Builder(long seed) {
-            this(new RandomValues(seed));
+            super(seed);
         }
 
         public Builder(RandomValues random) {
-            this.random = random;
-            prefix = "";
-            suffix = createSuffix(random);
-            referenceLocalDateTime = now().truncatedTo(SECONDS);
+            super(random);
         }
 
         public Builder(ValueProviderInitialization initialization) {
-            this.random = initialization.getRandom();
-            prefix = "";
-            suffix = initialization.getSuffix();
-            referenceLocalDateTime = initialization.getReferenceLocalDateTime().truncatedTo(SECONDS);
+            super(initialization);
         }
 
-        static String createSuffix(RandomValues random) {
-            return randomCharacters(MIXED_CASE_STRING, SUFFIX_LENGTH, random);
-        }
-
-        public Builder withConstantPrefix(String prefix) {
-            this.prefix = prefix;
-            return this;
-        }
-
-        public Builder withConstantSuffix(String suffix) {
-            this.suffix = suffix;
-            return this;
-        }
-
-        public Builder withReferenceLocalDateTime(LocalDateTime referenceLocalDateTime) {
-            this.referenceLocalDateTime = referenceLocalDateTime;
-            return this;
-        }
-
+        @Override
         public ValueProvider build() {
             return new ValueProvider(random, prefix, suffix, referenceLocalDateTime);
         }
