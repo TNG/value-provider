@@ -1167,6 +1167,29 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
         }
     }
 
+    /**
+     * Create a copy of the {@link AbstractValueProvider} with the same properties (seed, reference date/time, and suffix) except for the {@code prefix}.
+     * By convention, the suffix is used to mark test data that belong together, and is therefore shared when creating a hierarchy of test objects.
+     * The prefix is used to differentiate multiple instances of the same kind of data.
+     * @param prefix to use
+     * @return a copy of {@link AbstractValueProvider} with same seed, reference date/time, and suffix, but changed {@code prefix}.
+     */
+    public VP copyWithChangedPrefix(String prefix) {
+        //noinspection unchecked
+        return toBuilder((VP) this)
+                .withConstantPrefix(prefix)
+                .build();
+    }
+
+    /**
+     * Create a {@link ValueProviderBuilder} and initialize it with the properties (seed, reference date/time, prefix, and suffix) of the passed {@link AbstractValueProvider}.
+     * The {@link ValueProviderBuilder} allows subsequent modification of these properties.
+     * @param from the {@link AbstractValueProvider} to be used for initialization
+     * @return the created {@link ValueProviderBuilder}
+     * @see #copyWithChangedPrefix(String)
+     */
+    protected abstract ValueProviderBuilder<VP, ?> toBuilder(VP from);
+
     protected String getPrefix() {
         return prefix;
     }
@@ -1204,7 +1227,8 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
         if (getClass() != obj.getClass()) {
             return false;
         }
-        AbstractValueProvider<VP> other = (AbstractValueProvider<VP>) obj;
+        //noinspection unchecked
+        VP other = (VP) obj;
         return Objects.equals(random, other.random) &&
                 Objects.equals(prefix, other.prefix) &&
                 Objects.equals(suffix, other.suffix) &&
@@ -1213,14 +1237,15 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
 
     protected abstract static class AbstractBuilder<
             VP extends AbstractValueProvider<VP>,
-            BUILDER extends AbstractBuilder<VP, BUILDER>> {
+            BUILDER extends AbstractBuilder<VP, BUILDER>>
+            implements ValueProviderBuilder<VP, BUILDER> {
         private static final String DEFAULT_PREFIX = "";
         protected final RandomValues random;
         protected String prefix;
         protected String suffix;
         protected LocalDateTime referenceLocalDateTime;
 
-        protected AbstractBuilder(AbstractValueProvider<VP> from) {
+        protected AbstractBuilder(VP from) {
             this(from.random, from.prefix, from.suffix, from.referenceLocalDateTime);
         }
 
@@ -1250,22 +1275,23 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
             return randomCharacters(MIXED_CASE_STRING, SUFFIX_LENGTH, random);
         }
 
+        @Override
         public BUILDER withConstantPrefix(String prefix) {
             this.prefix = prefix;
             return derivedBuilder();
         }
 
+        @Override
         public BUILDER withConstantSuffix(String suffix) {
             this.suffix = suffix;
             return derivedBuilder();
         }
 
+        @Override
         public BUILDER withReferenceLocalDateTime(LocalDateTime referenceLocalDateTime) {
             this.referenceLocalDateTime = referenceLocalDateTime;
             return derivedBuilder();
         }
-
-        protected abstract VP build();
 
         @SuppressWarnings("unchecked")
         protected BUILDER derivedBuilder() {

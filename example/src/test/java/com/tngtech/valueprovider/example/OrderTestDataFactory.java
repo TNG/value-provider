@@ -3,7 +3,6 @@ package com.tngtech.valueprovider.example;
 import com.tngtech.valueprovider.ValueProvider;
 import com.tngtech.valueprovider.example.Order.OrderBuilder;
 
-import static com.tngtech.valueprovider.ValueProvider.copyWithChangedPrefix;
 import static com.tngtech.valueprovider.ValueProviderFactory.createRandomValueProvider;
 import static com.tngtech.valueprovider.example.AddressTestDataFactory.createAddress;
 import static com.tngtech.valueprovider.example.CustomerTestDataFactory.createCustomer;
@@ -38,8 +37,8 @@ public final class OrderTestDataFactory {
         boolean useDifferentBillingAddress = values.booleanValue();
         if (useDifferentBillingAddress) {
             builder
-                    .shippingAddress(createAddress(copyWithChangedPrefix(values, "S-")))
-                    .billingAddress(createAddress(copyWithChangedPrefix(values, "B-")));
+                    .shippingAddress(createAddress(values.copyWithChangedPrefix("S-")))
+                    .billingAddress(createAddress(values.copyWithChangedPrefix("B-")));
 
         } else {
             builder
@@ -51,7 +50,7 @@ public final class OrderTestDataFactory {
         int numOrderItems = values.intNumber(1, 5);
         for (int i = 0; i < numOrderItems; i++) {
             char prefix = (char) ('A' + i);
-            ValueProvider prefixedProvider = copyWithChangedPrefix(values, "" + prefix + "-");
+            ValueProvider prefixedProvider = values.copyWithChangedPrefix("" + prefix + "-");
             builder.orderItem(createOrderItem(prefixedProvider));
         }
     }

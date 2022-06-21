@@ -11,6 +11,11 @@ public class ValueProvider extends AbstractValueProvider<ValueProvider> {
         super(random, prefix, suffix, referenceLocalDateTime);
     }
 
+    @Override
+    protected Builder toBuilder(ValueProvider from) {
+        return new Builder(from);
+    }
+
     public static class Builder extends AbstractBuilder<ValueProvider, Builder> {
         public Builder(ValueProvider from) {
             super(from);
@@ -35,16 +40,11 @@ public class ValueProvider extends AbstractValueProvider<ValueProvider> {
     }
 
     /**
-     * Create a copy of the {@link ValueProvider} {@code source}, i.e. with the same seed and suffix, but a different {@code prefix}.
-     * By convention, the suffix is used to mark test data that belong together, and is therefore shared when creating a hierarchy of test objects.
-     * The prefix is used to differentiate multiple instances of a certain kind of data.
-     * @param source {@link ValueProvider} to be copied
-     * @param prefix to use (replaces the one that is potentially set for {@code source})
-     * @return copy of {@link ValueProvider} with same seed an suffix, but changed {@code prefix}.
+     * @deprecated use {@link AbstractValueProvider#copyWithChangedPrefix(String)} instead to allow copying a custom {@link ValueProvider} as well.
+     * @see AbstractValueProvider#copyWithChangedPrefix(String)
      */
+    @Deprecated
     public static ValueProvider copyWithChangedPrefix(ValueProvider source, String prefix) {
-        return new ValueProvider.Builder(source)
-                .withConstantPrefix(prefix)
-                .build();
+        return source.copyWithChangedPrefix(prefix);
     }
 }
