@@ -742,7 +742,8 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      * @param elements the elements to draw from.
      * @return the drawn elements (none / some / all).
      */
-    @SafeVarargs final public <T> Collection<T> someOf(T... elements) {
+    @SafeVarargs
+    public final <T> Collection<T> someOf(T... elements) {
         return someOf(asList(elements));
     }
 
