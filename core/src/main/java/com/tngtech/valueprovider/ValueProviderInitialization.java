@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Random;
 
-import static com.tngtech.valueprovider.ValueProvider.Builder.createSuffix;
+import static com.tngtech.valueprovider.AbstractValueProvider.AbstractBuilder.createSuffix;
 import static java.time.LocalDateTime.now;
 import static java.time.LocalDateTime.parse;
 import static java.time.temporal.ChronoUnit.SECONDS;
@@ -34,7 +34,11 @@ public class ValueProviderInitialization {
     public ValueProviderInitialization(RandomValues random, String suffix, LocalDateTime referenceLocalDateTime) {
         this.random = random;
         this.suffix = suffix;
-        this.referenceLocalDateTime = referenceLocalDateTime.truncatedTo(SECONDS);
+        this.referenceLocalDateTime = truncateReferenceLocalDateTime(referenceLocalDateTime);
+    }
+
+    static LocalDateTime truncateReferenceLocalDateTime(LocalDateTime input) {
+        return input.truncatedTo(SECONDS);
     }
 
     public RandomValues getRandom() {

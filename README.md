@@ -217,7 +217,6 @@ import com.tngtech.valueprovider.ValueProvider;
 import static com.tngtech.valueprovider.example.AddressTestDataFactory.createAddress;
 import static com.tngtech.valueprovider.example.CustomerTestDataFactory.createCustomer;
 import static com.tngtech.valueprovider.example.OrderItemTestDataFactory.createOrderItem;
-import static com.tngtech.valueprovider.ValueProvider.copyWithChangedPrefix;
 import static com.tngtech.valueprovider.ValueProviderFactory.createRandomValueProvider;
 
 public final class OrderTestDataFactory {
@@ -249,8 +248,8 @@ public final class OrderTestDataFactory {
         boolean useDifferentBillingAddress = values.booleanValue();
         if (useDifferentBillingAddress) {
             builder
-                    .shippingAddress(createAddress(copyWithChangedPrefix(values, "S-")))
-                    .billingAddress(createAddress(copyWithChangedPrefix(values, "B-")));
+                    .shippingAddress(createAddress(values.copyWithChangedPrefix("S-")))
+                    .billingAddress(createAddress(values.copyWithChangedPrefix("B-")));
 
         } else {
             builder
@@ -262,7 +261,7 @@ public final class OrderTestDataFactory {
         int numOrderItems = values.intNumber(1, 5);
         for (int i = 0; i < numOrderItems; i++) {
             char prefix = (char) ('A' + i);
-            ValueProvider prefixedProvider = copyWithChangedPrefix(values, "" + prefix + "-");
+            ValueProvider prefixedProvider = values.copyWithChangedPrefix("" + prefix + "-");
             builder.orderItem(createOrderItem(prefixedProvider));
         }
     }
@@ -304,8 +303,8 @@ public final class OrderTestDataFactory {
 }
 ```
 
-The `copyWithChangedPrefix()` method takes the suffix from the passed [ValueProvider](core/src/main/java/com/tngtech/valueprovider/ValueProvider.java), and creates a new instance with the passed
-prefix. Like the suffix, the prefix remains the same for the lifetime of the `ValueProvider`.
+The `copyWithChangedPrefix()` method takes the suffix of the [ValueProvider](core/src/main/java/com/tngtech/valueprovider/ValueProvider.java) for which it is called, and creates a new instance with the passed
+prefix. Like the suffix, the prefix remains the same for the lifetime of the [ValueProvider](core/src/main/java/com/tngtech/valueprovider/ValueProvider.java).
 
 A final aspect that is related to using lombok:
 As opposed to a [Product](example/src/main/java/com/tngtech/valueprovider/example/Product.java), creating an [Order](example/src/main/java/com/tngtech/valueprovider/example/Order.java) is done via a
@@ -470,7 +469,7 @@ already, reproducing test failures is based on this functionality.
 
 So, if you need reproducible test data, e.g., to test a transformation of Java data to XML by verifying against a previously stored XML file,
 use `ValueProviderFactory.createReproducibleValueProvider()`
-and provide a seed value of your choice to create the `ValueProvider`. Your test data factories will accept this [ValueProvider](core/src/main/java/com/tngtech/valueprovider/ValueProvider.java) just
+and provide a seed value of your choice to create the [ValueProvider](core/src/main/java/com/tngtech/valueprovider/ValueProvider.java). Your test data factories will accept this [ValueProvider](core/src/main/java/com/tngtech/valueprovider/ValueProvider.java) just
 as any other one.
 
 ### Extending ValueProvider functionality
@@ -480,9 +479,9 @@ the need will arise to add project specific functionality.
 
 We advise the following approach:
 
-* Create your own [ValueProvider](core/src/main/java/com/tngtech/valueprovider/ValueProvider.java) class. Let it extend the one provided by this library, and add the methods you need
+* Create your own [ValueProvider](core/src/main/java/com/tngtech/valueprovider/ValueProvider.java) class. Let it extend the [AbstractValueProvider](core/src/main/java/com/tngtech/valueprovider/AbstractValueProvider.java) provided by this library, and add the methods you need
 * Create your own [ValueProviderFactory](core/src/main/java/com/tngtech/valueprovider/ValueProviderFactory.java) class and implement 2 static methods that create instances of
-  your [ValueProvider](core/src/main/java/com/tngtech/valueprovider/ValueProvider.java) class
+  your derived [AbstractValueProvider](core/src/main/java/com/tngtech/valueprovider/AbstractValueProvider.java) class
     * `createRandomValueProvider()`
     * `createReproducibleValueProvider()`
 * Use your own classes instead of the ones provided by this library in your test data factories and other test code.

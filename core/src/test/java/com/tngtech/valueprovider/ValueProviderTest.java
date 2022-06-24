@@ -702,8 +702,28 @@ class ValueProviderTest {
                 .hasMessageContaining(illegalDomain);
     }
 
+    @Test
+    void copyWithChangedPrefix_should_create_new_instance_with_changed_prefix() {
+        ValueProvider source = builderWithRandomValues()
+                .withConstantPrefix("oldPrefix")
+                .build();
+        String newPrefix = source.fixedDecoratedString("newPrefix");
+
+        ValueProvider withChangedPrefix = source.copyWithChangedPrefix(newPrefix);
+
+        assertThat(withChangedPrefix).isNotSameAs(source);
+        assertThat(withChangedPrefix.getPrefix()).isEqualTo(newPrefix);
+        assertThat(withChangedPrefix.getSuffix()).isEqualTo(source.getSuffix());
+        assertThat(withChangedPrefix.getRandom()).isEqualTo(source.getRandom());
+        assertThat(withChangedPrefix.referenceLocalDateTime).isEqualTo(source.referenceLocalDateTime);
+    }
+
     private static ValueProvider withRandomValues() {
-        return new ValueProvider(createRandomInitialization());
+        return builderWithRandomValues().build();
+    }
+
+    private static ValueProvider.Builder builderWithRandomValues() {
+        return new ValueProvider.Builder(createRandomInitialization());
     }
 
     private ValueProvider withFixedValues() {
