@@ -325,6 +325,11 @@ class ValueProviderTest {
                 .isBetween(min, max);
     }
 
+    @Test
+    void bigIntegerNumber_should_thrown_an_exception_if_min_is_greater_than_max() {
+        assertThrows(IllegalArgumentException.class, () -> withRandomValues().bigIntegerNumber(BigInteger.valueOf(-1), BigInteger.valueOf(-2)));
+    }
+
     @SuppressWarnings("unchecked")
     @Test
     void integer_number_methods_should_handle_range_zero_to_one_properly() {
@@ -429,6 +434,11 @@ class ValueProviderTest {
     private void assertBigDecimalNumber(ValueProvider provider, double min, double max) {
         assertThat(provider.bigDecimalNumber(min, max))
                 .isBetween(BigDecimal.valueOf(min), BigDecimal.valueOf(max));
+    }
+
+    @Test
+    void bigDecimalNumber_should_thrown_an_exception_if_min_is_greater_than_max() {
+        assertThrows(IllegalArgumentException.class, () -> withRandomValues().bigDecimalNumber(-1.000, -1.001));
     }
 
     @Test
