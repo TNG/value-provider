@@ -325,6 +325,17 @@ class ValueProviderTest {
                 .isBetween(min, max);
     }
 
+    @Test
+    void bigIntegerNumber_should_throw_an_exception_if_min_is_greater_than_max() {
+        ValueProvider random = withRandomValues();
+        BigInteger max = BigInteger.valueOf(-2);
+        BigInteger minGreaterThanMax = BigInteger.valueOf(-1);
+
+        assertThatThrownBy(() -> random.bigIntegerNumber(minGreaterThanMax, max))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContainingAll("" + minGreaterThanMax, "" + max);
+    }
+
     @SuppressWarnings("unchecked")
     @Test
     void integer_number_methods_should_handle_range_zero_to_one_properly() {
@@ -429,6 +440,17 @@ class ValueProviderTest {
     private void assertBigDecimalNumber(ValueProvider provider, double min, double max) {
         assertThat(provider.bigDecimalNumber(min, max))
                 .isBetween(BigDecimal.valueOf(min), BigDecimal.valueOf(max));
+    }
+
+    @Test
+    void bigDecimalNumber_should_throw_an_exception_if_min_is_greater_than_max() {
+        ValueProvider random = withRandomValues();
+        Number max = 1.000;
+        Number minGreaterThanMax = 1.001;
+
+        assertThatThrownBy(() -> random.bigDecimalNumber(minGreaterThanMax, max))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContainingAll("" + minGreaterThanMax, "" + max);
     }
 
     @Test
