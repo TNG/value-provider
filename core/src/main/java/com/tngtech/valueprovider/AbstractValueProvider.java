@@ -599,7 +599,7 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      */
     public LocalTime localTime() {
         long secondsPerDay = Duration.ofDays(1).get(SECONDS);
-        return LocalTime.ofSecondOfDay(longNumber(0, secondsPerDay));
+        return LocalTime.ofSecondOfDay(longNumber(0, secondsPerDay - 1));
     }
 
     /**
