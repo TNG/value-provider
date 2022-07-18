@@ -28,13 +28,13 @@ value-provider has the following prerequisites:
 
 ```groovy
 // core library
-testImplementation 'com.tngtech.valueprovider:value-provider-core:1.1.0'
+testImplementation 'com.tngtech.valueprovider:value-provider-core:1.2.0'
 
 // infrastructure
 // for JUnit 5
-testImplementation 'com.tngtech.valueprovider:value-provider-junit5:1.1.0'
+testImplementation 'com.tngtech.valueprovider:value-provider-junit5:1.2.0'
 // alternatively, for JUnit 4
-testImplementation 'com.tngtech.valueprovider:value-provider-junit4:1.1.0'
+testImplementation 'com.tngtech.valueprovider:value-provider-junit4:1.2.0'
 ```
 
 ### Maven
@@ -48,7 +48,7 @@ testImplementation 'com.tngtech.valueprovider:value-provider-junit4:1.1.0'
     <dependency>
         <groupId>com.tngtech.valueprovider</groupId>
       <artifactId>value-provider-core</artifactId>
-      <version>1.1.0</version>
+      <version>1.2.0</version>
       <scope>test</scope>
     </dependency>
 
@@ -57,14 +57,14 @@ testImplementation 'com.tngtech.valueprovider:value-provider-junit4:1.1.0'
     <dependency>
         <groupId>com.tngtech.valueprovider</groupId>
       <artifactId>value-provider-junit5</artifactId>
-      <version>1.1.0</version>
+      <version>1.2.0</version>
       <scope>test</scope>
     </dependency>
     <!-- alternatively, for JUnit 4 -->
     <dependency>
         <groupId>com.tngtech.valueprovider</groupId>
       <artifactId>value-provider-junit4</artifactId>
-      <version>1.1.0</version>
+      <version>1.2.0</version>
       <scope>test</scope>
     </dependency>
 
