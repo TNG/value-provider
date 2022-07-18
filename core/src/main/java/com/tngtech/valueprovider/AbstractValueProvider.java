@@ -360,7 +360,6 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      * @param max the maximum value of the returned number.
      * @return the generated number.
      * @throws IllegalArgumentException if {@code min} &gt; {@code max}.
-     * @see #positiveIntNumber()
      */
     public int intNumber(int min, int max) {
         return (int) longNumber(min, max);
