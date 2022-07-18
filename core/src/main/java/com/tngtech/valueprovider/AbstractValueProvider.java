@@ -359,6 +359,7 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      * @param min the minimum value of the returned number.
      * @param max the maximum value of the returned number.
      * @return the generated number.
+     * @throws IllegalArgumentException if {@code min} > {@code max}.
      * @see #positiveIntNumber()
      */
     public int intNumber(int min, int max) {
@@ -396,6 +397,7 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      * @param min the minimum value of the returned number.
      * @param max the maximum value of the returned number.
      * @return the generated number.
+     * @throws IllegalArgumentException if {@code min} > {@code max}.
      * @see #positiveLongNumber()
      */
     public long longNumber(long min, long max) {
@@ -432,6 +434,7 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      * @param min the minimum value of the returned number.
      * @param max the maximum value of the returned number.
      * @return the generated number.
+     * @throws IllegalArgumentException if {@code min} > {@code max}.
      * @see #positiveBigIntegerNumber()
      */
     public BigInteger bigIntegerNumber(BigInteger min, BigInteger max) {
@@ -468,6 +471,7 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      * @param min the minimum value of the returned number.
      * @param max the maximum value of the returned number.
      * @return the generated number.
+     * @throws IllegalArgumentException if {@code min} > {@code max}.
      * @see #positiveBigDecimalNumber()
      */
     public BigDecimal bigDecimalNumber(Number min, Number max) {
@@ -487,18 +491,16 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      * @param min the minimum value of the returned number.
      * @param max the maximum value of the returned number.
      * @return the generated number.
+     * @throws IllegalArgumentException if {@code min} > {@code max}.
      * @see #positiveBigDecimalNumber()
      */
     public BigDecimal bigDecimalNumber(BigDecimal min, BigDecimal max) {
-        return max.compareTo(min) > 0
-                ? min.add(max.subtract(min).multiply(BigDecimal.valueOf(random.nextDouble())))
-                : min;
+        checkArgument(max.compareTo(min) >= 0, "min %s must be less than or equal max %s", min, max);
+        return min.add(max.subtract(min).multiply(BigDecimal.valueOf(random.nextDouble())));
     }
 
     private BigInteger randomBigIntegerNumber(BigInteger min, BigInteger max) {
-        if (max.compareTo(min) <= 0) {
-            return min;
-        }
+        checkArgument(max.compareTo(min) >= 0, "min %s must be less than or equal max %s", min, max);
         BigInteger diff = max.subtract(min).add(BigInteger.ONE);
         BigInteger randomDiff = BigInteger.valueOf(random.nextLong()).mod(diff);
         return min.add(randomDiff);
@@ -523,6 +525,7 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      * @param max   the maximum value of the returned number.
      * @param scale the scale to be set on the BigDecimal.
      * @return the generated number.
+     * @throws IllegalArgumentException if {@code min} > {@code max}.
      */
     public BigDecimal bigDecimalNumberWithScale(Number min, Number max, int scale) {
         BigDecimal result = bigDecimalNumber(min, max);
@@ -547,6 +550,7 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      * @param max   the maximum value of the returned number.
      * @param scale the scale to be set on the BigDecimal.
      * @return the generated number.
+     * @throws IllegalArgumentException if {@code min} > {@code max}.
      */
     public BigDecimal bigDecimalNumberWithScale(BigDecimal min, BigDecimal max, int scale) {
         BigDecimal result = bigDecimalNumber(min, max);
