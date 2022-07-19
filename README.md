@@ -295,7 +295,7 @@ public final class OrderTestDataFactory {
         int numOrderItems = values.intNumber(1, 5);
         for (int i = 0; i < numOrderItems; i++) {
             char prefix = (char) ('A' + i);
-            ValueProvider prefixedProvider = copyWithChangedPrefix(values, "" + prefix + "-");
+            ValueProvider prefixedProvider = values.copyWithChangedPrefix("" + prefix + "-");
             builder.orderItem(createOrderItem(prefixedProvider));
         }
     }
