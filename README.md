@@ -496,7 +496,10 @@ for a fully functional example.
 
 The infrastructure uses thread-local data to store the seed values and can therefore be used in parallel CI builds without any problems.
 
-Neither the infrastructure nor the [ValueProvider](core/src/main/java/com/tngtech/valueprovider/ValueProvider.java) are thread-safe. They are __not suited for multithreaded test code__.
+However, reproducing test failures is __not possible for multithreaded test code__. Likewise, a [ValueProvider](core/src/main/java/com/tngtech/valueprovider/ValueProvider.java) 
+initialized with a fixed seed value will not necessarily generate the same sequence of data if it is used by multiple threads, 
+as the sequence of method invocations from different threads is not reproducible, 
+and neither the [ValueProvider](core/src/main/java/com/tngtech/valueprovider/ValueProvider.java) nor the infrastructure provide any synchronisation. 
 
 ## License
 
