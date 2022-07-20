@@ -456,7 +456,7 @@ If the failure is related to random data, you can easily reproduce it. Just spec
 -Dvalue.provider.factory.reference.date.time=2021-06-04T15:28:34.004
 ```
 
-Note that seed values relate to individual test classes and methods, even if it they have been run in a CI build together with other tests. Thus, it is sufficient to rerun the individual test in order
+Note that seed values relate to individual test classes and methods, even if they have been run in a CI build together with other tests. Thus, it is sufficient to rerun the individual test in order
 to reproduce the failure.
 
 ### Reproducible ValueProviders
