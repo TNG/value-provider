@@ -57,6 +57,12 @@ public class RandomValues {
         return random.nextLong();
     }
 
+    public byte[] nextBytes(int length) {
+        byte[] bytes = new byte[length];
+        random.nextBytes(bytes);
+        return bytes;
+    }
+
     public BigInteger nextPositiveBigInteger(int numBits) {
         return new BigInteger(numBits, random);
     }
