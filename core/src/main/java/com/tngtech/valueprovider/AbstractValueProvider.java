@@ -417,7 +417,8 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      * @see #bigIntegerNumber(BigInteger, BigInteger)
      */
     public BigInteger positiveBigIntegerNumber() {
-        return bigIntegerNumber(BigInteger.ZERO, BigInteger.valueOf(Long.MAX_VALUE));
+        BigInteger max = random.nextPositiveBigInteger(intNumber(1, 10_000)).abs();
+        return bigIntegerNumber(BigInteger.ZERO, max);
     }
 
     /**

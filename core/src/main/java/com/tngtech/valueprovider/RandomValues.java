@@ -1,5 +1,6 @@
 package com.tngtech.valueprovider;
 
+import java.math.BigInteger;
 import java.util.Random;
 
 public class RandomValues {
@@ -54,5 +55,9 @@ public class RandomValues {
 
     public long nextLong() {
         return random.nextLong();
+    }
+
+    public BigInteger nextPositiveBigInteger(int numBits) {
+        return new BigInteger(numBits, random);
     }
 }
