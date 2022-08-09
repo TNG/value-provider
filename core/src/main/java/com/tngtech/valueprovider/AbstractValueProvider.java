@@ -455,7 +455,10 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      * @see #bigDecimalNumber(Number, Number)
      */
     public BigDecimal positiveBigDecimalNumber() {
-        return bigDecimalNumber(BigDecimal.ZERO, BigDecimal.valueOf(Double.MAX_VALUE));
+        BigInteger unscaled = positiveBigIntegerNumber();
+        int numDecimalDigits = unscaled.toString().length();
+        int scale = intNumber(0, numDecimalDigits);
+        return new BigDecimal(unscaled, scale);
     }
 
     /**

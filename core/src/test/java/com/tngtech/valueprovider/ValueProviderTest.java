@@ -461,6 +461,24 @@ class ValueProviderTest {
     }
 
     @Test
+    void positiveBigDecimalNumber_should_create_numbers_exceeding_long_range() {
+        BigDecimal maxLong = BigDecimal.valueOf(Long.MAX_VALUE);
+        int numCycles = 10;
+        int exceedingLongRange = 0;
+        ValueProvider random = withRandomValues();
+        ValueProvider fixed = withFixedValues();
+        for (long i = 0; i < numCycles; i++) {
+            if (random.positiveBigDecimalNumber().compareTo(maxLong) > 0) {
+                exceedingLongRange++;
+            }
+            if (fixed.positiveBigDecimalNumber().compareTo(maxLong) > 0) {
+                exceedingLongRange++;
+            }
+        }
+        assertThat(exceedingLongRange).isGreaterThanOrEqualTo(2);
+    }
+
+    @Test
     void bigDecimalNumber_should_throw_an_exception_if_min_is_greater_than_max() {
         ValueProvider random = withRandomValues();
         Number max = 1.000;
