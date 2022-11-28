@@ -8,10 +8,10 @@ participant "TestConstructorDetector" as TCD
 note over TCD: to detect test class instantiation\nand switch to test method cycle
 participant "ValueProviderFactory" as VPF
 note over VPF: Just shown for single thread,\nimplemented as ThreadLocal\nfor parallel test execution
-participant "DefaultVPICreator" as D_VPC
+participant "DefaultInitializationCreator" as D_VPC
 note over D_VPC: 1. Uses arbitrary/random seed\n2. Does NOT ensure unique suffixes
-participant "TestClassVPICreator" as C_VPC
-participant "TestMethodVPICreator" as M_VPC
+participant "TestClassInitializationCreator" as C_VPC
+participant "TestMethodInitializationCreator" as M_VPC
 note over C_VPC, M_VPC: 1. Seed and reference date/time\n    controllable via system properties\n2. Ensures unique suffixes\n    (as far as possible)
 
 JVM --> VPF : class-loading & instantiation
@@ -20,7 +20,7 @@ VPF -> D_VPC : instantiation
 activate D_VPC
 VPF -> M_VPC : instantiation
 activate M_VPC
-VPF -> VPF : activateCreator(DefaultVPICreator)
+VPF -> VPF : activateCreator(DefaultInitializationCreator)
 
 == Test A class-loading ==
 JVM --> VPF_X : instantiation
@@ -33,7 +33,7 @@ note right of C_VPC #lightgreen: different lifecycle required\nfor tests with JU
 VPF -> C_VPC : startTestCycle
 C_VPC -> C_VPC : initialize seed &\n reference date/time
 note right of C_VPC #lightgreen: using system properties
-VPF -> VPF : activateCreator(TestClassVPICreator)
+VPF -> VPF : activateCreator(TestClassInitializationCreator)
 VPF_X -> TCD : instantiation
 activate TCD
 VPF_X -> VPF : activateTestConstructorDetector
@@ -54,13 +54,13 @@ note left #lightgreen: instance variables
 VPF -> TCD : isCallFromTestConstructor
 TCD --> VPF : true
 VPF -> VPF : startTestMethodCycle
-VPF -> VPF : activateCreator(TestMethodVPICreator)
-VPF -> M_VPC : startTestCycle(TestClassVPICreator)
+VPF -> VPF : activateCreator(TestMethodInitializationCreator)
+VPF -> M_VPC : startTestCycle(TestClassInitializationCreator)
 M_VPC -> M_VPC : initialize seed &\n reference date/time
 note right of M_VPC #lightgreen: using system properties
-M_VPC -> M_VPC : copyValueProviderSuffixes(TestClassVPICreator)
+M_VPC -> M_VPC : copyValueProviderSuffixes(TestClassInitializationCreator)
 note right of M_VPC #lightgreen: required to ensure unique suffixes
-M_VPC -> M_VPC : copyReferenceDateTime(TestClassVPICreator)
+M_VPC -> M_VPC : copyReferenceDateTime(TestClassInitializationCreator)
 note right of M_VPC #lightgreen: required to ensure reproducible\ndate/time related test data
 VPF -> VPF : deactivateTestConstructorDetector
 VPF --> TCD
@@ -84,7 +84,7 @@ JVM -> VPF_X : afterEach
 VPF_X -> VPF : finishTestMethodCycle
 VPF -> M_VPC : finishTestCycle
 M_VPC -> M_VPC : resetValueProviderSuffixes
-VPF -> VPF : activateCreator(TestClassVPICreator)
+VPF -> VPF : activateCreator(TestClassInitializationCreator)
 VPF_X -> TCD : instantiation
 activate TCD
 VPF_X -> VPF : activateTestConstructorDetector
@@ -103,13 +103,13 @@ note left #lightgreen: instance variables
 VPF -> TCD : isCallFromTestConstructor
 TCD --> VPF : true
 VPF -> VPF : startTestMethodCycle
-VPF -> VPF : activateCreator(TestMethodVPICreator)
-VPF -> M_VPC : startTestCycle(TestClassVPICreator)
+VPF -> VPF : activateCreator(TestMethodInitializationCreator)
+VPF -> M_VPC : startTestCycle(TestClassInitializationCreator)
 M_VPC -> M_VPC : initialize seed &\n reference date/time
 note right of M_VPC #lightgreen: using system properties
-M_VPC -> M_VPC : copyValueProviderSuffixes(TestClassVPICreator)
+M_VPC -> M_VPC : copyValueProviderSuffixes(TestClassInitializationCreator)
 note right of M_VPC #lightgreen: required to ensure unique suffixes
-M_VPC -> M_VPC : copyReferenceDateTime(TestClassVPICreator)
+M_VPC -> M_VPC : copyReferenceDateTime(TestClassInitializationCreator)
 note right of M_VPC #lightgreen: required to ensure reproducible\ndate/time related test data
 VPF -> VPF : deactivateTestConstructorDetector
 VPF --> TCD
@@ -133,7 +133,7 @@ JVM -> VPF_X : afterEach
 VPF_X -> VPF : finishTestMethodCycle
 VPF -> M_VPC : finishTestCycle
 M_VPC -> M_VPC : resetValueProviderSuffixes
-VPF -> VPF : activateCreator(TestClassVPICreator)
+VPF -> VPF : activateCreator(TestClassInitializationCreator)
 VPF_X -> TCD : instantiation
 activate TCD
 
@@ -143,9 +143,9 @@ JVM -> VPF_X : afterAll
 VPF_X -> VPF : finishTestClassCycle
 VPF -> C_VPC : finishTestCycle
 C_VPC -> C_VPC : resetValueProviderSuffixes
-VPF -> VPF : delete TestClassVPICreator
+VPF -> VPF : delete TestClassInitializationCreator
 destroy C_VPC
-VPF -> VPF : activateCreator(DefaultVPICreator)
+VPF -> VPF : activateCreator(DefaultInitializationCreator)
 VPF_X -> VPF : deactivateTestConstructorDetector
 VPF --> TCD
 destroy TCD
@@ -164,7 +164,7 @@ note right of C_VPC #lightgreen: different lifecycle required\nfor tests with JU
 VPF -> C_VPC : startTestCycle
 C_VPC -> C_VPC : initialize seed &\n reference date/time
 note right of C_VPC #lightgreen: using system properties
-VPF -> VPF : activateCreator(TestClassVPICreator)
+VPF -> VPF : activateCreator(TestClassInitializationCreator)
 VPF_X -> TCD : instantiation
 activate TCD
 VPF_X -> VPF : activateTestConstructorDetector
@@ -186,13 +186,13 @@ VPF --> TCD
 destroy TCD
 
 VPF_X -> VPF : startTestMethodCycle
-VPF -> VPF : activateCreator(TestMethodVPICreator)
-VPF -> M_VPC : startTestCycle(TestClassVPICreator)
+VPF -> VPF : activateCreator(TestMethodInitializationCreator)
+VPF -> M_VPC : startTestCycle(TestClassInitializationCreator)
 M_VPC -> M_VPC : initialize seed &\n reference date/time
 note right of M_VPC #lightgreen: using system properties
-M_VPC -> M_VPC : copyValueProviderSuffixes(TestClassVPICreator)
+M_VPC -> M_VPC : copyValueProviderSuffixes(TestClassInitializationCreator)
 note right of M_VPC #lightgreen: required to ensure unique suffixes
-M_VPC -> M_VPC : copyReferenceDateTime(TestClassVPICreator)
+M_VPC -> M_VPC : copyReferenceDateTime(TestClassInitializationCreator)
 note right of M_VPC #lightgreen: required to ensure reproducible\ndate/time related test data
 
 T_B -> VPF : createRandomValueProvider

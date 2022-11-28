@@ -5,7 +5,7 @@ participant "Test B" as T_B
 
 participant "ValueProviderFactory" as VPF
 note over VPF: Just shown for single thread,\nimplemented as ThreadLocal\nfor parallel test execution
-participant "DefaultVPICreator" as D_VPC
+participant "DefaultInitializationCreator" as D_VPC
 note over D_VPC: 1. Uses arbitrary/random seed and reference date/time\n2. Does NOT ensure unique suffixes
 
 JVM --> VPF : class-loading & instantiation
