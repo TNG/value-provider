@@ -5,7 +5,7 @@ participant "Test" as T_A
 participant "<b><size:20>      ?      </size></b>" as TBI #lightblue
 activate TBI #lightblue
 participant "ValueProviderFactory" as VPF
-participant "VPFactoryException" as EX
+participant "ValueProviderException" as EX
 ...
 
 JVM --> VPF : class-loading & instantiation
@@ -26,9 +26,9 @@ EX -> VPF : getTestMethodSeed
 VPF -> M_VPC : getSeed
 EX -> VPF : getFormattedReferenceDateTime
 VPF -> M_VPC : getFormattedReferenceDateTime
-EX -> EX : 1. store original exception as cause\n2. extend original failure message\n     to reflect seed & reference date/time values
+EX -> EX : add ValueProviderException\nas suppressed exception to original exception\nto reflect seed & reference date/time values
 EX --> TBI
-TBI -> JVM: throw VPFactoryException
+TBI -> JVM: rethrow original exception
 ...
 
 @enduml
