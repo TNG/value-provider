@@ -33,4 +33,4 @@ jobs:
       uses: gradle/gradle-build-action@v2
       with:
         arguments: clean build
-        gradle-version: 7.3 # facilitates compatibility with JDK 17
+        gradle-version: 8.5 # facilitates compatibility with JDK 17
