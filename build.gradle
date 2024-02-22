@@ -82,7 +82,7 @@ ext {
 
 allprojects {
     group = 'com.tngtech.valueprovider'
-    version = '1.2.2'
+    version = '1.2.3-SNAPSHOT'
 
     repositories {
         mavenCentral()
