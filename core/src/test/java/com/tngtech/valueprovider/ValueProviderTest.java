@@ -197,6 +197,40 @@ class ValueProviderTest {
     }
 
     @Test
+    void optionalOf_on_function_should_create_present_and_empty() {
+        ValueProvider random = withRandomValues();
+
+        boolean presentCreated = false;
+        boolean emptyCreated = false;
+        for (int i = 0; i < 1000 && !(presentCreated && emptyCreated); i++) {
+            if (random.optionalOf(vp -> vp.randomString(10)).isPresent()) {
+                presentCreated = true;
+            } else {
+                emptyCreated = true;
+            }
+        }
+        assertThat(presentCreated).as("present created").isTrue();
+        assertThat(emptyCreated).as("empty created").isTrue();
+    }
+
+    @Test
+    void optionalOf_on_supplier_should_create_present_and_empty() {
+        ValueProvider random = withRandomValues();
+
+        boolean presentCreated = false;
+        boolean emptyCreated = false;
+        for (int i = 0; i < 1000 && !(presentCreated && emptyCreated); i++) {
+            if (random.optionalOf(random::uuid).isPresent()) {
+                presentCreated = true;
+            } else {
+                emptyCreated = true;
+            }
+        }
+        assertThat(presentCreated).as("present created").isTrue();
+        assertThat(emptyCreated).as("empty created").isTrue();
+    }
+
+    @Test
     void intNumber_should_create_number_between_min_and_max() {
         for (int i = 0; i < 1000; i++) {
             int min = i + 1;
