@@ -10,7 +10,6 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.Month;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
@@ -571,7 +570,7 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      * vp.bigDecimalPercentage();
      * </pre>
      * </p>
-     * 
+     *
      * @return the generated percentage.
      */
     public BigDecimal bigDecimalPercentage() {
@@ -603,18 +602,57 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
     }
 
     /**
-     * Draws a {@link LocalDate} in [1st of January of {@code begin} ; 31st of December of {@code end}].
+
+    * Draws a {@link LocalDate} in [1st of January of {@code startYear} ; 31st of December of {@code endYear}].
      *
-     * @param begin minimum year to draw from.
-     * @param end   maximum year to draw from.
+     * @param startYear the earliest year to draw from.
+     * @param endYear   the latest year to draw from.
      * @return the drawn {@link LocalDate}.
-     * @throws IllegalArgumentException if {@code end} &lt; {@code begin}.
+     * @throws IllegalArgumentException if {@code endYear} &lt; {@code startYear}.
      */
-    public LocalDate localDateBetweenYears(int begin, int end) {
-        checkArgument(begin <= end, "begin %s must be before end %s", begin, end);
-        LocalDate lower = LocalDate.of(begin, Month.JANUARY, 1);
-        LocalDate upper = LocalDate.of(end, Month.DECEMBER, 31);
-        return lower.plusDays(longNumber(0, DAYS.between(lower, upper)));
+    public LocalDate localDateBetweenYears(int startYear, int endYear) {
+        LocalDate start = LocalDate.ofYearDay(startYear, 1);
+        LocalDate end = LocalDate.of(endYear, 12, 31);
+        return localDateBetween(start, end);
+    }
+
+    /**
+     * Draws a {@link LocalDate} in [{@code start} ; {@code end}].
+     *
+     * @param start the earliest date to draw from.
+     * @param end   the latest date to draw from.
+     * @return the drawn {@link LocalDate}.
+     * @throws IllegalArgumentException if {@code start} &gt; {@code end}.
+     */
+    public LocalDate localDateBetween(LocalDate start, LocalDate end) {
+        checkArgument(beforeOrEqual(start, end), "start %s must be before or equal end %s", start, end);
+        return start.plusDays(longNumber(0, DAYS.between(start, end)));
+    }
+
+    private boolean beforeOrEqual(LocalDate start, LocalDate end) {
+        return start.isBefore(end) || start.isEqual(end);
+    }
+
+    /**
+     * Draws a {@link LocalDate} in [{@code today-pastDuration} ; {@code today}].
+     *
+     * @param pastDuration the maximum duration in the past to consider drawing from.
+     * @return the drawn {@link LocalDate}.
+     */
+    public LocalDate localDateInPast(Duration pastDuration) {
+        LocalDate start = fixedLocalDate().minusDays(pastDuration.toDays());
+        return localDateBetween(start, fixedLocalDate());
+    }
+
+    /**
+     * Draws a {@link LocalDate} in [{@code today} ; {@code today+futureDuration}].
+     *
+     * @param futureDuration the maximum duration in the future to consider drawing from.
+     * @return the drawn {@link LocalDate}.
+     */
+    public LocalDate localDateInFuture(Duration futureDuration) {
+        LocalDate end = fixedLocalDate().plusDays(futureDuration.toDays());
+        return localDateBetween(fixedLocalDate(), end);
     }
 
     /**
@@ -628,18 +666,47 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
     }
 
     /**
+     * Draws a {@link LocalDateTime} in [{@code start} ; {@code end}].
+     *
+     * @param start the earliest date time to draw from.
+     * @param end   the latest date time to draw from.
+     * @return the drawn {@link LocalDateTime}.
+     * @throws IllegalArgumentException if {@code start} &gt; {@code end}.
+     */
+    public LocalDateTime localDateTimeBetween(LocalDateTime start, LocalDateTime end) {
+        checkArgument(beforeOrEqual(start, end), "start %s must be before or equal end %s", start, end);
+        return start.plusSeconds(longNumber(0, SECONDS.between(start, end)));
+    }
+
+    private boolean beforeOrEqual(LocalDateTime start, LocalDateTime end) {
+        return start.isBefore(end) || start.isEqual(end);
+    }
+
+    /**
+     * Draws a {@link LocalDateTime} in [{@code start} T00:00:00 ; {@code end} T23:59:59].
+     *
+     * @param start the earliest date to draw from.
+     * @param end   the latest date to draw from.
+     * @return the drawn {@link LocalDateTime}.
+     * @throws IllegalArgumentException if {@code start} &gt; {@code end}.
+     */
+    public LocalDateTime localDateTimeBetween(LocalDate start, LocalDate end) {
+        return localDateTimeBetween(start.atStartOfDay(), end.atTime(23, 59, 59));
+    }
+
+    /**
      * Generates a {@link Duration} in [0 ; {@code max}].
-     * 
+     *
      * @param max the upper bound of the generated {@link Duration}.
      * @return the generated {@link Duration}.
      */
     public Duration duration(Duration max) {
         return Duration.ofMillis(longNumber(0, max.toMillis()));
-    } 
+    }
 
     /**
      * Generates a {@link Duration} in [{@code min} ; {@code max}].
-     * 
+     *
      * @param min the lower bound of the generated {@link Duration}.
      * @param max the upper bound of the generated {@link Duration}.
      * @return the generated {@link Duration}.

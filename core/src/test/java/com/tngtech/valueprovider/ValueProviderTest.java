@@ -8,7 +8,10 @@ import java.net.InetAddress;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.time.Duration;
+import java.time.LocalDate;
+import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumSet;
@@ -96,6 +99,13 @@ class ValueProviderTest {
         String address = random.lowercaseString(stringLength);
         int min = random.intNumber(100, 1000);
         int max = random.intNumber(1001, 2000);
+        LocalDate start = random.localDateBetweenYears(min, max);
+        LocalDate end = random.localDateBetweenYears(
+            random.intNumber(3000, 4000),
+            random.intNumber(4001, 10000)
+        );
+        Duration duration = Duration.ofDays(Long.valueOf(min));
+        LocalTime time = random.localTime();
         int numLines = random.intNumber(2, 10);
         Duration minDuration = Duration.ofHours(1);
         Duration maxDuration = Duration.ofDays(1);
@@ -131,6 +141,11 @@ class ValueProviderTest {
                 invoke("duration", maxDuration),
                 invoke("duration", minDuration, maxDuration),
                 invoke("fixedLocalDateTime"),
+                invoke("localDateBetween", start, end),
+                invoke("localDateInPast", duration),
+                invoke("localDateInFuture", duration),
+                invoke("localDateTimeBetween", LocalDateTime.of(start, time), LocalDateTime.of(end, time)),
+                invoke("localDateTimeBetween", start, end),
                 invoke("fixedDecoratedStrings", numLines),
                 invoke("fixedDecoratedStrings", numLines, random.randomString(stringLength))
         );
@@ -587,6 +602,59 @@ class ValueProviderTest {
         Throwable thrown = assertThrows(IllegalArgumentException.class,
                 () -> withRandomValues().numericString(tooSmallLength, min, max));
         assertThat(thrown.getMessage()).contains("" + tooSmallLength, "" + min);
+    }
+
+    @Test
+    void localDateInBetween_should_generate_value_in_between() {
+        LocalDate start = LocalDate.of(2000, 1, 1);
+        LocalDate end = LocalDate.of(2040, 12, 31);
+        assertThat(withRandomValues().localDateBetween(start, end)).isAfterOrEqualTo(start)
+            .isBeforeOrEqualTo(end);
+    }
+
+    @Test
+    void localDateInBetween_should_reject_temporal_inconsistency() {
+        LocalDate start = LocalDate.of(2000, 1, 1);
+        LocalDate end = LocalDate.of(2040, 12, 31);
+        Throwable thrown = assertThrows(IllegalArgumentException.class,
+            () -> withRandomValues().localDateBetween(end, start));
+        assertThat(thrown.getMessage()).contains("must be before or equal end ");
+    }
+
+    @Test
+    void localDateInPast_should_return_value_in_allowed_range() {
+        LocalDate today = LocalDate.now();
+        Duration duration = Duration.ofDays(300);
+        LocalDate pastDate = today.minusDays(duration.toDays());
+        assertThat(withRandomValues().localDateInPast(duration)).isAfterOrEqualTo(pastDate)
+            .isBeforeOrEqualTo(today);
+    }
+
+    @Test
+    void localDateInFuture_should_return_value_in_allowed_range() {
+        LocalDate today = LocalDate.now();
+        Duration duration = Duration.ofDays(300);
+        LocalDate futureDate = today.plusDays(duration.toDays());
+        assertThat(withRandomValues().localDateInFuture(duration)).isAfterOrEqualTo(today)
+            .isBeforeOrEqualTo(futureDate);
+    }
+
+    @Test
+    void localDateTimeInBetween_should_generate_value_in_between() {
+        LocalDate start = LocalDate.of(2000, 1, 1);
+        LocalDate end = LocalDate.of(2040, 12, 31);
+        assertThat(withRandomValues().localDateTimeBetween(start, end))
+            .isAfterOrEqualTo(LocalDateTime.of(start, LocalTime.MIN))
+            .isBeforeOrEqualTo(LocalDateTime.of(end, LocalTime.MAX));
+    }
+
+    @Test
+    void localDateTimeInBetween_should_reject_temporal_inconsistency() {
+        LocalDate start = LocalDate.of(2000, 1, 1);
+        LocalDate end = LocalDate.of(2040, 12, 31);
+        Throwable thrown = assertThrows(IllegalArgumentException.class,
+            () -> withRandomValues().localDateTimeBetween(end, start));
+        assertThat(thrown.getMessage()).contains("must be before or equal end ");
     }
 
     @Test
