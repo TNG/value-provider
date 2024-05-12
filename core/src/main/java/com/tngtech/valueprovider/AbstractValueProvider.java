@@ -600,7 +600,7 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
 
     /**
      * Draws a {@link LocalDate} in [{@code start} ; {@code end}].
-     * 
+     *
      * @param start the earliest date to draw from.
      * @param end   the latest date to draw from.
      * @return the drawn {@link LocalDate}.
@@ -617,7 +617,7 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
 
     /**
      * Draws a {@link LocalDate} in [{@code today-pastDuration} ; {@code today}].
-     * 
+     *
      * @param pastDuration the maximum duration in the past to consider drawing from.
      * @return the drawn {@link LocalDate}.
      */
@@ -628,7 +628,7 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
 
     /**
      * Draws a {@link LocalDate} in [{@code today} ; {@code today+futureDuration}].
-     * 
+     *
      * @param futureDuration the maximum duration in the future to consider drawing from.
      * @return the drawn {@link LocalDate}.
      */
