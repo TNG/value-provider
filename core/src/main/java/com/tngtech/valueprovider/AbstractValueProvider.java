@@ -1198,11 +1198,11 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      */
     protected abstract ValueProviderBuilder<VP, ?> toBuilder(VP from);
 
-    protected String getPrefix() {
+    public String getPrefix() {
         return prefix;
     }
 
-    protected String getSuffix() {
+    public String getSuffix() {
         return suffix;
     }
 
