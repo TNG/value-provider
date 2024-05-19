@@ -8,6 +8,7 @@ import java.net.InetAddress;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.time.Duration;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -24,6 +25,7 @@ import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
 import lombok.Data;
+
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
@@ -105,6 +107,8 @@ class ValueProviderTest {
         Duration duration = Duration.ofDays(Long.valueOf(min));
         LocalTime time = random.localTime();
         int numLines = random.intNumber(2, 10);
+        Duration minDuration = Duration.ofHours(1);
+        Duration maxDuration = Duration.ofDays(1);
 
         return newArrayList(
                 invoke("booleanValue"),
@@ -133,6 +137,8 @@ class ValueProviderTest {
                 invoke("fixedLocalDate"),
                 invoke("localDateBetweenYears", min, max),
                 invoke("localTime"),
+                invoke("duration", maxDuration),
+                invoke("duration", minDuration, maxDuration),
                 invoke("fixedLocalDateTime"),
                 invoke("localDateBetween", start, end),
                 invoke("localDateInPast", duration),
@@ -604,6 +610,21 @@ class ValueProviderTest {
         Throwable thrown = assertThrows(IllegalArgumentException.class,
             () -> withRandomValues().localDateTimeBetween(end, start));
         assertThat(thrown.getMessage()).contains("must be before or equal end ");
+    }
+
+    @Test
+    void duration_should_be_smaller_than_max_duration() {
+        ValueProvider random = withRandomValues();
+        assertThat(random.duration(Duration.ofDays(1)))
+                .isLessThanOrEqualTo(Duration.ofDays(1));
+    }
+
+    @Test
+    void duration_should_be_bigger_than_min_and_smaller_than_max_duration() {
+        ValueProvider random = withRandomValues();
+        assertThat(random.duration(Duration.ofMinutes(1), Duration.ofDays(1)))
+                .isGreaterThanOrEqualTo(Duration.ofMinutes(1))
+                .isLessThanOrEqualTo(Duration.ofDays(1));
     }
 
     @Test
