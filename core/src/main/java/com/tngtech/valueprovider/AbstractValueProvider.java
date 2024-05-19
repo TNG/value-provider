@@ -994,7 +994,7 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      *
      * ValueProvider vp = ValueProviderFactory.createRandomValueProvider();
      * vp.optionalOf(MyBeanTestData::myBean);
-     * vp.optionalOf(provider -> provider.r.randomString(10));
+     * vp.optionalOf(provider -> provider.randomString(10));
      * </pre>
      * </p>
      *
