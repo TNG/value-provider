@@ -610,6 +610,29 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
     }
 
     /**
+     * Generates a {@link Duration} in [0 ; {@code max}].
+     * 
+     * @param max the upper bound of the generated {@link Duration}.
+     * @return the generated {@link Duration}.
+     */
+    public Duration duration(Duration max) {
+        return Duration.ofMillis(longNumber(0, max.toMillis()));
+    } 
+
+    /**
+     * Generates a {@link Duration} in [{@code min} ; {@code max}].
+     * 
+     * @param min the lower bound of the generated {@link Duration}.
+     * @param max the upper bound of the generated {@link Duration}.
+     * @return the generated {@link Duration}.
+     * @throws IllegalArgumentException if {@code min} &gt; {@code max}.
+     */
+    public Duration duration(Duration min, Duration max) {
+        checkArgument(min.compareTo(max) <= 0, "min %s must be less than or equal max %s", min, max);
+        return Duration.ofMillis(longNumber(min.toMillis(), max.toMillis()));
+    }
+
+    /**
      * Draws one element from the elements of an Enum class.
      * <p>
      * Example:

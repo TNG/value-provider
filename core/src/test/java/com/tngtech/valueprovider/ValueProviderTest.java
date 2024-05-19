@@ -7,6 +7,7 @@ import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collection;
@@ -21,6 +22,7 @@ import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
 import lombok.Data;
+
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
@@ -95,6 +97,8 @@ class ValueProviderTest {
         int min = random.intNumber(100, 1000);
         int max = random.intNumber(1001, 2000);
         int numLines = random.intNumber(2, 10);
+        Duration minDuration = Duration.ofHours(1);
+        Duration maxDuration = Duration.ofDays(1);
 
         return newArrayList(
                 invoke("booleanValue"),
@@ -123,6 +127,8 @@ class ValueProviderTest {
                 invoke("fixedLocalDate"),
                 invoke("localDateBetweenYears", min, max),
                 invoke("localTime"),
+                invoke("duration", maxDuration),
+                invoke("duration", minDuration, maxDuration),
                 invoke("fixedLocalDateTime"),
                 invoke("fixedDecoratedStrings", numLines),
                 invoke("fixedDecoratedStrings", numLines, random.randomString(stringLength))
@@ -536,6 +542,21 @@ class ValueProviderTest {
         Throwable thrown = assertThrows(IllegalArgumentException.class,
                 () -> withRandomValues().numericString(tooSmallLength, min, max));
         assertThat(thrown.getMessage()).contains("" + tooSmallLength, "" + min);
+    }
+
+    @Test
+    void duration_should_be_smaller_than_max_duration() {
+        ValueProvider random = withRandomValues();
+        assertThat(random.duration(Duration.ofDays(1)))
+                .isLessThanOrEqualTo(Duration.ofDays(1));
+    }
+
+    @Test
+    void duration_should_be_bigger_than_min_and_smaller_than_max_duration() {
+        ValueProvider random = withRandomValues();
+        assertThat(random.duration(Duration.ofMinutes(1), Duration.ofDays(1)))
+                .isGreaterThanOrEqualTo(Duration.ofMinutes(1))
+                .isLessThanOrEqualTo(Duration.ofDays(1));
     }
 
     @Test
