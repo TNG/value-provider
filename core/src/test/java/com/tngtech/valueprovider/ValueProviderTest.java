@@ -118,6 +118,7 @@ class ValueProviderTest {
                 invoke("url", address),
                 invoke("bigDecimalNumber", min, max),
                 invoke("bigIntegerNumber", BigInteger.valueOf(min), BigInteger.valueOf(max)),
+                invoke("bigDecimalPercentage"),
                 invoke("intNumber", min, max),
                 invoke("longNumber", min, max),
                 invoke("fixedLocalDate"),
@@ -500,6 +501,16 @@ class ValueProviderTest {
                 .isBetween(BigDecimal.valueOf(min - offsetForScale), BigDecimal.valueOf(max + offsetForScale));
         assertThat(withFixedValues().bigDecimalNumberWithScale(min, max, scale))
                 .isBetween(BigDecimal.valueOf(min - offsetForScale), BigDecimal.valueOf(max + offsetForScale));
+    }
+
+    @Test
+    void bigDecimalPercentage_should_return_numbers_within_0_and_1() {
+        ValueProvider random = withRandomValues();
+        for (int i = 0; i < 1000; i++) {
+            BigDecimal percentage = random.bigDecimalPercentage();
+            assertThat(percentage).isGreaterThanOrEqualTo(BigDecimal.ZERO);
+            assertThat(percentage).isLessThanOrEqualTo(BigDecimal.ONE);
+        }
     }
 
     @TestFactory
