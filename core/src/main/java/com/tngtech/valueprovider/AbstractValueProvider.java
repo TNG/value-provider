@@ -561,6 +561,22 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
     }
 
     /**
+     * Generates a {@link BigDecimal} in [{@code 0} ; {@code 1}],
+     * <p>
+     * Example:
+     * <pre>
+     * ValueProvider vp = ValueProviderFactory.createRandomValueProvider();
+     * vp.bigDecimalPercentage();
+     * </pre>
+     * </p>
+     * 
+     * @return the generated percentage.
+     */
+    public BigDecimal bigDecimalPercentage() {
+        return bigDecimalNumber(BigDecimal.ZERO, BigDecimal.ONE);
+    }
+
+    /**
      * Returns the reference {@link LocalDateTime} as passed in the {@link ValueProviderInitialization}.
      * <p><b>Note:</b>
      * When initializing the {@link ValueProvider} via {@link ValueProviderFactory#createRandomValueProvider()}, this yields the current {@link LocalDateTime}, as produced by {@link LocalDateTime#now()}.
