@@ -1,5 +1,7 @@
 package com.tngtech.valueprovider;
 
+import com.google.common.collect.Iterables;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
@@ -10,20 +12,11 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-
-import com.google.common.collect.Iterables;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -953,14 +946,14 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      * <p>
      * Example:
      * <pre>
-     *          static class MyBeanTestData {
+     *          static class MyBeanTestDataFactory {
      *              public static MyBean myBean(ValueProvider valueProvider) {
      *                  // builds and returns your bean
      *              }
      *          }
      *
      *         ValueProvider vp = ValueProviderFactory.createRandomValueProvider();
-     *         vp.listOfContaining(MyBeanTestData::myBean, myBean(), myBean(), myBean()); // -> List[myBean_1, myBean_2, myBean_random, myBean_3, myBean_random]
+     *         vp.listOfContaining(MyBeanTestDataFactory::myBean, myBean(), myBean(), myBean()); // -> List[myBean_1, myBean_2, myBean_random, myBean_3, myBean_random]
      * </pre>
      * </p>
      *
@@ -1007,14 +1000,14 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      * <p>
      * Example:
      * <pre>
-     *          static class MyBeanTestData {
+     *          static class MyBeanTestDataFactory {
      *              public static MyBean myBean(ValueProvider valueProvider) {
      *                  // builds and returns your bean
      *              }
      *          }
      *
      *         ValueProvider vp = ValueProviderFactory.createRandomValueProvider();
-     *         vp.nonEmptyListOf(MyBeanTestData::myBean); // -> List[myBean_generated_1, myBean_generated_2]
+     *         vp.nonEmptyListOf(MyBeanTestDataFactory::myBean); // -> List[myBean_generated_1, myBean_generated_2]
      * </pre>
      * </p>
      *
@@ -1031,15 +1024,15 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      * <p>
      * Example:
      * <pre>
-     *          static class MyBeanTestData {
+     *          static class MyBeanTestDataFactory {
      *              public static MyBean myBean(ValueProvider valueProvider) {
      *                  // builds and returns your bean
      *              }
      *          }
      *
      *         ValueProvider vp = ValueProviderFactory.createRandomValueProvider();
-     *         vp.listOf(MyBeanTestData::myBean); // -> List[myBean_generated_1, myBean_generated_2]
-     *         vp.listOf(MyBeanTestData::myBean); // -> List[]
+     *         vp.listOf(MyBeanTestDataFactory::myBean); // -> List[myBean_generated_1, myBean_generated_2]
+     *         vp.listOf(MyBeanTestDataFactory::myBean); // -> List[]
      * </pre>
      * </p>
      *
@@ -1056,14 +1049,14 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      * <p>
      * Example:
      * <pre>
-     *          static class MyBeanTestData {
+     *          static class MyBeanTestDataFactory {
      *              public static MyBean myBean(ValueProvider valueProvider) {
      *                  // builds and returns your bean
      *              }
      *          }
      *
      *         ValueProvider vp = ValueProviderFactory.createRandomValueProvider();
-     *         vp.listOf(MyBeanTestData::myBean, 4); // -> List[myBean_generated_1, myBean_generated_2, myBean_generated_3, myBean_generated_4]
+     *         vp.listOf(MyBeanTestDataFactory::myBean, 4); // -> List[myBean_generated_1, myBean_generated_2, myBean_generated_3, myBean_generated_4]
      * </pre>
      * </p>
      *
@@ -1092,14 +1085,14 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      * Generates an {@link Optional} of {@code <T>} by means of {@code generator}.
      * Example:
      * <pre>
-     * static class MyBeanTestData {
+     * static class MyBeanTestDataFactory {
      *     public static MyBean myBean(ValueProvider valueProvider) {
      *         // builds and returns your bean
      *     }
      * }
      *
      * ValueProvider vp = ValueProviderFactory.createRandomValueProvider();
-     * vp.optionalOf(MyBeanTestData::myBean);
+     * vp.optionalOf(MyBeanTestDataFactory::myBean);
      * vp.optionalOf(provider -> provider.randomString(10));
      * </pre>
      * </p>

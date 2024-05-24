@@ -1,12 +1,12 @@
 package com.tngtech.valueprovider.example.customprovider;
 
-import java.util.Random;
-
 import com.tngtech.valueprovider.ValueProviderExtension;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import static com.tngtech.valueprovider.example.customprovider.CustomValueProviderFactoryTest.MyBeanTestData.myBean;
+import java.util.Random;
+
+import static com.tngtech.valueprovider.example.customprovider.CustomValueProviderFactoryTest.MyBeanTestDataFactory.myBean;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SuppressWarnings("JoinAssertThatStatements")
@@ -44,10 +44,10 @@ class CustomValueProviderFactoryTest {
     void type_inference_should_work_for_listOf_in_a_custom_ValueProvider() {
         CustomValueProvider customValueProvider = CustomValueProviderFactory.createRandomValueProvider();
         customValueProvider.listOf(vp -> myBean());
-        customValueProvider.listOf(MyBeanTestData::myBean);
+        customValueProvider.listOf(MyBeanTestDataFactory::myBean);
     }
 
-    static class MyBeanTestData {
+    static class MyBeanTestDataFactory{
         public static MyBean myBean() {
             return new MyBean("not using VP");
         }

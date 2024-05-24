@@ -1,5 +1,10 @@
 package com.tngtech.valueprovider;
 
+import lombok.Data;
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestFactory;
+
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -9,56 +14,22 @@ import java.net.URL;
 import java.net.UnknownHostException;
 import java.time.Duration;
 import java.time.LocalDate;
-import java.time.Duration;
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.Duration;
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.Duration;
-import java.time.Duration;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
-
-import lombok.Data;
-
-import org.junit.jupiter.api.DynamicTest;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestFactory;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
 import static com.tngtech.valueprovider.ValueProvider.Builder;
 import static com.tngtech.valueprovider.ValueProviderInitialization.createRandomInitialization;
 import static com.tngtech.valueprovider.ValueProviderInitialization.createReproducibleInitialization;
-import static com.tngtech.valueprovider.ValueProviderTest.MethodInvocation.assertDifferentResultAsFarAsPossible;
-import static com.tngtech.valueprovider.ValueProviderTest.MethodInvocation.assertEqualResult;
-import static com.tngtech.valueprovider.ValueProviderTest.MethodInvocation.invoke;
-import static com.tngtech.valueprovider.ValueProviderTest.MyBeanTestData.myBeanContained;
-import static com.tngtech.valueprovider.ValueProviderTest.TestEnum.EIGHT;
-import static com.tngtech.valueprovider.ValueProviderTest.TestEnum.ELEVEN;
-import static com.tngtech.valueprovider.ValueProviderTest.TestEnum.FIVE;
-import static com.tngtech.valueprovider.ValueProviderTest.TestEnum.FOUR;
-import static com.tngtech.valueprovider.ValueProviderTest.TestEnum.NINE;
-import static com.tngtech.valueprovider.ValueProviderTest.TestEnum.ONE;
-import static com.tngtech.valueprovider.ValueProviderTest.TestEnum.SEVEN;
-import static com.tngtech.valueprovider.ValueProviderTest.TestEnum.SIX;
-import static com.tngtech.valueprovider.ValueProviderTest.TestEnum.TEN;
-import static com.tngtech.valueprovider.ValueProviderTest.TestEnum.THREE;
-import static com.tngtech.valueprovider.ValueProviderTest.TestEnum.TWELVE;
-import static com.tngtech.valueprovider.ValueProviderTest.TestEnum.TWO;
+import static com.tngtech.valueprovider.ValueProviderTest.MethodInvocation.*;
+import static com.tngtech.valueprovider.ValueProviderTest.MyBeanTestDataFactory.myBeanContained;
+import static com.tngtech.valueprovider.ValueProviderTest.TestEnum.*;
 import static java.time.LocalDateTime.now;
 import static java.util.Arrays.stream;
 import static java.util.Collections.emptyList;
@@ -109,8 +80,8 @@ class ValueProviderTest {
         int max = random.intNumber(1001, 2000);
         LocalDate start = random.localDateBetweenYears(min, max);
         LocalDate end = random.localDateBetweenYears(
-            random.intNumber(3000, 4000),
-            random.intNumber(4001, 10000)
+                random.intNumber(3000, 4000),
+                random.intNumber(4001, 10000)
         );
         Duration duration = Duration.ofDays(Long.valueOf(min));
         LocalTime time = random.localTime();
@@ -617,7 +588,7 @@ class ValueProviderTest {
         LocalDate start = LocalDate.of(2000, 1, 1);
         LocalDate end = LocalDate.of(2040, 12, 31);
         assertThat(withRandomValues().localDateBetween(start, end)).isAfterOrEqualTo(start)
-            .isBeforeOrEqualTo(end);
+                .isBeforeOrEqualTo(end);
     }
 
     @Test
@@ -625,7 +596,7 @@ class ValueProviderTest {
         LocalDate start = LocalDate.of(2000, 1, 1);
         LocalDate end = LocalDate.of(2040, 12, 31);
         Throwable thrown = assertThrows(IllegalArgumentException.class,
-            () -> withRandomValues().localDateBetween(end, start));
+                () -> withRandomValues().localDateBetween(end, start));
         assertThat(thrown.getMessage()).contains("must be before or equal end ");
     }
 
@@ -635,7 +606,7 @@ class ValueProviderTest {
         Duration duration = Duration.ofDays(300);
         LocalDate pastDate = today.minusDays(duration.toDays());
         assertThat(withRandomValues().localDateInPast(duration)).isAfterOrEqualTo(pastDate)
-            .isBeforeOrEqualTo(today);
+                .isBeforeOrEqualTo(today);
     }
 
     @Test
@@ -644,7 +615,7 @@ class ValueProviderTest {
         Duration duration = Duration.ofDays(300);
         LocalDate futureDate = today.plusDays(duration.toDays());
         assertThat(withRandomValues().localDateInFuture(duration)).isAfterOrEqualTo(today)
-            .isBeforeOrEqualTo(futureDate);
+                .isBeforeOrEqualTo(futureDate);
     }
 
     @Test
@@ -652,8 +623,8 @@ class ValueProviderTest {
         LocalDate start = LocalDate.of(2000, 1, 1);
         LocalDate end = LocalDate.of(2040, 12, 31);
         assertThat(withRandomValues().localDateTimeBetween(start, end))
-            .isAfterOrEqualTo(LocalDateTime.of(start, LocalTime.MIN))
-            .isBeforeOrEqualTo(LocalDateTime.of(end, LocalTime.MAX));
+                .isAfterOrEqualTo(LocalDateTime.of(start, LocalTime.MIN))
+                .isBeforeOrEqualTo(LocalDateTime.of(end, LocalTime.MAX));
     }
 
     @Test
@@ -661,7 +632,7 @@ class ValueProviderTest {
         LocalDate start = LocalDate.of(2000, 1, 1);
         LocalDate end = LocalDate.of(2040, 12, 31);
         Throwable thrown = assertThrows(IllegalArgumentException.class,
-            () -> withRandomValues().localDateTimeBetween(end, start));
+                () -> withRandomValues().localDateTimeBetween(end, start));
         assertThat(thrown.getMessage()).contains("must be before or equal end ");
     }
 
@@ -832,7 +803,7 @@ class ValueProviderTest {
         int numberOfElements = random.intNumber(5, 10);
 
         // when
-        List<MyBean> myBeans = random.listOf(MyBeanTestData::myBean, numberOfElements);
+        List<MyBean> myBeans = random.listOf(MyBeanTestDataFactory::myBean, numberOfElements);
 
         // then
         assertThat(myBeans).hasSize(numberOfElements);
@@ -844,7 +815,7 @@ class ValueProviderTest {
         ValueProvider random = withRandomValues();
 
         // when
-        List<MyBean> myBeans = random.listOf(MyBeanTestData::myBean);
+        List<MyBean> myBeans = random.listOf(MyBeanTestDataFactory::myBean);
 
         // then
         assertThat(myBeans).hasSizeLessThanOrEqualTo(5); // 5 is the default
@@ -856,7 +827,7 @@ class ValueProviderTest {
         ValueProvider random = withRandomValues();
 
         // when
-        List<MyBean> myBeans = random.nonEmptyListOf(MyBeanTestData::myBean);
+        List<MyBean> myBeans = random.nonEmptyListOf(MyBeanTestDataFactory::myBean);
 
         // then
         assertThat(myBeans).isNotEmpty()
@@ -869,7 +840,7 @@ class ValueProviderTest {
         ValueProvider random = withRandomValues();
 
         // when
-        List<MyBean> myBeans = random.listOfContaining(MyBeanTestData::myBean, myBeanContained(1), myBeanContained(2), myBeanContained(3));
+        List<MyBean> myBeans = random.listOfContaining(MyBeanTestDataFactory::myBean, myBeanContained(1), myBeanContained(2), myBeanContained(3));
 
         // then
         assertThat(myBeans).hasSizeLessThanOrEqualTo(7)
@@ -937,7 +908,7 @@ class ValueProviderTest {
     enum EmptyTestEnum {
     }
 
-    static class MyBeanTestData {
+    static class MyBeanTestDataFactory {
         public static MyBean myBean(ValueProvider valueProvider) {
             return new MyBean("randomly generated" + valueProvider.intNumber(0, Integer.MAX_VALUE));
         }
