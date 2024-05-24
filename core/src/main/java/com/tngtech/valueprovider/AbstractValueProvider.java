@@ -16,9 +16,11 @@ import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -1016,6 +1018,49 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      */
     public boolean booleanValue() {
         return random.nextBoolean();
+    }
+
+    /**
+     * <p>
+     * Generates an {@link Optional} of {@code <T>} by means of {@code generator}.
+     * Example:
+     * <pre>
+     * static class MyBeanTestData {
+     *     public static MyBean myBean(ValueProvider valueProvider) {
+     *         // builds and returns your bean
+     *     }
+     * }
+     *
+     * ValueProvider vp = ValueProviderFactory.createRandomValueProvider();
+     * vp.optionalOf(MyBeanTestData::myBean);
+     * vp.optionalOf(provider -> provider.randomString(10));
+     * </pre>
+     * </p>
+     *
+     * @param <T> the type of value to generate
+     * @param generator a generator {@link Function} to generate {@code <T>} given an implementation of {@link AbstractValueProvider}.
+     * @return the generated {@link Optional}.
+     */
+    public <T> Optional<T> optionalOf(Function<VP, T> generator) {
+        return booleanValue() ? Optional.of(generator.apply((VP) this)) : Optional.empty();
+    }
+
+    /**
+     * <p>
+     * Generates an {@link Optional} of {@code <T>} by means of {@code supplier}.
+     * Example:
+     * <pre>
+     * ValueProvider vp = ValueProviderFactory.createRandomValueProvider();
+     * vp.optionalOf(vp::uuid);
+     * </pre>
+     * </p>
+     *
+     * @param <T> the type of value to generate
+     * @param supplier a supplier {@link Supplier} to generate {@code <T>}.
+     * @return the generated {@link Optional}.
+     */
+    public <T> Optional<T> optionalOf(Supplier<T> supplier) {
+        return booleanValue() ? Optional.of(supplier.get()) : Optional.empty();
     }
 
     /**
