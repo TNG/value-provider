@@ -560,7 +560,7 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      * Example:
      * <pre>
      * ValueProvider vp = ValueProviderFactory.createRandomValueProvider();
-     * vp.bigDecimalPercentage();
+     * vp.bigDecimalPercentage(); // -> BigDecimal[0.37]
      * </pre>
      * </p>
      *
@@ -1082,7 +1082,8 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
 
     /**
      * <p>
-     * Generates an {@link Optional} of {@code <T>} by means of {@code generator}.
+     * Randomly generates an {@link Optional} of {@code <T>} by means of {@code generator} or {@code Optional.empty()}.
+     * <p>
      * Example:
      * <pre>
      * static class MyBeanTestDataFactory {
@@ -1092,30 +1093,31 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      * }
      *
      * ValueProvider vp = ValueProviderFactory.createRandomValueProvider();
-     * vp.optionalOf(MyBeanTestDataFactory::myBean);
-     * vp.optionalOf(provider -> provider.randomString(10));
+     * vp.optionalOf(MyBeanTestDataFactory::myBean); // -> Optional.empty()
+     * vp.optionalOf(provider -> provider.randomString(10)); // -> Optional.of("eicDgiDGdd")
      * </pre>
      * </p>
      *
-     * @param <T> the type of value to generate
      * @param generator a generator {@link Function} to generate {@code <T>} given an implementation of {@link AbstractValueProvider}.
+     *
      * @return the generated {@link Optional}.
      */
     public <T> Optional<T> optionalOf(Function<VP, T> generator) {
+        //noinspection unchecked
         return booleanValue() ? Optional.of(generator.apply((VP) this)) : Optional.empty();
     }
 
     /**
      * <p>
-     * Generates an {@link Optional} of {@code <T>} by means of {@code supplier}.
+     * Randomly generates an {@link Optional} of {@code <T>} by means of {@code supplier} or {@code Optional.empty()}.
+     * <p>
      * Example:
      * <pre>
      * ValueProvider vp = ValueProviderFactory.createRandomValueProvider();
-     * vp.optionalOf(vp::uuid);
+     * vp.optionalOf(vp::uuid); // -> Optional.of(Uuid["550e8400-e29b-41d4-a716-446655440000"])
      * </pre>
      * </p>
      *
-     * @param <T> the type of value to generate
      * @param supplier a supplier {@link Supplier} to generate {@code <T>}.
      * @return the generated {@link Optional}.
      */
