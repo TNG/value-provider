@@ -2,7 +2,6 @@ name: CI
 
 on:
   push:
-    branches: [ "master" ]
   pull_request:
     branches: [ "master" ]
   workflow_dispatch: # allows manual triggering
@@ -16,21 +15,22 @@ jobs:
     runs-on: ubuntu-latest
     
     strategy:
-      fail-fast: false # ensures build runs for all three JDKs
+      fail-fast: false # ensures build runs for all JDKs
       matrix:
-        java: [ '8', '11', '17' ]
-      
+        java: [ '8', '11', '17', '21' ]
+
     name: Java ${{ matrix.Java }}
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up JDK
-      uses: actions/setup-java@v3
-      with:
-        java-version: ${{ matrix.java }}
-        distribution: 'temurin'
-    - name: Build with Gradle
-      uses: gradle/gradle-build-action@v2
-      with:
-        arguments: clean build
-        gradle-version: 8.5 # facilitates compatibility with JDK 21
+      - uses: actions/checkout@v4
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ matrix.java }}
+          distribution: 'temurin'
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.5"
+      - name: Build with Gradle
+        run: ./gradlew clean build
