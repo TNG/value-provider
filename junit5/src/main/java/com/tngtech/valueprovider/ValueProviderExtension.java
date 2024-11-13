@@ -4,21 +4,15 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
 import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.extension.AfterAllCallback;
-import org.junit.jupiter.api.extension.AfterEachCallback;
-import org.junit.jupiter.api.extension.BeforeAllCallback;
-import org.junit.jupiter.api.extension.BeforeEachCallback;
-import org.junit.jupiter.api.extension.ExtensionContext;
-import org.junit.jupiter.api.extension.InvocationInterceptor;
-import org.junit.jupiter.api.extension.ReflectiveInvocationContext;
-import org.junit.jupiter.api.extension.TestExecutionExceptionHandler;
+import org.junit.jupiter.api.TestInstance.Lifecycle;
+import org.junit.jupiter.api.extension.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static com.tngtech.valueprovider.ValueProviderExtension.TestMethodCycleState.BEFORE_FIRST_CYCLE;
-import static com.tngtech.valueprovider.ValueProviderExtension.TestMethodCycleState.CYCLE_COMLETED;
-import static com.tngtech.valueprovider.ValueProviderExtension.TestMethodCycleState.CYCLE_STARTED;
+import static com.tngtech.valueprovider.ValueProviderExtension.TestMethodCycleState.*;
 import static java.lang.System.identityHashCode;
+import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
+import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_METHOD;
 
 public class ValueProviderExtension implements
         BeforeAllCallback, AfterAllCallback,
@@ -47,7 +41,7 @@ public class ValueProviderExtension implements
     public void beforeAll(ExtensionContext context) {
         logger.debug("{} beforeAll {}",
                 identityHashCode(this), getTestClassName(context));
-        startTestClassCycle();
+        startTestClassCycleIf(context, PER_METHOD);
     }
 
     @Override
@@ -55,6 +49,7 @@ public class ValueProviderExtension implements
             ExtensionContext extensionContext) throws Throwable {
         logger.debug("{} interceptTestClassConstructor {}",
                 identityHashCode(this), buildQualifiedTestMethodName(extensionContext));
+        startTestClassCycleIf(extensionContext, PER_CLASS);
         ensureStaticInitializationOfTestClass(extensionContext);
         startTestMethodCycle();
         return invocation.proceed();
@@ -89,14 +84,21 @@ public class ValueProviderExtension implements
     public void afterEach(ExtensionContext context) {
         logger.debug("{} afterEach {}",
                 identityHashCode(this), buildQualifiedTestMethodName(context));
-        finishTestMethodCycle();
+        finishTestMethodCycleIf(context, PER_METHOD);
     }
 
     @Override
     public void afterAll(ExtensionContext context) {
         logger.debug("{} afterAll {}",
                 identityHashCode(this), getTestClassName(context));
+        finishTestMethodCycleIf(context, PER_CLASS);
         finishTestClassCycle();
+    }
+
+    private void startTestClassCycleIf(ExtensionContext context, Lifecycle lifecycle) {
+        if (isLifecycle(context, lifecycle)) {
+            startTestClassCycle();
+        }
     }
 
     private void startTestClassCycle() {
@@ -119,6 +121,12 @@ public class ValueProviderExtension implements
     private void finishTestMethodCycleIfNecessary() {
         if (testMethodCycleState == CYCLE_STARTED) {
             // was started, but not finished due to @Disabled test-method
+            finishTestMethodCycle();
+        }
+    }
+
+    private void finishTestMethodCycleIf(ExtensionContext context, Lifecycle lifecycle) {
+        if (isLifecycle(context, lifecycle)) {
             finishTestMethodCycle();
         }
     }
@@ -149,5 +157,9 @@ public class ValueProviderExtension implements
         return context.getTestMethod()
                 .map(Method::getName)
                 .orElse("<unknown>");
+    }
+
+    private static boolean isLifecycle(ExtensionContext context, Lifecycle lifecycle) {
+        return lifecycle == context.getTestInstanceLifecycle().orElse(null);
     }
 }
