@@ -3,6 +3,7 @@ package com.tngtech.valueprovider;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Supplier;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +12,7 @@ import static com.google.common.collect.Lists.asList;
 import static com.tngtech.valueprovider.InitializationCreator.VALUE_PROVIDER_FACTORY_TEST_CLASS_SEED_PROPERTY;
 import static com.tngtech.valueprovider.InitializationCreator.VALUE_PROVIDER_FACTORY_TEST_METHOD_SEED_PROPERTY;
 import static java.lang.System.setProperty;
+import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -84,8 +86,11 @@ public class ValueProviderAsserter {
     }
 
     private ValueProviderAsserter assertHasNextTestClassRandomValues(List<ValueProvider> providers) {
-        providers.forEach(this::assertHasNextTestClassRandomValues);
-        return this;
+        return assertHasNextRandomValues(providers, "test-CLASS", this::expectedNextTestClassRandomValues);
+    }
+
+    private ValueProviderAsserter assertHasNextTestMethodRandomValues(List<ValueProvider> providers) {
+        return assertHasNextRandomValues(providers, "test-METHOD", this::expectedNextTestMethodRandomValues);
     }
 
     /**
@@ -93,37 +98,35 @@ public class ValueProviderAsserter {
      * It does currently NOT support the extra cycles that may be required for unique VP suffixes,
      * as those can easily be avoided be appropriate initial seed values, at least for a small number of created VPs.
      */
-    private ValueProviderAsserter assertHasNextTestClassRandomValues(ValueProvider provider) {
-        assertThat(provider.getRandom()).isEqualTo(expectedNextTestClassRandomValues());
-        return this;
-    }
-
-    private ValueProviderAsserter assertHasNextTestMethodRandomValues(List<ValueProvider> providers) {
-        providers.forEach(this::assertHasNextTestMethodRandomValues);
-        return this;
-    }
-
-    /**
-     * @see #assertHasNextTestClassRandomValues(ValueProvider)
-     */
-    @SuppressWarnings("UnusedReturnValue")
-    private ValueProviderAsserter assertHasNextTestMethodRandomValues(ValueProvider provider) {
-        assertThat(provider.getRandom()).isEqualTo(expectedNextTestMethodRandomValues());
+    private ValueProviderAsserter assertHasNextRandomValues(
+            List<ValueProvider> providers,
+            String testCycle, Supplier<RandomValues> expectedRandomValuesSupplier) {
+        List<RandomValues> expectedRandomValues = new ArrayList<>();
+        List<RandomValues> actualRandomValues = new ArrayList<>();
+        providers.forEach(provider -> {
+            actualRandomValues.add(provider.getRandom());
+            expectedRandomValues.add(expectedRandomValuesSupplier.get());
+        });
+        if (logger.isDebugEnabled()) {
+            List<Long> expectedSeeds = expectedRandomValues.stream()
+                    .map(RandomValues::getSeed)
+                    .collect(toList());
+            logger.debug("assertHasNextRandomValues({}), expectedRandomValues seeds {}", testCycle, expectedSeeds);
+        }
+        assertThat(actualRandomValues).as("%s random values", testCycle).isEqualTo(expectedRandomValues);
         return this;
     }
 
     private RandomValues expectedNextTestClassRandomValues() {
-        return expectedNextRandomValues("test-CLASS", testClassSequence);
+        return expectedNextRandomValues(testClassSequence);
     }
 
     private RandomValues expectedNextTestMethodRandomValues() {
-        return expectedNextRandomValues("test-METHOD", testMethodSequence);
+        return expectedNextRandomValues(testMethodSequence);
     }
 
-    private RandomValues expectedNextRandomValues(String testCycle, RandomValuesSequence sequence) {
-        RandomValues random = sequence.nextRandomValues();
-        logger.debug("expectedNextRandomValues({}), {}({})", testCycle, sequence.getSequenceCounter(), random.getSeed());
-        return random;
+    private RandomValues expectedNextRandomValues(RandomValuesSequence sequence) {
+        return sequence.nextRandomValues();
     }
 
     private ValueProviderAsserter assertSuffixes(Collection<ValueProvider> valueProviders) {
