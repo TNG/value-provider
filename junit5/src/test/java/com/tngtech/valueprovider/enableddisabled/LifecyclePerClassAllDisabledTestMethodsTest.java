@@ -1,5 +1,6 @@
-package com.tngtech.valueprovider;
+package com.tngtech.valueprovider.enableddisabled;
 
+import com.tngtech.valueprovider.ValueProviderExtension;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;

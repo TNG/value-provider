@@ -1,9 +1,12 @@
-package com.tngtech.valueprovider;
+package com.tngtech.valueprovider.dataprovider;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
+import com.tngtech.valueprovider.ValueProvider;
+import com.tngtech.valueprovider.ValueProviderAsserter;
+import com.tngtech.valueprovider.ValueProviderExtension;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
