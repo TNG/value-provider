@@ -52,7 +52,7 @@ public class ValueProviderExtension implements
             ReflectiveInvocationContext<Constructor<T>> invocationContext,
             ExtensionContext extensionContext) throws Throwable {
         logger.debug("{} interceptTestClassConstructor {}",
-                identityHashCode(this), buildQualifiedTestMethodName(extensionContext));
+                identityHashCode(this), getTestClassName(extensionContext));
         startTestClassCycleIf(extensionContext, PER_CLASS);
         ensureStaticInitializationOfTestClass(extensionContext);
         startTestMethodCycle(extensionContext);
