@@ -1,0 +1,111 @@
+@startuml
+participant "JVM\nJUnit\nRuntime" as JVM
+participant "Test A,\nLifecycle\n'PER_CLASS'" as T_A
+
+participant "VPExtension\n(JUnit5)" as VPF_X #lightblue
+participant "ValueProviderFactory" as VPF
+note over VPF: Just shown for single thread,\nimplemented as ThreadLocal\nfor parallel test execution
+participant "DefaultInitializationCreator" as D_VPC
+note over D_VPC: 1. Uses arbitrary/random seed\n2. Does NOT ensure unique suffixes
+participant "TestClassInitializationCreator" as C_VPC
+participant "TestMethodInitializationCreator" as M_VPC
+note over C_VPC, M_VPC: 1. Seed and reference date/time\n    controllable via system properties\n2. Ensures unique suffixes\n    (as far as possible)
+
+JVM --> VPF : class-loading & instantiation
+activate VPF
+VPF -> D_VPC : instantiation
+activate D_VPC
+VPF -> M_VPC : instantiation
+activate M_VPC
+VPF -> VPF : activateCreator(DefaultInitializationCreator)
+
+== Test A class-loading ==
+JVM --> VPF_X : instantiation
+activate VPF_X #lightblue
+JVM -> VPF_X : beforeAll
+note right #lightgreen: nothing to do for Lifecycle PER_CLASS
+JVM -> VPF_X : interceptTestClassConstructor
+VPF_X -> VPF : startTestClassCycle
+VPF -> C_VPC : instantiation
+activate C_VPC
+note right of C_VPC #lightgreen: different lifecycle required\nfor tests with JUnit4 DataProvider
+VPF -> C_VPC : startTestCycle
+C_VPC -> C_VPC : initialize seed &\n reference date/time
+note right of C_VPC #lightgreen: using system properties
+VPF -> VPF : activateCreator(TestClassInitializationCreator)
+VPF_X -> JVM : trigger class-loading of Test A
+
+T_A -> VPF : createRandomValueProvider
+note left #lightgreen: static initialization
+VPF -> C_VPC : createRandomValueProvider
+
+VPF_X -> VPF : startTestMethodCycle
+VPF -> VPF : activateCreator(TestMethodInitializationCreator)
+VPF -> M_VPC : startTestCycle(TestClassInitializationCreator)
+M_VPC -> M_VPC : initialize seed &\n reference date/time
+note right of M_VPC #lightgreen: using system properties
+M_VPC -> M_VPC : copyValueProviderSuffixes(TestClassInitializationCreator)
+note right of M_VPC #lightgreen: required to ensure unique suffixes
+M_VPC -> M_VPC : copyReferenceDateTime(TestClassInitializationCreator)
+note right of M_VPC #lightgreen: required to ensure reproducible\ndate/time related test data
+JVM <-- VPF_X : proceed
+== Test A test method <1> ==
+JVM --> T_A : instantiation (once for all test methods)
+activate T_A
+
+T_A -> VPF : createRandomValueProvider
+note left #lightgreen: instance variables
+VPF -> M_VPC : createRandomValueProvider
+
+T_A -> VPF : createRandomValueProvider
+note left #lightgreen: before methods
+VPF -> M_VPC : createRandomValueProvider
+
+JVM -> T_A : test method <1>
+T_A -> VPF : createRandomValueProvider
+note left #lightgreen: test method
+VPF -> M_VPC : createRandomValueProvider
+
+T_A --> JVM : return
+JVM -> VPF_X : afterEach
+note right #lightgreen: nothing to do for Lifecycle PER_CLASS
+newpage
+
+== Test A test method <2> ==
+T_A -> VPF : createRandomValueProvider
+note left #lightgreen
+(note: instance variables shared)
+before methods
+end note
+VPF -> M_VPC : createRandomValueProvider
+
+JVM -> T_A : test method <2>
+T_A -> VPF : createRandomValueProvider
+note left #lightgreen: test method
+VPF -> M_VPC : createRandomValueProvider
+
+T_A --> JVM : return
+JVM -> VPF_X : afterEach
+note right #lightgreen: nothing to do for Lifecycle PER_CLASS
+
+JVM --> T_A : destruction
+destroy T_A
+
+JVM -> VPF_X : afterAll
+
+VPF_X -> VPF : finishTestMethodCycle
+VPF -> M_VPC : finishTestCycle
+M_VPC -> M_VPC : resetValueProviderSuffixes
+VPF -> VPF : activateCreator(TestClassInitializationCreator)
+
+VPF_X -> VPF : finishTestClassCycle
+VPF -> C_VPC : finishTestCycle
+C_VPC -> C_VPC : resetValueProviderSuffixes
+VPF -> VPF : delete TestClassInitializationCreator
+destroy C_VPC
+VPF -> VPF : activateCreator(DefaultInitializationCreator)
+
+JVM --> VPF_X
+destroy VPF_X
+
+@enduml
