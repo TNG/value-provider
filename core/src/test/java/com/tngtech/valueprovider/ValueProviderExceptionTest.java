@@ -1,13 +1,11 @@
 package com.tngtech.valueprovider;
 
+import java.util.Optional;
+
 import org.junit.jupiter.api.Test;
 
-import static com.tngtech.valueprovider.InitializationCreator.VALUE_PROVIDER_FACTORY_REFERENCE_DATE_TIME_PROPERTY;
-import static com.tngtech.valueprovider.InitializationCreator.VALUE_PROVIDER_FACTORY_TEST_CLASS_SEED_PROPERTY;
-import static com.tngtech.valueprovider.InitializationCreator.VALUE_PROVIDER_FACTORY_TEST_METHOD_SEED_PROPERTY;
-import static com.tngtech.valueprovider.ValueProviderFactory.getFormattedReferenceDateTime;
-import static com.tngtech.valueprovider.ValueProviderFactory.getTestClassSeed;
-import static com.tngtech.valueprovider.ValueProviderFactory.getTestMethodSeed;
+import static com.tngtech.valueprovider.InitializationCreator.*;
+import static com.tngtech.valueprovider.ValueProviderFactory.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ValueProviderExceptionTest {
@@ -25,5 +23,15 @@ class ValueProviderExceptionTest {
                 .contains(VALUE_PROVIDER_FACTORY_TEST_CLASS_SEED_PROPERTY,
                         VALUE_PROVIDER_FACTORY_TEST_METHOD_SEED_PROPERTY,
                         VALUE_PROVIDER_FACTORY_REFERENCE_DATE_TIME_PROPERTY);
+    }
+
+    @Test
+    void should_show_test_class_to_re_run_for_failure_reproduction_if_provided() {
+        Class<?> testClassToReRun = this.getClass();
+        ValueProviderException exception = new ValueProviderException(Optional.of(testClassToReRun));
+
+        String message = exception.getMessage();
+
+        assertThat(message).contains(testClassToReRun.getName());
     }
 }

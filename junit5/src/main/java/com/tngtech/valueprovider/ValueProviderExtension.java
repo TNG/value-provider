@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import static com.tngtech.valueprovider.ValueProviderExtension.TestMethodCycleState.*;
 import static java.lang.System.identityHashCode;
+import static java.util.Optional.empty;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_METHOD;
 
@@ -78,9 +79,13 @@ public class ValueProviderExtension implements
     public void handleTestExecutionException(ExtensionContext context, Throwable throwable) throws Throwable {
         logger.debug("{} handleTestExecutionException {}",
                 identityHashCode(this), buildQualifiedTestMethodName(context));
+        // If the test class hierarchy of the failed test method contains any class(es) with Lifecycle PER_CLASS,
+        // all test methods of this hierarchy must be re-run to reproduce the failure.
+        // The root test class of the hierarchy must therefore be shown in the failure reproduction info.
+        Optional<Class<?>> testClassToReRunForReproduction = getRootClassInHierarchyWithLifecyclePerClass(context);
         // Note: handleTestExecutionException() is invoked BEFORE afterEach, i.e. BEFORE seed is reset,
         // so that the correct seed values appear in the failure message
-        throwable.addSuppressed(new ValueProviderException());
+        throwable.addSuppressed(new ValueProviderException(testClassToReRunForReproduction));
         throw throwable;
     }
 
@@ -177,6 +182,24 @@ public class ValueProviderExtension implements
         }
         Set<Lifecycle> remainingLifecyclesInHierarchy = determineLifecyclesInTestClassHierarchy(context.getParent());
         return remainingLifecyclesInHierarchy.isEmpty() || containsOnlyLifecyclePerMethod(remainingLifecyclesInHierarchy);
+    }
+
+    private static Optional<Class<?>> getRootClassInHierarchyWithLifecyclePerClass(ExtensionContext startContext) {
+        List<Class<?>> testClassesInHierarchyWithLifecyclePerClass = new ArrayList<>();
+        traverseContextHierarchy(startContext, context ->
+                addTestClassAtBeginningIfLifecyclePerClass(context, testClassesInHierarchyWithLifecyclePerClass));
+        if (testClassesInHierarchyWithLifecyclePerClass.isEmpty()) {
+            return empty();
+        }
+        return Optional.of(testClassesInHierarchyWithLifecyclePerClass.get(0));
+    }
+
+    private static void addTestClassAtBeginningIfLifecyclePerClass(ExtensionContext context, List<Class<?>> addTo) {
+        if (!isLifecycle(context, PER_CLASS)) {
+            return;
+        }
+        context.getTestClass().ifPresent(testClass ->
+                addTo.add(0, testClass));
     }
 
     private static boolean testClassHierarchyHasOnlyLifecyclePerMethod(ExtensionContext context) {
