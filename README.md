@@ -1,11 +1,14 @@
 # value-provider
 
-value-provider is a free library that facilitates writing realistic test data and in turn better tests for your Java application.  
-It works best in conjunction with reusable test data factories that encapsulate creating valid instances for your data objects.
+value-provider is a free library that facilitates writing realistic test data and in turn better tests for your Java
+application.  
+It works best in conjunction with reusable test data factories that encapsulate creating valid instances for your data
+objects.
 
 value-provider consists of two major parts:
 
-* the [ValueProvider](core/src/main/java/com/tngtech/valueprovider/ValueProvider.java) class which populates properties of test data objects with random values
+* the [ValueProvider](core/src/main/java/com/tngtech/valueprovider/ValueProvider.java) class which populates properties
+  of test data objects with random values
 * infrastructure for reproducing said random data in case of test failures (JUnit5 extension, JUnit4 rules)
 
 ## Contributing
@@ -14,7 +17,8 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 
 Please make sure to update the tests as appropriate.
 
-For further information, please refer to [CONTRIBUTING.md](CONTRIBUTING.md). For technical details, you may find the sequence diagrams in the `doc` directory helpful.
+For further information, please refer to [CONTRIBUTING.md](CONTRIBUTING.md). For technical details, you may find the
+sequence diagrams in the `doc` directory helpful.
 
 ## Installation
 
@@ -28,13 +32,13 @@ value-provider has the following prerequisites:
 
 ```groovy
 // core library
-testImplementation 'com.tngtech.valueprovider:value-provider-core:1.2.3'
+testImplementation 'com.tngtech.valueprovider:value-provider-core:1.3.0'
 
 // infrastructure
 // for JUnit 5
-testImplementation 'com.tngtech.valueprovider:value-provider-junit5:1.2.3'
+testImplementation 'com.tngtech.valueprovider:value-provider-junit5:1.3.0'
 // alternatively, for JUnit 4
-testImplementation 'com.tngtech.valueprovider:value-provider-junit4:1.2.3'
+testImplementation 'com.tngtech.valueprovider:value-provider-junit4:1.3.0'
 ```
 
 ### Maven
@@ -47,25 +51,25 @@ testImplementation 'com.tngtech.valueprovider:value-provider-junit4:1.2.3'
     <!-- core library -->
     <dependency>
         <groupId>com.tngtech.valueprovider</groupId>
-      <artifactId>value-provider-core</artifactId>
-      <version>1.2.3</version>
-      <scope>test</scope>
+        <artifactId>value-provider-core</artifactId>
+        <version>1.3.0</version>
+        <scope>test</scope>
     </dependency>
 
     <!-- infrastructure -->
     <!-- for JUnit 5 -->
     <dependency>
         <groupId>com.tngtech.valueprovider</groupId>
-      <artifactId>value-provider-junit5</artifactId>
-      <version>1.2.3</version>
-      <scope>test</scope>
+        <artifactId>value-provider-junit5</artifactId>
+        <version>1.3.0</version>
+        <scope>test</scope>
     </dependency>
     <!-- alternatively, for JUnit 4 -->
     <dependency>
         <groupId>com.tngtech.valueprovider</groupId>
-      <artifactId>value-provider-junit4</artifactId>
-      <version>1.2.3</version>
-      <scope>test</scope>
+        <artifactId>value-provider-junit4</artifactId>
+        <version>1.3.0</version>
+        <scope>test</scope>
     </dependency>
 
     <!-- ... -->
@@ -74,7 +78,8 @@ testImplementation 'com.tngtech.valueprovider:value-provider-junit4:1.2.3'
 
 ## Usage
 
-We strongly recommend implementing reusable __test data factories__ that encapsulate creating valid instances for your test data objects.
+We strongly recommend implementing reusable __test data factories__ that encapsulate creating valid instances for your
+test data objects.
 
 #### A Simple test data factory
 
@@ -96,7 +101,8 @@ public class Product {
 }
 ```
 
-... the test data factory would look like... (see also [ProductTestDataFactory](example/src/test/java/com/tngtech/valueprovider/example/ProductTestDataFactory.java)):
+... the test data factory would look like... (see
+also [ProductTestDataFactory](example/src/test/java/com/tngtech/valueprovider/example/ProductTestDataFactory.java)):
 
 ```java
 import com.tngtech.valueprovider.ValueProvider;
@@ -126,7 +132,8 @@ The [ValueProvider](core/src/main/java/com/tngtech/valueprovider/ValueProvider.j
 * select a [ProductCategory](example/src/main/java/com/tngtech/valueprovider/example/ProductCategory.java) at random
 * populate the `name` and `description` properties with a so called *decorated* string
 
-What is a decorated string? Let's have a look at the following example output when invoking `ProductTestDataFactory.createProduct()` multiple times:
+What is a decorated string? Let's have a look at the following example output when invoking
+`ProductTestDataFactory.createProduct()` multiple times:
 
 ```
 Product(category=CAR, name=nameaPr, description=descriptionaPr)
@@ -134,16 +141,22 @@ Product(category=COMPUTER, name=nameyBp, description=descriptionyBp)
 Product(category=COMPUTER, name=namejeM, description=descriptionjeM)
 ```
 
-The *decoration* is simply a 3 letter suffix that is appended to the base string provided as parameter to the `fixedDecoratedString()` method.
+The *decoration* is simply a 3 letter suffix that is appended to the base string provided as parameter to the
+`fixedDecoratedString()` method.
 
-Note that the suffix of all String properties of one [Product](example/src/main/java/com/tngtech/valueprovider/example/Product.java) instance stays the same, since the values are populated using the
-same [ValueProvider](core/src/main/java/com/tngtech/valueprovider/ValueProvider.java) instance. Conversely, different [Product](example/src/main/java/com/tngtech/valueprovider/example/Product.java)
-instances contain properties with different suffixes. This is achieved by invoking `createRandomValueProvider()`, when calling
+Note that the suffix of all String properties of
+one [Product](example/src/main/java/com/tngtech/valueprovider/example/Product.java) instance stays the same, since the
+values are populated using the
+same [ValueProvider](core/src/main/java/com/tngtech/valueprovider/ValueProvider.java) instance. Conversely,
+different [Product](example/src/main/java/com/tngtech/valueprovider/example/Product.java)
+instances contain properties with different suffixes. This is achieved by invoking `createRandomValueProvider()`, when
+calling
 the [ProductTestDataFactory](example/src/test/java/com/tngtech/valueprovider/example/ProductTestDataFactory.java).
 
 #### Complex test data factories
 
-Having seen the basics, let's move on to a more complex example. Consider an [Order](example/src/main/java/com/tngtech/valueprovider/example/Order.java):
+Having seen the basics, let's move on to a more complex example. Consider
+an [Order](example/src/main/java/com/tngtech/valueprovider/example/Order.java):
 
 ```java
 // ...
@@ -197,18 +210,24 @@ shippingAddress=Address(zip=81571, city=S-citykwh, street=S-streetkwh, number=17
 billingAddress=Address(zip=71331, city=B-citykwh, street=B-streetkwh, number=169))
 ```
 
-Note that the 3 letter suffix that we already saw in the [Product](example/src/main/java/com/tngtech/valueprovider/example/Product.java) example is shared for the entire hierarchy of objects that
+Note that the 3 letter suffix that we already saw in
+the [Product](example/src/main/java/com/tngtech/valueprovider/example/Product.java) example is shared for the entire
+hierarchy of objects that
 comprise an order. It therefore eases recognizing objects that belong together.
 
-The output also demonstrates further aspects of randomization in test data factories. The 3 order objects all have a different number of order items, and e.g., the shipping and billing addresses have
+The output also demonstrates further aspects of randomization in test data factories. The 3 order objects all have a
+different number of order items, and e.g., the shipping and billing addresses have
 random zip codes or house numbers.
 
-Last but not least, note the second aspect of string *decoration*. The products in the order items have an additional prefix in their string properties (e.g., 'A-', 'B-', ...). This is required to
-differentiate multiple objects of the same kind. The same applies to the shipping and billing addresses. They have different prefixes, if they differ ('S-' vs. 'B-'), but no prefix, if they are the
+Last but not least, note the second aspect of string *decoration*. The products in the order items have an additional
+prefix in their string properties (e.g., 'A-', 'B-', ...). This is required to
+differentiate multiple objects of the same kind. The same applies to the shipping and billing addresses. They have
+different prefixes, if they differ ('S-' vs. 'B-'), but no prefix, if they are the
 same.
 
 Let's take a look at
-[OrderTestDataFactory](example/src/test/java/com/tngtech/valueprovider/example/OrderTestDataFactory.java) - how to achieve all this:
+[OrderTestDataFactory](example/src/test/java/com/tngtech/valueprovider/example/OrderTestDataFactory.java) - how to
+achieve all this:
 
 ```java
 import com.tngtech.valueprovider.example.Order.OrderBuilder;
@@ -268,7 +287,8 @@ public final class OrderTestDataFactory {
 }
 ```
 
-Sharing the same suffix for the entire object hierarchy is easy, just pass the [ValueProvider](core/src/main/java/com/tngtech/valueprovider/ValueProvider.java) instance to each invoked test data
+Sharing the same suffix for the entire object hierarchy is easy, just pass
+the [ValueProvider](core/src/main/java/com/tngtech/valueprovider/ValueProvider.java) instance to each invoked test data
 factory as in:
 
 ```java
@@ -303,19 +323,29 @@ public final class OrderTestDataFactory {
 }
 ```
 
-The `copyWithChangedPrefix()` method takes the suffix of the [ValueProvider](core/src/main/java/com/tngtech/valueprovider/ValueProvider.java) for which it is called, and creates a new instance with the passed
-prefix. Like the suffix, the prefix remains the same for the lifetime of the [ValueProvider](core/src/main/java/com/tngtech/valueprovider/ValueProvider.java).
+The `copyWithChangedPrefix()` method takes the suffix of
+the [ValueProvider](core/src/main/java/com/tngtech/valueprovider/ValueProvider.java) for which it is called, and creates
+a new instance with the passed
+prefix. Like the suffix, the prefix remains the same for the lifetime of
+the [ValueProvider](core/src/main/java/com/tngtech/valueprovider/ValueProvider.java).
 
 A final aspect that is related to using lombok:
-As opposed to a [Product](example/src/main/java/com/tngtech/valueprovider/example/Product.java), creating an [Order](example/src/main/java/com/tngtech/valueprovider/example/Order.java) is done via a
-builder rather than via a factory method. The [OrderTestDataFactory](example/src/test/java/com/tngtech/valueprovider/example/OrderTestDataFactory.java) therefore has 4 methods, a pair
+As opposed to a [Product](example/src/main/java/com/tngtech/valueprovider/example/Product.java), creating
+an [Order](example/src/main/java/com/tngtech/valueprovider/example/Order.java) is done via a
+builder rather than via a factory method.
+The [OrderTestDataFactory](example/src/test/java/com/tngtech/valueprovider/example/OrderTestDataFactory.java) therefore
+has 4 methods, a pair
 of `createOrder()` and a pair of `createOrderBuilder()`
-methods. Again, one of each pair has the [ValueProvider](core/src/main/java/com/tngtech/valueprovider/ValueProvider.java) as parameter to allow passing it on to invoked test data factories. The other
-one without parameter creates a new random [ValueProvider](core/src/main/java/com/tngtech/valueprovider/ValueProvider.java).
+methods. Again, one of each pair has
+the [ValueProvider](core/src/main/java/com/tngtech/valueprovider/ValueProvider.java) as parameter to allow passing it on
+to invoked test data factories. The other
+one without parameter creates a new
+random [ValueProvider](core/src/main/java/com/tngtech/valueprovider/ValueProvider.java).
 
 ### Using factories in tests
 
-Now comes the easy part: If you need a valid data object for your test, but don't care about its content, create one. If you need more than one data object with different but valid data, create
+Now comes the easy part: If you need a valid data object for your test, but don't care about its content, create one. If
+you need more than one data object with different but valid data, create
 another one:
 
 ```java
@@ -338,7 +368,8 @@ class MyOrderTest {
 }
 ```
 
-If you want to control specific aspects of a data object that are important for your test, restrict your test code to only these aspects:
+If you want to control specific aspects of a data object that are important for your test, restrict your test code to
+only these aspects:
 
 ```java
 import static com.tngtech.valueprovider.example.OrderTestDataFactory.createOrderBuilder;
@@ -356,13 +387,15 @@ class MyOrderTest {
 }
 ```
 
-Please refer to [OrderTest](example/src/test/java/com/tngtech/valueprovider/example/OrderTest.java) for more examples, and to
+Please refer to [OrderTest](example/src/test/java/com/tngtech/valueprovider/example/OrderTest.java) for more examples,
+and to
 the [ValueProvider](core/src/main/java/com/tngtech/valueprovider/ValueProvider.java)
 and its Javadoc to learn more about the methods it offers to populate the properties of your data objects.
 
 ### Reproducing test failures caused by random data
 
-As you have learned by now, using randomness helps minimize the code for creating test data. However, this comes at a price: If you want to reproduce test failures that might be related to random
+As you have learned by now, using randomness helps minimize the code for creating test data. However, this comes at a
+price: If you want to reproduce test failures that might be related to random
 data, especially fom your CI suite of hundreds or even thousands of tests, it is vital to use the same data.
 
 value-provider supports this use case out of the box by providing infrastructure for reproducing test failures.
@@ -384,8 +417,23 @@ class MyOrderTest {
 }
 ```
 
-If your test class is __derived__ from a base class, make sure to specify the [ValueProviderExtension](junit5/src/main/java/com/tngtech/valueprovider/ValueProviderExtension.java)
+If your test class is __derived__ from a base class, make sure to specify
+the [ValueProviderExtension](junit5/src/main/java/com/tngtech/valueprovider/ValueProviderExtension.java)
 in the __base class__ of the inheritance hierarchy.
+
+###### JUnit 5 @TestInstance Lifecycle
+
+JUnit 5 allows to control the instantiation (lifecycle in JUnit terms) of the test class.
+As an alternative to the default lifecycle `PER_METHOD`, i.e. new instantiation of the test class for each test method
+execution,
+it supports `PER_CLASS`, i.e. single instantiation of the test class for execution of all test method  
+(see [JUnit documentation](https://junit.org/junit5/docs/current/user-guide/#writing-tests-test-instance-lifecycle)
+for details).
+
+The [ValueProviderExtension](junit5/src/main/java/com/tngtech/valueprovider/ValueProviderExtension.java) supports both
+lifecycles since version 1.3.0. There are some subtle differences
+when it comes to reproducing test failures. Please refer to
+the [respective part of this documentation](#reproducing-test-failures-and-test-lifecycle) for details
 
 ##### JUnit 4
 
@@ -403,7 +451,8 @@ public class MyOrderTest {
 }
 ```
 
-If your test uses __static__ test data created by using a [ValueProvider](core/src/main/java/com/tngtech/valueprovider/ValueProvider.java), use the
+If your test uses __static__ test data created by using
+a [ValueProvider](core/src/main/java/com/tngtech/valueprovider/ValueProvider.java), use the
 [ValueProviderClassRule](junit4/src/main/java/com/tngtech/valueprovider/ValueProviderClassRule.java) in addition:
 
 ```java
@@ -430,7 +479,8 @@ in the __base class__ of the inheritance hierarchy. Otherwise, your test (or oth
 
 #### Reproducing test failures
 
-If a test using the infrastructure fails, it provides information about the seed values used for generating the random data as shown in the following example:
+If a test using the infrastructure fails, it provides information about the seed values used for generating the random
+data as shown in the following example:
 
 ```
 org.junit.ComparisonFailure:
@@ -448,7 +498,8 @@ at com.tngtech.valueprovider.ValueProviderRule$1.evaluate(ValueProviderRule.java
 ...
 ```
 
-If the failure is related to random data, you can easily reproduce it. Just specify the above shown JVM system properties in the command line when you re-run the test, e.g., in your IDE:
+If the failure is related to random data, you can easily reproduce it. Just specify the above shown JVM system
+properties in the command line when you re-run the failed test, e.g., in your IDE:
 
 ```
 -Dvalue.provider.factory.test.class.seed=0
@@ -456,53 +507,95 @@ If the failure is related to random data, you can easily reproduce it. Just spec
 -Dvalue.provider.factory.reference.date.time=2021-06-04T15:28:34.004
 ```
 
-Note that seed values relate to individual test classes and methods, even if they have been run in a CI build together with other tests. Thus, it is sufficient to rerun the individual test in order
-to reproduce the failure.
+##### Reproducing test failures and test lifecycle
+
+For JUnit 4 and JUnit 5 with the default test lifecycle `PER_METHOD`, seed values relate to __individual test methods__
+within a test class, even if they have been run in a CI build together with other tests. Thus, it is sufficient to only
+rerun __the individual test method__ to reproduce the failure.
+
+For the alternative JUnit 5 lifecycle `PER_CLASS`, seed values relate to __individual test classes__. Thus, you have to
+rerun __all test methods__ of the test class (up to and including the failed one) to reproduce the failure. In addition,
+we would highly recommend to ensure a defined execution sequence of the test methods via a respective `@TestMethodOrder`
+annotation.
+
+JUnit 5 also supports inner `@Nested` test classes to ease structuring your tests (see
+[JUnit documentation](https://junit.org/junit5/docs/current/user-guide/#writing-tests-nested)
+for details). The nesting may be arbitrarily deep, i.e. `@Nested` classes may contain further `@Nested` classes. The
+test lifecycle may be chosen individually for the main test class as well as for each `@Nested` test class. As long as
+the main test class and all `@Nested` test classes use the default test lifecycle `PER_METHOD`, it is again sufficient
+to rerun the individual test method, regardless if it is in the main class or any nested class. As soon as the lifecycle
+`PER_CLASS` is used for one or more classes in the nesting hierarchy where the failure occured, you have to re-run __all
+test methods of this hierarchy__ of test classes to reproduce the failure. For convenience, the failure message
+generated by the infrastructure provides the name of the root test class of this hierarchy in addition to the seed
+values as shown in the following example:
+
+```
+"If the failure is related to random ValueProviders, re-run all tests of 'com.tngtech.valueprovider.ValueProviderExceptionTest' and specify the following system properties for the JVM to reproduce:
+-Dvalue.provider.factory.test.class.seed=0
+-Dvalue.provider.factory.test.method.seed=-5385145878463633929
+-Dvalue.provider.factory.reference.date.time=2024-12-09T17:02:50.109"
+```
 
 ### Reproducible ValueProviders
 
 The above example code always used `ValueProviderFactory.createRandomValueProvider()`
-to create a [ValueProvider](core/src/main/java/com/tngtech/valueprovider/ValueProvider.java) that, in turn, generates random data. To be more precise,
+to create a [ValueProvider](core/src/main/java/com/tngtech/valueprovider/ValueProvider.java) that, in turn, generates
+random data. To be more precise,
 the [ValueProvider](core/src/main/java/com/tngtech/valueprovider/ValueProvider.java)
-is initialized with a random seed and will generate exactly the same data, if it is initialized with the same seed, and the same sequence of method invocations is executed. As you may have guessed
+is initialized with a random seed and will generate exactly the same data, if it is initialized with the same seed, and
+the same sequence of method invocations is executed. As you may have guessed
 already, reproducing test failures is based on this functionality.
 
-So, if you need reproducible test data, e.g., to test a transformation of Java data to XML by verifying against a previously stored XML file,
+So, if you need reproducible test data, e.g., to test a transformation of Java data to XML by verifying against a
+previously stored XML file,
 use `ValueProviderFactory.createReproducibleValueProvider()`
-and provide a seed value of your choice to create the [ValueProvider](core/src/main/java/com/tngtech/valueprovider/ValueProvider.java). Your test data factories will accept this [ValueProvider](core/src/main/java/com/tngtech/valueprovider/ValueProvider.java) just
+and provide a seed value of your choice to create
+the [ValueProvider](core/src/main/java/com/tngtech/valueprovider/ValueProvider.java). Your test data factories will
+accept this [ValueProvider](core/src/main/java/com/tngtech/valueprovider/ValueProvider.java) just
 as any other one.
 
 ### Extending ValueProvider functionality
 
-The [ValueProvider](core/src/main/java/com/tngtech/valueprovider/ValueProvider.java) offers a considerable amount of common methods to fill properties of test data objects. Sooner or later however,
+The [ValueProvider](core/src/main/java/com/tngtech/valueprovider/ValueProvider.java) offers a considerable amount of
+common methods to fill properties of test data objects. Sooner or later however,
 the need will arise to add project specific functionality.
 
 We advise the following approach:
 
-* Create your own [ValueProvider](core/src/main/java/com/tngtech/valueprovider/ValueProvider.java) class. Let it extend the [AbstractValueProvider](core/src/main/java/com/tngtech/valueprovider/AbstractValueProvider.java) provided by this library, and add the methods you need
-* Create your own [ValueProviderFactory](core/src/main/java/com/tngtech/valueprovider/ValueProviderFactory.java) class and implement 2 static methods that create instances of
+* Create your own [ValueProvider](core/src/main/java/com/tngtech/valueprovider/ValueProvider.java) class. Let it extend
+  the [AbstractValueProvider](core/src/main/java/com/tngtech/valueprovider/AbstractValueProvider.java) provided by this
+  library, and add the methods you need
+* Create your own [ValueProviderFactory](core/src/main/java/com/tngtech/valueprovider/ValueProviderFactory.java) class
+  and implement 2 static methods that create instances of
   your derived [AbstractValueProvider](core/src/main/java/com/tngtech/valueprovider/AbstractValueProvider.java) class
     * `createRandomValueProvider()`
     * `createReproducibleValueProvider()`
 * Use your own classes instead of the ones provided by this library in your test data factories and other test code.
 
-Refer to [CustomValueProvider](example/src/main/java/com/tngtech/valueprovider/example/customprovider/CustomValueProvider.java)
+Refer
+to [CustomValueProvider](example/src/main/java/com/tngtech/valueprovider/example/customprovider/CustomValueProvider.java)
 ,
 [CustomValueProviderFactory](example/src/main/java/com/tngtech/valueprovider/example/customprovider/CustomValueProviderFactory.java)
-, and [CustomValueProviderFactoryTest](example/src/test/java/com/tngtech/valueprovider/example/customprovider/CustomValueProviderFactoryTest.java)
+,
+and [CustomValueProviderFactoryTest](example/src/test/java/com/tngtech/valueprovider/example/customprovider/CustomValueProviderFactoryTest.java)
 for a fully functional example.
 
 ### Limitations wrt. multithreaded tests
 
-The infrastructure uses thread-local data to store the seed values and can therefore be used in parallel CI builds without any problems.
+The infrastructure uses thread-local data to store the seed values and can therefore be used in parallel CI builds
+without any problems.
 
-However, reproducing test failures is __not possible for multithreaded test code__. Likewise, a [ValueProvider](core/src/main/java/com/tngtech/valueprovider/ValueProvider.java) 
-initialized with a fixed seed value will not necessarily generate the same sequence of data if it is used by multiple threads, 
-as the sequence of method invocations from different threads is not reproducible, 
-and neither the [ValueProvider](core/src/main/java/com/tngtech/valueprovider/ValueProvider.java) nor the infrastructure provide any synchronisation. 
+However, reproducing test failures is __not possible for multithreaded test code__. Likewise,
+a [ValueProvider](core/src/main/java/com/tngtech/valueprovider/ValueProvider.java)
+initialized with a fixed seed value will not necessarily generate the same sequence of data if it is used by multiple
+threads,
+as the sequence of method invocations from different threads is not reproducible,
+and neither the [ValueProvider](core/src/main/java/com/tngtech/valueprovider/ValueProvider.java) nor the infrastructure
+provide any synchronisation.
 
 ## License
 
 value-provider is published under the Apache License 2.0, see [license file](LICENSE) for details.
 
-<sup>1</sup>Please note that we use [lombok](https://projectlombok.org/) and immutable data objects in our examples for convenience, but this is not a requirement for using value-provider.
+<sup>1</sup>Please note that we use [lombok](https://projectlombok.org/) and immutable data objects in our examples for
+convenience, but this is not a requirement for using value-provider.

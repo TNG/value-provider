@@ -40,7 +40,7 @@ ext {
     dependency = [
             apache_commons       : [group: 'org.apache.commons', name: 'commons-lang3', version: '3.14.0'],
             guava                : [group: 'com.google.guava', name: 'guava', version: '33.0.0-jre'],
-            slf4j                : [group: 'org.slf4j', name: 'slf4j-api', version: '2.0.12'],
+            slf4j_api            : [group: 'org.slf4j', name: 'slf4j-api', version: '2.0.16'],
             lombok               : [group: 'org.projectlombok', name: 'lombok', version: '1.18.30'],
 
             junit4               : [group: 'junit', name: 'junit', version: '4.13.2'],
@@ -48,9 +48,7 @@ ext {
             junit5_dataprovider  : [group: 'com.tngtech.junit.dataprovider', name: 'junit-jupiter-dataprovider', version: '2.10'],
             assertj_core         : [group: 'org.assertj', name: 'assertj-core', version: '3.25.3'],
             mockito              : [group: 'org.mockito', name: 'mockito-core', version: '5.10.0'],
-            log4j_api            : [group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.23.0'],
-            log4j_core           : [group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.23.0'],
-            log4j_slf4j          : [group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.23.0'],
+            slf4j_simple         : [group: 'org.slf4j', name: 'slf4j-simple', version: '2.0.16'],
 
             junit4_engine        : [group: 'org.junit.vintage', name: 'junit-vintage-engine', version: '5.10.2'],
             junit_jupiter_api    : [group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.10.2'],
@@ -110,15 +108,14 @@ subprojects {
     dependencies {
         implementation dependency.apache_commons
         implementation dependency.guava
-        implementation dependency.slf4j
+        implementation dependency.slf4j_api
 
         testImplementation dependency.assertj_core
         testImplementation dependency.junit4
         testImplementation dependency.junit_jupiter_api
 
-        testRuntimeOnly dependency.log4j_slf4j
-        testRuntimeOnly dependency.log4j_api
-        testRuntimeOnly dependency.log4j_core
+        // hint: activate (debug) logging via system property -Dorg.slf4j.simpleLogger.defaultLogLevel=debug
+        testRuntimeOnly dependency.slf4j_simple
     }
 
     repositories {

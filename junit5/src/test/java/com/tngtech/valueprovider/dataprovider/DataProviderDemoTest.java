@@ -1,4 +1,4 @@
-package com.tngtech.valueprovider;
+package com.tngtech.valueprovider.dataprovider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,6 +6,9 @@ import java.util.List;
 import com.tngtech.junit.dataprovider.DataProvider;
 import com.tngtech.junit.dataprovider.UseDataProvider;
 import com.tngtech.junit.dataprovider.UseDataProviderExtension;
+import com.tngtech.valueprovider.ValueProvider;
+import com.tngtech.valueprovider.ValueProviderAsserter;
+import com.tngtech.valueprovider.ValueProviderExtension;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

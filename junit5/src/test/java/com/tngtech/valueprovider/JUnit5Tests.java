@@ -1,7 +1,12 @@
 package com.tngtech.valueprovider;
 
+import java.util.List;
+import java.util.Objects;
+
 import static com.tngtech.valueprovider.ValueProviderAsserter.reinitializeTestClassSeed;
 import static com.tngtech.valueprovider.ValueProviderAsserter.setSeedProperties;
+import static java.util.Arrays.stream;
+import static java.util.stream.Collectors.toList;
 
 public final class JUnit5Tests {
     /**
@@ -16,4 +21,11 @@ public final class JUnit5Tests {
         setSeedProperties();
         reinitializeTestClassSeed();
     }
+
+    public static List<ValueProvider> asListWithoutNulls(ValueProvider... valueProviders) {
+        return stream(valueProviders)
+                .filter(Objects::nonNull)
+                .collect(toList());
+    }
+
 }
