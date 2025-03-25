@@ -2,10 +2,12 @@ package com.tngtech.valueprovider;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import static com.tngtech.valueprovider.JUnit5Tests.ensureDefinedFactoryState;
 import static com.tngtech.valueprovider.ValueProviderFactory.createRandomValueProvider;
 
+@ExtendWith(ValueProviderExtension.class)
 class TestHierarchyDemoTestBase {
     static final ValueProvider baseClassRandom;
 

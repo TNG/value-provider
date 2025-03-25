@@ -3,11 +3,9 @@ package com.tngtech.valueprovider;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 
 import static com.tngtech.valueprovider.ValueProviderFactory.createRandomValueProvider;
 
-@ExtendWith(ValueProviderExtension.class)
 class TestHierarchyDemoTest extends TestHierarchyDemoTestBase {
     private static final ValueProvider classRandom = createRandomValueProvider();
 

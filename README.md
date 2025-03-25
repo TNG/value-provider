@@ -417,9 +417,10 @@ class MyOrderTest {
 }
 ```
 
-If your test class is __derived__ from a base class, make sure to specify
+If your test class is __derived__ from a base class, 
 the [ValueProviderExtension](junit5/src/main/java/com/tngtech/valueprovider/ValueProviderExtension.java)
-in the __base class__ of the inheritance hierarchy.
+may be specified in the __base class__ of the inheritance hierarchy, 
+so that it need not be specified in every derived test class.
 
 ###### JUnit 5 @TestInstance Lifecycle
 
