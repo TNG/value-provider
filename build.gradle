@@ -48,6 +48,7 @@ ext {
             junit5_dataprovider  : [group: 'com.tngtech.junit.dataprovider', name: 'junit-jupiter-dataprovider', version: '2.10'],
             assertj_core         : [group: 'org.assertj', name: 'assertj-core', version: '3.25.3'],
             mockito              : [group: 'org.mockito', name: 'mockito-core', version: '5.10.0'],
+            instancio            : [group: 'org.instancio', name: 'instancio-junit', version: '5.4.1'],
             slf4j_simple         : [group: 'org.slf4j', name: 'slf4j-simple', version: '2.0.16'],
 
             junit4_engine        : [group: 'org.junit.vintage', name: 'junit-vintage-engine', version: '5.10.2'],
