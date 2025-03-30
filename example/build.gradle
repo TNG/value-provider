@@ -4,7 +4,9 @@ dependencies {
     implementation project(':core')
 
     testImplementation dependency.junit_jupiter_api
+    testImplementation dependency.junit_jupiter_params
     testImplementation dependency.instancio
+    testAnnotationProcessor dependency.lombok
     testImplementation project(':junit5')
 
     testRuntimeOnly dependency.junit_jupiter_engine
