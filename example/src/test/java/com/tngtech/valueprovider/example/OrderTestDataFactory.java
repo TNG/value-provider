@@ -3,10 +3,12 @@ package com.tngtech.valueprovider.example;
 import com.tngtech.valueprovider.ValueProvider;
 import com.tngtech.valueprovider.example.Order.OrderBuilder;
 
+import java.util.List;
+
 import static com.tngtech.valueprovider.ValueProviderFactory.createRandomValueProvider;
 import static com.tngtech.valueprovider.example.AddressTestDataFactory.createAddress;
 import static com.tngtech.valueprovider.example.CustomerTestDataFactory.createCustomer;
-import static com.tngtech.valueprovider.example.OrderItemTestDataFactory.createOrderItem;
+import static java.lang.String.format;
 
 public final class OrderTestDataFactory {
 
@@ -27,10 +29,17 @@ public final class OrderTestDataFactory {
 
     public static OrderBuilder createOrderBuilder(ValueProvider values) {
         OrderBuilder builder = Order.builder()
-                .customer(createCustomer(values));
+                .customer(createCustomer(values))
+                .orderItems(createItems(values));
         setAddress(builder, values);
-        addItems(builder, values);
         return builder;
+    }
+
+    private static List<OrderItem> createItems(ValueProvider values) {
+        return values.collection()
+                .numElements(1, 5)
+                .replacePrefixVia(i -> format("%c", (char) ('A' + i)))
+                .listOf(OrderItemTestDataFactory::createOrderItem);
     }
 
     private static void setAddress(OrderBuilder builder, ValueProvider values) {
@@ -43,15 +52,6 @@ public final class OrderTestDataFactory {
         } else {
             builder
                     .shippingAddress(createAddress(values));
-        }
-    }
-
-    private static void addItems(OrderBuilder builder, ValueProvider values) {
-        int numOrderItems = values.intNumber(1, 5);
-        for (int i = 0; i < numOrderItems; i++) {
-            char prefix = (char) ('A' + i);
-            ValueProvider prefixedProvider = values.copyWithChangedPrefix(prefix + "-");
-            builder.orderItem(createOrderItem(prefixedProvider));
         }
     }
 }
