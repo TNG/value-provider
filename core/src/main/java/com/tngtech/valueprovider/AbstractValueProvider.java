@@ -1066,9 +1066,8 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      * @return the generated {@link List}.
      */
     public <T> List<T> listOf(Function<VP, T> generator, int numberOfElements) {
-        //noinspection unchecked
         return IntStream.range(0, numberOfElements)
-                .mapToObj(i -> generator.apply((VP) this))
+                .mapToObj(i -> generator.apply(derived()))
                 .collect(toList());
     }
 
@@ -1104,8 +1103,7 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      * @return the generated {@link Optional}.
      */
     public <T> Optional<T> optionalOf(Function<VP, T> generator) {
-        //noinspection unchecked
-        return booleanValue() ? Optional.of(generator.apply((VP) this)) : Optional.empty();
+        return booleanValue() ? Optional.of(generator.apply(derived())) : Optional.empty();
     }
 
     /**
@@ -1331,8 +1329,7 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      * @return a copy of {@link AbstractValueProvider} with same seed, reference date/time, and suffix, but changed {@code prefix}.
      */
     public VP copyWithChangedPrefix(String prefix) {
-        //noinspection unchecked
-        return toBuilder((VP) this)
+        return toBuilder(derived())
                 .withConstantPrefix(prefix)
                 .build();
     }
@@ -1346,6 +1343,11 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      * @see #copyWithChangedPrefix(String)
      */
     protected abstract ValueProviderBuilder<VP, ?> toBuilder(VP from);
+
+    private VP derived() {
+        //noinspection unchecked
+        return (VP) this;
+    }
 
     public String getPrefix() {
         return prefix;
@@ -1450,8 +1452,8 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
             return derivedBuilder();
         }
 
-        @SuppressWarnings("unchecked")
         protected BUILDER derivedBuilder() {
+            //noinspection unchecked
             return (BUILDER) this;
         }
     }
