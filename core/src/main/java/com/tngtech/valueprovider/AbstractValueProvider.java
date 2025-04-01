@@ -16,7 +16,6 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -1066,9 +1065,19 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      * @return the generated {@link List}.
      */
     public <T> List<T> listOf(Function<VP, T> generator, int numberOfElements) {
-        return IntStream.range(0, numberOfElements)
-                .mapToObj(i -> generator.apply(derived()))
-                .collect(toList());
+        return collection()
+                .numElements(numberOfElements)
+                .listOf(generator);
+    }
+
+    /**
+     * Starting point for creating a collection of objects providing more fine-grained control than the
+     * {@link #listOf(Function)}, {@link #nonEmptyListOf(Function)}, {@link #listOfContaining(Function, Collection)} methods.
+     *
+     * @return the {@link CollectionGenerator} to control and finally execute the collection creation.
+     */
+    public CollectionGenerator<VP> collection() {
+        return CollectionGenerator.of(derived());
     }
 
     /**
