@@ -595,8 +595,7 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
     }
 
     /**
-
-    * Draws a {@link LocalDate} in [1st of January of {@code startYear} ; 31st of December of {@code endYear}].
+     * Draws a {@link LocalDate} in [1st of January of {@code startYear} ; 31st of December of {@code endYear}].
      *
      * @param startYear the earliest year to draw from.
      * @param endYear   the latest year to draw from.
@@ -942,7 +941,8 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
     }
 
     /**
-     * Generates a {@link List} of &lt;T&gt; (by means of {@code generator}) and includes {@code furtherContainedElements} in the {@link List}.
+     * Generates a {@link List} of &lt;T&gt; (by means of {@code generator}) and includes
+     * {@code firstContainedElement} and all {@code furtherContainedElements} in the {@link List}.
      * <p>
      * Example:
      * <pre>
@@ -957,9 +957,9 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      * </pre>
      * </p>
      *
-     * @param generator           a generator {@link Function} to generate T given an implementation of {@link AbstractValueProvider}.
-     * @param firstContainedElement   first element that should be contained in the generated list.
-     * @param furtherContainedElements   further elements that should be contained in the generated list.
+     * @param generator                a generator {@link Function} to generate T given an implementation of {@link AbstractValueProvider}.
+     * @param firstContainedElement    first element that should be contained in the generated list.
+     * @param furtherContainedElements further elements that should be contained in the generated list.
      *
      * @return the generated {@link List}.
      *
@@ -986,7 +986,7 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
     }
 
     private <T> int maxNumberOfRandomElements(Collection<T> containedElements) {
-        if (containedElements.size() == 0) {
+        if (containedElements.isEmpty()) {
             return 5;
         }
         if (containedElements.size() == 1) {
@@ -1060,7 +1060,8 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      * </pre>
      * </p>
      *
-     * @param generator           a generator {@link Function} to generate T given an implementation of {@link AbstractValueProvider}.
+     * @param generator         a generator {@link Function} to generate T given an implementation of {@link AbstractValueProvider}.
+     * @param numberOfElements  the desired number of elements.
      *
      * @return the generated {@link List}.
      */
@@ -1325,6 +1326,7 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      * Create a copy of the {@link AbstractValueProvider} with the same properties (seed, reference date/time, and suffix) except for the {@code prefix}.
      * By convention, the suffix is used to mark test data that belong together, and is therefore shared when creating a hierarchy of test objects.
      * The prefix is used to differentiate multiple instances of the same kind of data.
+     *
      * @param prefix to use
      * @return a copy of {@link AbstractValueProvider} with same seed, reference date/time, and suffix, but changed {@code prefix}.
      */
@@ -1338,6 +1340,7 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
     /**
      * Create a {@link ValueProviderBuilder} and initialize it with the properties (seed, reference date/time, prefix, and suffix) of the passed {@link AbstractValueProvider}.
      * The {@link ValueProviderBuilder} allows subsequent modification of these properties.
+     *
      * @param from the {@link AbstractValueProvider} to be used for initialization
      * @return the created {@link ValueProviderBuilder}
      * @see #copyWithChangedPrefix(String)
