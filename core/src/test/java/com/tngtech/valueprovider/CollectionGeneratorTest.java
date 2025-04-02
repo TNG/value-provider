@@ -4,7 +4,9 @@ import lombok.NoArgsConstructor;
 import lombok.Value;
 import org.junit.jupiter.api.Test;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import static com.tngtech.valueprovider.CollectionGeneratorTest.MyStringTestDataFactory.BASE_PROPERTY_NAME;
 import static com.tngtech.valueprovider.ValueProviderInitialization.createRandomInitialization;
@@ -12,6 +14,7 @@ import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static lombok.AccessLevel.PRIVATE;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class CollectionGeneratorTest {
     private static final int DEFAULT_MIN_COLLECTION_SIZE = 0;
@@ -39,6 +42,17 @@ class CollectionGeneratorTest {
                 .listOf(vp -> 1);
 
         assertThat(list).hasSize(specifiedSize);
+    }
+
+    @Test
+    void should_create_Set_of_specified_size() {
+        int specifiedSize = random.intNumber(11, 43);
+
+        Set<Integer> set = collection
+                .numElements(specifiedSize)
+                .setOf(ValueProvider::positiveIntNumber);
+
+        assertThat(set).hasSize(specifiedSize);
     }
 
     @Test
@@ -80,15 +94,27 @@ class CollectionGeneratorTest {
         String suffixedPropertyName = BASE_PROPERTY_NAME + prefixedRandom.getSuffix();
         CollectionGenerator<ValueProvider> collection = prefixedRandom.collection().numElements(3);
 
-        List<MyString> list = collection
+        Set<MyString> set = collection
                 .appendToPrefixVia(i -> format("%c_", (char) ('a' + i)))
-                .listOf(MyStringTestDataFactory::createMyString);
+                .setOf(MyStringTestDataFactory::createMyString);
 
-        List<String> strings = extractStrings(list);
-        assertThat(strings).containsExactly(
+        List<String> strings = extractStrings(set);
+        assertThat(strings).containsExactlyInAnyOrder(
                 prefixToBeAppendedTo + "a_" + suffixedPropertyName,
                 prefixToBeAppendedTo + "b_" + suffixedPropertyName,
                 prefixToBeAppendedTo + "c_" + suffixedPropertyName);
+    }
+
+    @Test
+    void setOf_should_fail_when_creating_specified_number_of_different_elements_is_not_possible() {
+        int specifiedSize = random.intNumber(3, 5);
+        CollectionGenerator<ValueProvider> generator = collection
+                .numElements(specifiedSize);
+
+        assertThatThrownBy(() -> generator
+                .setOf(vp -> 1))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContainingAll("" + specifiedSize);
     }
 
     @Value
@@ -96,8 +122,8 @@ class CollectionGeneratorTest {
         String value;
     }
 
-    private static List<String> extractStrings(List<MyString> list) {
-        return list.stream()
+    private static List<String> extractStrings(Collection<MyString> collection) {
+        return collection.stream()
                 .map(MyString::getValue)
                 .collect(toList());
     }
