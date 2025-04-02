@@ -52,7 +52,9 @@ public class CollectionGenerator<VP extends AbstractValueProvider<VP>> {
      *
      * @param minNumElements the minimum number (inclusive) of collection elements to create.
      * @param maxNumElements the maximum number (inclusive) of collection elements to create.
+     *
      * @return this generator instance for further method invocation.
+     *
      * @see #numElements(int)
      * @see #listOf(Function)
      */
@@ -64,10 +66,12 @@ public class CollectionGenerator<VP extends AbstractValueProvider<VP>> {
      * Controls the exact number of collection elements.
      *
      * @param numElements the number of collection elements to create.
+     *
      * @return this generator instance for further method invocation.
+     *
+     * @throws IllegalArgumentException for negative values of {@code numElements}
      * @see #numElements(int, int)
      * @see #listOf(Function)
-     * @throws IllegalArgumentException for negative values of {@code numElements}
      */
     public CollectionGenerator<VP> numElements(int numElements) {
         checkArgument(numElements >= 0, "numElements %s must >= 0", numElements);
@@ -80,7 +84,9 @@ public class CollectionGenerator<VP extends AbstractValueProvider<VP>> {
      * The result replaces any currently set prefix of the {@link AbstractValueProvider} that created this generator.
      *
      * @param elementIndexToPrefix the {@link Function} to create the prefix number of collection elements to create.
+     *
      * @return this generator instance for further method invocation.
+     *
      * @see #appendToPrefixVia(Function)
      * @see #listOf(Function)
      */
@@ -93,7 +99,9 @@ public class CollectionGenerator<VP extends AbstractValueProvider<VP>> {
      * The result is appended to the currently set prefix of the {@link AbstractValueProvider} that created this generator.
      *
      * @param elementIndexToPrefix the {@link Function} to create the prefix number of collection elements to create.
+     *
      * @return this generator instance for further method invocation.
+     *
      * @see #replacePrefixVia(Function)
      * @see #listOf(Function)
      */
@@ -128,6 +136,7 @@ public class CollectionGenerator<VP extends AbstractValueProvider<VP>> {
      *
      * @param elementGenerator a generator {@link Function} to generate T given an implementation of {@link AbstractValueProvider}.
      * @param <T>              the type of list elements.
+     *
      * @return the created {@link List}.
      */
     public <T> List<T> listOf(Function<VP, T> elementGenerator) {
@@ -157,7 +166,9 @@ public class CollectionGenerator<VP extends AbstractValueProvider<VP>> {
      *
      * @param elementGenerator a generator {@link Function} to generate T given an implementation of {@link AbstractValueProvider}.
      * @param <T>              the type of list elements.
+     *
      * @return the created {@link Set}.
+     *
      * @throws IllegalArgumentException if creating enough different (wrt. {@link #equals(Object)} of type &lt;T&gt;) elements fails
      */
     public <T> Set<T> setOf(Function<VP, T> elementGenerator) {
