@@ -20,8 +20,9 @@ import static java.util.stream.Collectors.toList;
  * @param <VP> the {@link AbstractValueProvider} type to be used for element generation.
  */
 public class CollectionGenerator<VP extends AbstractValueProvider<VP>> {
-    private static final int DEFAULT_MIN_COLLECTION_SIZE = 0;
-    private static final int DEFAULT_MAX_COLLECTION_SIZE = 5;
+    static final int DEFAULT_MIN_COLLECTION_SIZE = 0;
+    static final int DEFAULT_MIN_NONEMPTY_COLLECTION_SIZE = 1;
+    static final int DEFAULT_MAX_COLLECTION_SIZE = 5;
     private static final int MAX_NUM_RETRIES_TO_CREATE_DIFFERENT_ELEMENTS = 5000;
 
     enum PrefixHandling {

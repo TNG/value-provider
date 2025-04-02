@@ -24,6 +24,7 @@ import java.util.stream.Stream;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
+import static com.tngtech.valueprovider.CollectionGeneratorTest.DEFAULT_MAX_COLLECTION_SIZE;
 import static com.tngtech.valueprovider.ValueProvider.Builder;
 import static com.tngtech.valueprovider.ValueProviderInitialization.createRandomInitialization;
 import static com.tngtech.valueprovider.ValueProviderInitialization.createReproducibleInitialization;
@@ -818,7 +819,7 @@ class ValueProviderTest {
         List<MyBean> myBeans = random.listOf(MyBeanTestDataFactory::myBean);
 
         // then
-        assertThat(myBeans).hasSizeLessThanOrEqualTo(5); // 5 is the default
+        assertThat(myBeans).hasSizeLessThanOrEqualTo(DEFAULT_MAX_COLLECTION_SIZE);
     }
 
     @Test
@@ -831,7 +832,7 @@ class ValueProviderTest {
 
         // then
         assertThat(myBeans).isNotEmpty()
-                .hasSizeLessThanOrEqualTo(5); // 5 is the default
+                .hasSizeLessThanOrEqualTo(DEFAULT_MAX_COLLECTION_SIZE);
     }
 
     @Test
