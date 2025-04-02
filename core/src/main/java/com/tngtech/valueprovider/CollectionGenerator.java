@@ -1,12 +1,15 @@
 package com.tngtech.valueprovider;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.IntStream;
 
 import static com.tngtech.valueprovider.CollectionGenerator.PrefixHandling.APPEND_TO_EXISTING;
 import static com.tngtech.valueprovider.CollectionGenerator.PrefixHandling.REPLACE;
+import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.stream.Collectors.toList;
 
@@ -19,6 +22,7 @@ import static java.util.stream.Collectors.toList;
 public class CollectionGenerator<VP extends AbstractValueProvider<VP>> {
     private static final int DEFAULT_MIN_COLLECTION_SIZE = 0;
     private static final int DEFAULT_MAX_COLLECTION_SIZE = 5;
+    private static final int MAX_NUM_RETRIES_TO_CREATE_DIFFERENT_ELEMENTS = 5000;
 
     enum PrefixHandling {
         REPLACE,
@@ -124,11 +128,56 @@ public class CollectionGenerator<VP extends AbstractValueProvider<VP>> {
      */
     public <T> List<T> listOf(Function<VP, T> elementGenerator) {
         return IntStream.range(0, numElements)
-                .mapToObj(elementIndex -> {
-                    VP prefixedValues = createValueProviderFor(elementIndex);
-                    return elementGenerator.apply(prefixedValues);
-                })
+                .mapToObj(elementIndex -> createElement(elementGenerator, elementIndex))
                 .collect(toList());
+    }
+
+    /**
+     * Creates a {@link Set} of &lt;T&gt; (by means of {@code elementGenerator}).
+     * <p>
+     * Example:
+     * <pre>
+     *          static class MyBeanTestDataFactory {
+     *              public static MyBean myBean(ValueProvider valueProvider) {
+     *                  // builds and returns your bean
+     *              }
+     *          }
+     *
+     *         ValueProvider vp = ValueProviderFactory.createRandomValueProvider();
+     *         vp.collection()
+     *           .numElements(2)
+     *           .replacePrefixVia(i -> String.format("%c", (char) ('A' + i)))
+     *           .setOf(MyBeanTestDataFactory::myBean); // -> Set[myBean_generated_prefix_1-, myBean_generated_prefix_2-]
+     * </pre>
+     * </p>
+     *
+     * @param elementGenerator a generator {@link Function} to generate T given an implementation of {@link AbstractValueProvider}.
+     * @param <T>              the type of list elements.
+     * @return the created {@link Set}.
+     * @throws IllegalArgumentException if creating enough different (wrt. {@link #equals(Object)} of type &lt;T&gt;) elements fails
+     */
+    public <T> Set<T> setOf(Function<VP, T> elementGenerator) {
+        int i = 0;
+        int numRetriesToCreateDifferentElement = 0;
+        Set<T> result = new HashSet<>();
+        while (result.size() < numElements && numRetriesToCreateDifferentElement < MAX_NUM_RETRIES_TO_CREATE_DIFFERENT_ELEMENTS) {
+            boolean different = result.add(createElement(elementGenerator, i));
+            if (!different) {
+                numRetriesToCreateDifferentElement++;
+            }
+            i++;
+        }
+        if (numRetriesToCreateDifferentElement >= MAX_NUM_RETRIES_TO_CREATE_DIFFERENT_ELEMENTS) {
+            String message = format("Unable to create %d different elements, giving up after %d retries",
+                    numElements, numRetriesToCreateDifferentElement);
+            throw new IllegalArgumentException(message);
+        }
+        return result;
+    }
+
+    private <T> T createElement(Function<VP, T> elementGenerator, int elementIndex) {
+        VP prefixedValues = createValueProviderFor(elementIndex);
+        return elementGenerator.apply(prefixedValues);
     }
 
     private VP createValueProviderFor(int elementIndex) {
