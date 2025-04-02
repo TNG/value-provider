@@ -104,7 +104,9 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      * <p>Note that prefix and suffix remain constant for the entire lifetime of each {@link AbstractValueProvider} instance.</p>
      *
      * @param base the String to be decorated.
+     *
      * @return the decorated {@code base}.
+     *
      * @see #fixedDecoratedString(String, int)
      */
     public String fixedDecoratedString(String base) {
@@ -135,7 +137,9 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      *
      * @param base      the String to be decorated.
      * @param maxLength the maximum length of the returned String.
+     *
      * @return the decorated {@code base} with maximum length of {@code maxLength}.
+     *
      * @see #fixedDecoratedString(String)
      */
     public String fixedDecoratedString(String base, int maxLength) {
@@ -158,6 +162,7 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      * Creates a {@link Function} that decorates Strings.
      *
      * @param decorateString the String to decorate.
+     *
      * @return the decorating {@link Function}.
      */
     public static <VP extends AbstractValueProvider<VP>> Function<VP, String> creatorForFixedDecoratedString(final String decorateString) {
@@ -168,6 +173,7 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      * Creates a {@link Function} that generates Strings of {@code length}.
      *
      * @param length the length of the generated String.
+     *
      * @return the String generating {@link Function}.
      */
     public static <VP extends AbstractValueProvider<VP>> Function<VP, String> creatorForRandomString(final int length) {
@@ -178,7 +184,9 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      * Generates a {@link List} of 'decorated' strings. Please refer to {@link #fixedDecoratedString(String)} for details.
      *
      * @param number of strings to create
+     *
      * @return the {@link List} of generated strings
+     *
      * @see #fixedDecoratedStrings(int, String)
      * @see #fixedDecoratedString(String)
      */
@@ -191,7 +199,9 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      *
      * @param number of strings to create
      * @param base   the string to be decorated.
+     *
      * @return the {@link List} of generated strings
+     *
      * @see #fixedDecoratedStrings(int)
      * @see #fixedDecoratedString(String)
      */
@@ -214,7 +224,9 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      * </p>
      *
      * @param length the length of the generated String.
+     *
      * @return the generated String of length {@code length}.
+     *
      * @see #numericString(int, int, int)
      */
     public String numericString(int length) {
@@ -236,7 +248,9 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      * @param length the length of the generated String.
      * @param min    the lower limit (inclusive) of the generated number (as String).
      * @param max    the upper limit (inclusive) of the generated number (as String).
+     *
      * @return the generated String.
+     *
      * @throws IllegalArgumentException if {@code min} &gt; {@code max}.
      * @throws IllegalArgumentException if {@code min} &lt;= 0.
      * @throws IllegalArgumentException if the requested length of the String is smaller than the number of digits of {@code min}.
@@ -265,7 +279,9 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      * </p>
      *
      * @param length the length of the generated String.
+     *
      * @return the generated String.
+     *
      * @see #lowercaseString(int)
      * @see #uppercaseString(int)
      */
@@ -284,7 +300,9 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      * </p>
      *
      * @param length the length of the generated String.
+     *
      * @return the generated String.
+     *
      * @see #uppercaseString(int)
      * @see #randomString(int)
      */
@@ -303,7 +321,9 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      * </p>
      *
      * @param length the length of the generated String.
+     *
      * @return the generated String.
+     *
      * @see #lowercaseString(int)
      * @see #randomString(int)
      */
@@ -334,6 +354,7 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      * </p>
      *
      * @return the generated number.
+     *
      * @see #intNumber(int, int)
      */
     public int positiveIntNumber() {
@@ -353,7 +374,9 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      *
      * @param min the minimum value of the returned number.
      * @param max the maximum value of the returned number.
+     *
      * @return the generated number.
+     *
      * @throws IllegalArgumentException if {@code min} &gt; {@code max}.
      */
     public int intNumber(int min, int max) {
@@ -371,6 +394,7 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      * </p>
      *
      * @return the generated number.
+     *
      * @see #longNumber(long, long)
      */
     public long positiveLongNumber() {
@@ -390,7 +414,9 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      *
      * @param min the minimum value of the returned number.
      * @param max the maximum value of the returned number.
+     *
      * @return the generated number.
+     *
      * @throws IllegalArgumentException if {@code min} &gt; {@code max}.
      * @see #positiveLongNumber()
      */
@@ -409,6 +435,7 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      * </p>
      *
      * @return the generated number.
+     *
      * @see #bigIntegerNumber(BigInteger, BigInteger)
      */
     public BigInteger positiveBigIntegerNumber() {
@@ -428,7 +455,9 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      *
      * @param min the minimum value of the returned number.
      * @param max the maximum value of the returned number.
+     *
      * @return the generated number.
+     *
      * @throws IllegalArgumentException if {@code min} &gt; {@code max}.
      * @see #positiveBigIntegerNumber()
      */
@@ -447,6 +476,7 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      * </p>
      *
      * @return the generated number
+     *
      * @see #bigDecimalNumber(Number, Number)
      */
     public BigDecimal positiveBigDecimalNumber() {
@@ -468,7 +498,9 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      *
      * @param min the minimum value of the returned number.
      * @param max the maximum value of the returned number.
+     *
      * @return the generated number.
+     *
      * @throws IllegalArgumentException if {@code min} &gt; {@code max}.
      * @see #positiveBigDecimalNumber()
      */
@@ -488,7 +520,9 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      *
      * @param min the minimum value of the returned number.
      * @param max the maximum value of the returned number.
+     *
      * @return the generated number.
+     *
      * @throws IllegalArgumentException if {@code min} &gt; {@code max}.
      * @see #positiveBigDecimalNumber()
      */
@@ -522,7 +556,9 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      * @param min   the minimum value of the returned number.
      * @param max   the maximum value of the returned number.
      * @param scale the scale to be set on the BigDecimal.
+     *
      * @return the generated number.
+     *
      * @throws IllegalArgumentException if {@code min} &gt; {@code max}.
      */
     public BigDecimal bigDecimalNumberWithScale(Number min, Number max, int scale) {
@@ -547,7 +583,9 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      * @param min   the minimum value of the returned number.
      * @param max   the maximum value of the returned number.
      * @param scale the scale to be set on the BigDecimal.
+     *
      * @return the generated number.
+     *
      * @throws IllegalArgumentException if {@code min} &gt; {@code max}.
      */
     public BigDecimal bigDecimalNumberWithScale(BigDecimal min, BigDecimal max, int scale) {
@@ -600,7 +638,9 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      *
      * @param startYear the earliest year to draw from.
      * @param endYear   the latest year to draw from.
+     *
      * @return the drawn {@link LocalDate}.
+     *
      * @throws IllegalArgumentException if {@code endYear} &lt; {@code startYear}.
      */
     public LocalDate localDateBetweenYears(int startYear, int endYear) {
@@ -614,7 +654,9 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      *
      * @param start the earliest date to draw from.
      * @param end   the latest date to draw from.
+     *
      * @return the drawn {@link LocalDate}.
+     *
      * @throws IllegalArgumentException if {@code start} &gt; {@code end}.
      */
     public LocalDate localDateBetween(LocalDate start, LocalDate end) {
@@ -630,6 +672,7 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      * Draws a {@link LocalDate} in [{@code today-pastDuration} ; {@code today}].
      *
      * @param pastDuration the maximum duration in the past to consider drawing from.
+     *
      * @return the drawn {@link LocalDate}.
      */
     public LocalDate localDateInPast(Duration pastDuration) {
@@ -641,6 +684,7 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      * Draws a {@link LocalDate} in [{@code today} ; {@code today+futureDuration}].
      *
      * @param futureDuration the maximum duration in the future to consider drawing from.
+     *
      * @return the drawn {@link LocalDate}.
      */
     public LocalDate localDateInFuture(Duration futureDuration) {
@@ -663,7 +707,9 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      *
      * @param start the earliest date time to draw from.
      * @param end   the latest date time to draw from.
+     *
      * @return the drawn {@link LocalDateTime}.
+     *
      * @throws IllegalArgumentException if {@code start} &gt; {@code end}.
      */
     public LocalDateTime localDateTimeBetween(LocalDateTime start, LocalDateTime end) {
@@ -680,7 +726,9 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      *
      * @param start the earliest date to draw from.
      * @param end   the latest date to draw from.
+     *
      * @return the drawn {@link LocalDateTime}.
+     *
      * @throws IllegalArgumentException if {@code start} &gt; {@code end}.
      */
     public LocalDateTime localDateTimeBetween(LocalDate start, LocalDate end) {
@@ -691,6 +739,7 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      * Generates a {@link Duration} in [0 ; {@code max}].
      *
      * @param max the upper bound of the generated {@link Duration}.
+     *
      * @return the generated {@link Duration}.
      */
     public Duration duration(Duration max) {
@@ -702,7 +751,9 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      *
      * @param min the lower bound of the generated {@link Duration}.
      * @param max the upper bound of the generated {@link Duration}.
+     *
      * @return the generated {@link Duration}.
+     *
      * @throws IllegalArgumentException if {@code min} &gt; {@code max}.
      */
     public Duration duration(Duration min, Duration max) {
@@ -721,7 +772,9 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      * </p>
      *
      * @param enumClass the enum to draw from.
+     *
      * @return the drawn value.
+     *
      * @see #oneOfExcluding(Enum[])
      */
     public <T extends Enum<?>> T oneOf(Class<T> enumClass) {
@@ -741,6 +794,7 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      *
      * @param firstElement    the first element.
      * @param furtherElements additional elements.
+     *
      * @return the drawn element.
      */
     @SafeVarargs
@@ -759,7 +813,9 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      * </p>
      *
      * @param elements the array of elements.
+     *
      * @return the drawn element.
+     *
      * @throws IllegalArgumentException if empty {@code elements} are provided.
      */
     public <T> T oneOf(T[] elements) {
@@ -777,7 +833,9 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      * </p>
      *
      * @param elements an {@link Iterable} of elements.
+     *
      * @return the drawn element.
+     *
      * @throws IllegalArgumentException if empty {@code elements} are provided.
      * @see #oneOfExcluding(Iterable, Object[])
      */
@@ -801,6 +859,7 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      * </p>
      *
      * @param enumClass the enum to draw from.
+     *
      * @return the drawn elements (none / some / all).
      */
     public <T extends Enum<T>> Set<T> someOf(Class<T> enumClass) {
@@ -823,7 +882,9 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      *
      * @param enumClass        the enum to draw from.
      * @param numberOfElements the number of elements to draw.
+     *
      * @return the drawn elements.
+     *
      * @throws IllegalArgumentException if {@code enumClass} has fewer than {@code numberOfElements} elements.
      */
     public <T extends Enum<T>> Set<T> someOf(Class<T> enumClass, int numberOfElements) {
@@ -844,6 +905,7 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      * </p>
      *
      * @param elements the elements to draw from.
+     *
      * @return the drawn elements (none / some / all).
      */
     @SafeVarargs
@@ -865,6 +927,7 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      * </p>
      *
      * @param elements the elements to draw from.
+     *
      * @return the drawn elements (none / some / all).
      */
     public <T> Collection<T> someOf(Iterable<T> elements) {
@@ -884,7 +947,9 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      *
      * @param elements         the elements to draw from.
      * @param numberOfElements the number of elements to draw.
+     *
      * @return the drawn elements.
+     *
      * @throws IllegalArgumentException if {@code elements} has fewer than {@code numberOfElements} elements.
      */
     public <T> Collection<T> someOf(Iterable<T> elements, int numberOfElements) {
@@ -909,7 +974,9 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      * </p>
      *
      * @param elementsToExclude elements that should not be drawn.
+     *
      * @return the drawn value.
+     *
      * @throws IllegalArgumentException if no elements are left after the exclusion.
      * @see #oneOf(Class)
      */
@@ -930,7 +997,9 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      *
      * @param elements          an {@link Iterable} of elements.
      * @param elementsToExclude elements that should not be drawn.
+     *
      * @return the drawn element.
+     *
      * @throws IllegalArgumentException if {@code elements} is empty or if no elements are left after the exclusion.
      * @see #oneOf(Iterable)
      */
@@ -1395,7 +1464,9 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      * </p>
      *
      * @param domain the domain of the {@link URL}.
+     *
      * @return the generated URL.
+     *
      * @throws IllegalArgumentException if {@code domain} yields an invalid {@link URL}.
      */
     public URL url(String domain) {
@@ -1429,7 +1500,9 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      * </p>
      *
      * @param domain the domain of the {@link URL}.
+     *
      * @return the generated URL.
+     *
      * @throws IllegalArgumentException if {@code domain} yields an invalid {@link URL}.
      */
     public URL httpUrl(String domain) {
@@ -1463,6 +1536,7 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      * </p>
      *
      * @return the generated URL.
+     *
      * @throws IllegalArgumentException if {@code domain} yields an invalid {@link URL}.
      */
     public URL httpsUrl(String domain) {
@@ -1489,6 +1563,7 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      * The prefix is used to differentiate multiple instances of the same kind of data.
      *
      * @param prefix to use
+     *
      * @return a copy of {@link AbstractValueProvider} with same seed, reference date/time, and suffix, but changed {@code prefix}.
      */
     public VP copyWithChangedPrefix(String prefix) {
@@ -1502,7 +1577,9 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      * The {@link ValueProviderBuilder} allows subsequent modification of these properties.
      *
      * @param from the {@link AbstractValueProvider} to be used for initialization
+     *
      * @return the created {@link ValueProviderBuilder}
+     *
      * @see #copyWithChangedPrefix(String)
      */
     protected abstract ValueProviderBuilder<VP, ?> toBuilder(VP from);
