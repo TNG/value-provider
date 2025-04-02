@@ -106,6 +106,16 @@ class CollectionGeneratorTest {
     }
 
     @Test
+    void numElements_should_fail_for_negative_values() {
+        int illegalNegative = random.intNumber(-1000, -1);
+
+        assertThatThrownBy(() -> collection
+                .numElements(illegalNegative))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContainingAll("" + illegalNegative);
+    }
+
+    @Test
     void setOf_should_fail_when_creating_specified_number_of_different_elements_is_not_possible() {
         int specifiedSize = random.intNumber(3, 5);
         CollectionGenerator<ValueProvider> generator = collection

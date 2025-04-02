@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.IntStream;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.tngtech.valueprovider.CollectionGenerator.PrefixHandling.APPEND_TO_EXISTING;
 import static com.tngtech.valueprovider.CollectionGenerator.PrefixHandling.REPLACE;
 import static java.lang.String.format;
@@ -66,8 +67,10 @@ public class CollectionGenerator<VP extends AbstractValueProvider<VP>> {
      * @return this generator instance for further method invocation.
      * @see #numElements(int, int)
      * @see #listOf(Function)
+     * @throws IllegalArgumentException for negative values of {@code numElements}
      */
     public CollectionGenerator<VP> numElements(int numElements) {
+        checkArgument(numElements >= 0, "numElements %s must >= 0", numElements);
         this.numElements = numElements;
         return this;
     }
