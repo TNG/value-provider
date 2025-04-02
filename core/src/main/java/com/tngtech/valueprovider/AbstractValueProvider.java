@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -964,6 +965,7 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      * @return the generated {@link List}.
      *
      * @see #listOf(Function)
+     * @see #setOfContaining(Function, Object, Object[])
      */
     @SafeVarargs
     public final <T> List<T> listOfContaining(Function<VP, T> generator, T firstContainedElement, T... furtherContainedElements) {
@@ -972,17 +974,76 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
 
     /**
      * see {@link #listOfContaining(Function, Object, Object[])}
+     * see {@link #setOfContaining(Function, Collection)}
      */
-    public final <T> List<T> listOfContaining(Function<VP, T> generator, Collection<T> containedElements) {
+    public <T> List<T> listOfContaining(Function<VP, T> generator, Collection<T> containedElements) {
+        List<T> result = new ArrayList<>();
+        addTo(result, this::listOf, generator, containedElements);
+        return result;
+    }
+
+    /**
+     * Generates a {@link Set} of &lt;T&gt; (by means of {@code generator}) and tries to include
+     * {@code firstContainedElement} and all {@code furtherContainedElements} in the {@link Set}.
+     * <p>
+     * It should be noted that
+     * <ul>
+     *     <li>due to the semantics of {@link Set}</li>
+     *     <li>depending on the specific content of {@code firstContainedElement} and {@code furtherContainedElements}</li>
+     *     <li>depending on the implementation of {@link #equals(Object)} of type &lt;T&gt;</li>
+     * </ul>
+     * <b>there can be no guarantee, that all the elements will be contained in the generated {@link Set}</b>.
+     * </p>
+     * <p>
+     * Example:
+     * <pre>
+     *          static class MyBeanTestDataFactory {
+     *              public static MyBean myBean(ValueProvider valueProvider) {
+     *                  // builds and returns your bean
+     *              }
+     *          }
+     *
+     *         ValueProvider vp = ValueProviderFactory.createRandomValueProvider();
+     *         vp.setOfContaining(MyBeanTestDataFactory::myBean, myBean(), myBean(), myBean()); // -> Set[myBean_2, myBean_random, myBean_3, myBean_1, myBean_random]
+     * </pre>
+     * </p>
+     *
+     * @param generator                a generator {@link Function} to generate T given an implementation of {@link AbstractValueProvider}.
+     * @param firstContainedElement    first element that should be contained in the generated set.
+     * @param furtherContainedElements further elements that should be contained in the generated set.
+     *
+     * @return the generated {@link Set}.
+     *
+     * @throws IllegalArgumentException if creating enough different (wrt. {@link #equals(Object)} of type &lt;T&gt;) elements fails
+     * @see #setOf(Function)
+     * @see #listOfContaining(Function, Object, Object[])
+     */
+    @SafeVarargs
+    public final <T> Set<T> setOfContaining(Function<VP, T> generator, T firstContainedElement, T... furtherContainedElements) {
+        return setOfContaining(generator, asList(firstContainedElement, furtherContainedElements));
+    }
+
+    /**
+     * see {@link #setOfContaining(Function, Object, Object[])}
+     */
+    public <T> Set<T> setOfContaining(Function<VP, T> generator, Collection<T> containedElements) {
+        Set<T> result = new HashSet<>();
+        addTo(result, this::setOf, generator, containedElements);
+        return result;
+    }
+
+    private <T> void addTo(
+            Collection<T> toAddTo,
+            BiFunction<Function<VP, T>, Integer, Collection<T>> randomCollectionGenerator,
+            Function<VP, T> elementGenerator,
+            Collection<T> containedElements) {
         int maxNumberOfRandomElements = maxNumberOfRandomElements(containedElements);
 
-        List<T> generatedElements = new ArrayList<>();
         for (T containedValue : containedElements) {
-            generatedElements.addAll(listOf(generator, intNumber(DEFAULT_MIN_COLLECTION_SIZE, maxNumberOfRandomElements)));
-            generatedElements.add(containedValue);
+            toAddTo.addAll(randomCollectionGenerator.apply(elementGenerator, intNumber(DEFAULT_MIN_COLLECTION_SIZE, maxNumberOfRandomElements)));
+            toAddTo.add(containedValue);
         }
-        generatedElements.addAll(listOf(generator, intNumber(DEFAULT_MIN_COLLECTION_SIZE, maxNumberOfRandomElements)));
-        return generatedElements;
+        toAddTo.addAll(randomCollectionGenerator.apply(elementGenerator, intNumber(DEFAULT_MIN_COLLECTION_SIZE, maxNumberOfRandomElements)));
     }
 
     private <T> int maxNumberOfRandomElements(Collection<T> containedElements) {
@@ -1011,16 +1072,45 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      * </pre>
      * </p>
      *
-     * @param generator           a generator {@link Function} to generate T given an implementation of {@link AbstractValueProvider}.
+     * @param generator a generator {@link Function} to generate T given an implementation of {@link AbstractValueProvider}.
      *
      * @return the generated {@link List}.
+     *
+     * @see #nonEmptySetOf(Function)
      */
     public <T> List<T> nonEmptyListOf(Function<VP, T> generator) {
         return listOf(generator, intNumber(DEFAULT_MIN_NONEMPTY_COLLECTION_SIZE, DEFAULT_MAX_COLLECTION_SIZE));
     }
 
     /**
-     * Generates a {@link List} of &lt;T&gt; (by means of {@code generator}). Might return the empty list.
+     * Generates a {@link Set} of &lt;T&gt; (by means of {@code generator}). Ensures that the {@link Set} contains at least one element.
+     * <p>
+     * Example:
+     * <pre>
+     *          static class MyBeanTestDataFactory {
+     *              public static MyBean myBean(ValueProvider valueProvider) {
+     *                  // builds and returns your bean
+     *              }
+     *          }
+     *
+     *         ValueProvider vp = ValueProviderFactory.createRandomValueProvider();
+     *         vp.nonEmptySetOf(MyBeanTestDataFactory::myBean); // -> Set[myBean_generated_2, myBean_generated_1]
+     * </pre>
+     * </p>
+     *
+     * @param generator a generator {@link Function} to generate T given an implementation of {@link AbstractValueProvider}.
+     *
+     * @return the generated {@link Set}.
+     *
+     * @throws IllegalArgumentException if creating enough different (wrt. {@link #equals(Object)} of type &lt;T&gt;) elements fails
+     * @see #nonEmptyListOf(Function)
+     */
+    public <T> Set<T> nonEmptySetOf(Function<VP, T> generator) {
+        return setOf(generator, intNumber(DEFAULT_MIN_NONEMPTY_COLLECTION_SIZE, DEFAULT_MAX_COLLECTION_SIZE));
+    }
+
+    /**
+     * Generates a {@link List} of &lt;T&gt; (by means of {@code generator}). Might return the empty {@link List}.
      * <p>
      * Example:
      * <pre>
@@ -1036,12 +1126,42 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      * </pre>
      * </p>
      *
-     * @param generator           a generator {@link Function} to generate T given an implementation of {@link AbstractValueProvider}.
+     * @param generator a generator {@link Function} to generate T given an implementation of {@link AbstractValueProvider}.
      *
      * @return the generated {@link List}.
+     *
+     * @see #setOf(Function)
      */
     public <T> List<T> listOf(Function<VP, T> generator) {
         return listOf(generator, intNumber(DEFAULT_MIN_COLLECTION_SIZE, DEFAULT_MAX_COLLECTION_SIZE));
+    }
+
+    /**
+     * Generates a {@link Set} of &lt;T&gt; (by means of {@code generator}). Might return the empty {@link Set}.
+     * <p>
+     * Example:
+     * <pre>
+     *          static class MyBeanTestDataFactory {
+     *              public static MyBean myBean(ValueProvider valueProvider) {
+     *                  // builds and returns your bean
+     *              }
+     *          }
+     *
+     *         ValueProvider vp = ValueProviderFactory.createRandomValueProvider();
+     *         vp.setOf(MyBeanTestDataFactory::myBean); // -> Set[myBean_generated_1, myBean_generated_2]
+     *         vp.setOf(MyBeanTestDataFactory::myBean); // -> Set[]
+     * </pre>
+     * </p>
+     *
+     * @param generator a generator {@link Function} to generate T given an implementation of {@link AbstractValueProvider}.
+     *
+     * @return the generated {@link Set}.
+     *
+     * @throws IllegalArgumentException if creating enough different (wrt. {@link #equals(Object)} of type &lt;T&gt;) elements fails
+     * @see #listOf(Function)
+     */
+    public <T> Set<T> setOf(Function<VP, T> generator) {
+        return setOf(generator, intNumber(DEFAULT_MIN_COLLECTION_SIZE, DEFAULT_MAX_COLLECTION_SIZE));
     }
 
     /**
@@ -1060,15 +1180,47 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      * </pre>
      * </p>
      *
-     * @param generator         a generator {@link Function} to generate T given an implementation of {@link AbstractValueProvider}.
-     * @param numberOfElements  the desired number of elements.
+     * @param generator        a generator {@link Function} to generate T given an implementation of {@link AbstractValueProvider}.
+     * @param numberOfElements the desired number of elements.
      *
      * @return the generated {@link List}.
+     *
+     * @see #setOf(Function, int)
      */
     public <T> List<T> listOf(Function<VP, T> generator, int numberOfElements) {
         return collection()
                 .numElements(numberOfElements)
                 .listOf(generator);
+    }
+
+    /**
+     * Generates a {@link Set} of &lt;T&gt; (by means of {@code generator}). Containing exactly {@code numberOfElements} elements.
+     * <p>
+     * Example:
+     * <pre>
+     *          static class MyBeanTestDataFactory {
+     *              public static MyBean myBean(ValueProvider valueProvider) {
+     *                  // builds and returns your bean
+     *              }
+     *          }
+     *
+     *         ValueProvider vp = ValueProviderFactory.createRandomValueProvider();
+     *         vp.setOf(MyBeanTestDataFactory::myBean, 3); // -> Set[myBean_generated_1, myBean_generated_3, myBean_generated_2]
+     * </pre>
+     * </p>
+     *
+     * @param generator        a generator {@link Function} to generate T given an implementation of {@link AbstractValueProvider}.
+     * @param numberOfElements the desired number of elements.
+     *
+     * @return the generated {@link Set}.
+     *
+     * @throws IllegalArgumentException if creating enough different (wrt. {@link #equals(Object)} of type &lt;T&gt;) elements fails
+     * @see #listOf(Function, int)
+     */
+    public <T> Set<T> setOf(Function<VP, T> generator, int numberOfElements) {
+        return collection()
+                .numElements(numberOfElements)
+                .setOf(generator);
     }
 
     /**
@@ -1128,6 +1280,7 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      * </p>
      *
      * @param supplier a supplier {@link Supplier} to generate {@code <T>}.
+     *
      * @return the generated {@link Optional}.
      */
     public <T> Optional<T> optionalOf(Supplier<T> supplier) {
