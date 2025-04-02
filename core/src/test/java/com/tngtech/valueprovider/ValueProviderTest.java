@@ -798,55 +798,73 @@ class ValueProviderTest {
     }
 
     @Test
-    void listOf_should_return_provided_number_of_elements() {
+    void listOf_and_setOf_should_return_provided_number_of_elements() {
         // given
         ValueProvider random = withRandomValues();
         int numberOfElements = random.intNumber(5, 10);
 
         // when
-        List<MyBean> myBeans = random.listOf(MyBeanTestDataFactory::myBean, numberOfElements);
+        List<MyBean> myBeansList = random.listOf(MyBeanTestDataFactory::myBean, numberOfElements);
+        Set<MyBean> myBeansSet = random.setOf(MyBeanTestDataFactory::myBean, numberOfElements);
 
         // then
-        assertThat(myBeans).hasSize(numberOfElements);
+        assertThat(myBeansList).hasSize(numberOfElements);
+        assertThat(myBeansSet).hasSize(numberOfElements);
     }
 
     @Test
-    void listOf_should_return_a_sensible_number_of_elements() {
+    void listOf_and_setOf_should_return_a_sensible_number_of_elements() {
         // given
         ValueProvider random = withRandomValues();
 
         // when
-        List<MyBean> myBeans = random.listOf(MyBeanTestDataFactory::myBean);
+        List<MyBean> myBeansList = random.listOf(MyBeanTestDataFactory::myBean);
+        Set<MyBean> myBeansSet = random.setOf(MyBeanTestDataFactory::myBean);
 
         // then
-        assertThat(myBeans).hasSizeLessThanOrEqualTo(DEFAULT_MAX_COLLECTION_SIZE);
+        assertThat(myBeansList).hasSizeLessThanOrEqualTo(DEFAULT_MAX_COLLECTION_SIZE);
+        assertThat(myBeansSet).hasSizeLessThanOrEqualTo(DEFAULT_MAX_COLLECTION_SIZE);
     }
 
     @Test
-    void nonEmptyListOf_should_return_at_least_one_element() {
+    void nonEmptyListOf_and_nonEmptySetOf_should_return_at_least_one_element() {
         // given
         ValueProvider random = withRandomValues();
 
         // when
-        List<MyBean> myBeans = random.nonEmptyListOf(MyBeanTestDataFactory::myBean);
+        List<MyBean> myBeansList = random.nonEmptyListOf(MyBeanTestDataFactory::myBean);
+        Set<MyBean> myBeansSet = random.nonEmptySetOf(MyBeanTestDataFactory::myBean);
 
         // then
-        assertThat(myBeans).isNotEmpty()
+        assertThat(myBeansList).isNotEmpty()
+                .hasSizeLessThanOrEqualTo(DEFAULT_MAX_COLLECTION_SIZE);
+        assertThat(myBeansSet).isNotEmpty()
                 .hasSizeLessThanOrEqualTo(DEFAULT_MAX_COLLECTION_SIZE);
     }
 
     @Test
-    void listOfContaining_should_return_the_provided_elements_plus_some_randomly_generated_elements() {
+    void listOfContaining_and_setOfContaining_should_return_the_provided_elements_plus_some_randomly_generated_elements() {
         // given
         ValueProvider random = withRandomValues();
+        MyBean containedElement1 = myBeanContained(1);
+        MyBean containedElement2 = myBeanContained(2);
+        MyBean containedElement3 = myBeanContained(3);
 
         // when
-        List<MyBean> myBeans = random.listOfContaining(MyBeanTestDataFactory::myBean, myBeanContained(1), myBeanContained(2), myBeanContained(3));
+        List<MyBean> myBeansList = random.listOfContaining(MyBeanTestDataFactory::myBean, containedElement1, containedElement2, containedElement3);
+        Set<MyBean> myBeansSet = random.setOfContaining(MyBeanTestDataFactory::myBean, containedElement1, containedElement2, containedElement3);
 
         // then
-        assertThat(myBeans).hasSizeLessThanOrEqualTo(7)
-                // 3 contained beans + max. 1 random 'spacing' bean between each + max. 1 random bean at the beginning/end
-                .contains(myBeanContained(1), myBeanContained(2), myBeanContained(3));
+        // 3 contained beans (works for Set as well, as containedElements are all different wrt. MyBean.equals())
+        int minSize = 3;
+        // + max. 1 random 'spacing' bean between each + max. 1 random bean at the beginning/end
+        int maxSize = minSize + 4;
+        assertThat(myBeansList).hasSizeGreaterThanOrEqualTo(minSize)
+                .hasSizeLessThanOrEqualTo(maxSize)
+                .contains(containedElement1, containedElement2, containedElement3);
+        assertThat(myBeansSet).hasSizeGreaterThanOrEqualTo(minSize)
+                .hasSizeLessThanOrEqualTo(maxSize)
+                .contains(containedElement1, containedElement2, containedElement3);
     }
 
     @Test
