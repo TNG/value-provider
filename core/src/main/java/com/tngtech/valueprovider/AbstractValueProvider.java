@@ -23,6 +23,7 @@ import static com.google.common.collect.Lists.asList;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Lists.newArrayListWithCapacity;
 import static com.google.common.collect.Sets.newHashSet;
+import static com.tngtech.valueprovider.CollectionGenerator.*;
 import static com.tngtech.valueprovider.ValueProviderInitialization.truncateReferenceLocalDateTime;
 import static java.lang.String.format;
 import static java.time.LocalDateTime.now;
@@ -977,21 +978,21 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
 
         List<T> generatedElements = new ArrayList<>();
         for (T containedValue : containedElements) {
-            generatedElements.addAll(listOf(generator, intNumber(0, maxNumberOfRandomElements)));
+            generatedElements.addAll(listOf(generator, intNumber(DEFAULT_MIN_COLLECTION_SIZE, maxNumberOfRandomElements)));
             generatedElements.add(containedValue);
         }
-        generatedElements.addAll(listOf(generator, intNumber(0, maxNumberOfRandomElements)));
+        generatedElements.addAll(listOf(generator, intNumber(DEFAULT_MIN_COLLECTION_SIZE, maxNumberOfRandomElements)));
         return generatedElements;
     }
 
     private <T> int maxNumberOfRandomElements(Collection<T> containedElements) {
         if (containedElements.isEmpty()) {
-            return 5;
+            return DEFAULT_MAX_COLLECTION_SIZE;
         }
         if (containedElements.size() == 1) {
-            return 2;
+            return DEFAULT_MAX_COLLECTION_SIZE / 2;
         }
-        return 1;
+        return DEFAULT_MIN_NONEMPTY_COLLECTION_SIZE;
     }
 
     /**
@@ -1015,7 +1016,7 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      * @return the generated {@link List}.
      */
     public <T> List<T> nonEmptyListOf(Function<VP, T> generator) {
-        return listOf(generator, intNumber(1, 5));
+        return listOf(generator, intNumber(DEFAULT_MIN_NONEMPTY_COLLECTION_SIZE, DEFAULT_MAX_COLLECTION_SIZE));
     }
 
     /**
@@ -1040,7 +1041,7 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      * @return the generated {@link List}.
      */
     public <T> List<T> listOf(Function<VP, T> generator) {
-        return listOf(generator, intNumber(0, 5));
+        return listOf(generator, intNumber(DEFAULT_MIN_COLLECTION_SIZE, DEFAULT_MAX_COLLECTION_SIZE));
     }
 
     /**

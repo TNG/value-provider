@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class CollectionGeneratorTest {
     private static final int DEFAULT_MIN_COLLECTION_SIZE = 0;
-    private static final int DEFAULT_MAX_COLLECTION_SIZE = 5;
+    static final int DEFAULT_MAX_COLLECTION_SIZE = 5;
 
     private final ValueProvider random = withRandomValues();
     private final CollectionGenerator<ValueProvider> collection = random.collection();
