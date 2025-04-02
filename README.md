@@ -187,24 +187,24 @@ This time, let's start with the example output of invoking `OrderTestDataFactory
 ```
 Order(
 orderItems=[
-OrderItem(product=Product(category=COMPUTER, name=A-nameFhG, description=A-descriptionFhG), quantity=66),
-OrderItem(product=Product(category=FOOD, name=B-nameFhG, description=B-descriptionFhG), quantity=8),
-OrderItem(product=Product(category=COMPUTER, name=C-nameFhG, description=C-descriptionFhG), quantity=35),
-OrderItem(product=Product(category=BOOK, name=D-nameFhG, description=D-descriptionFhG), quantity=89)],
+OrderItem(product=Product(category=COMPUTER, name=AnameFhG, description=AdescriptionFhG), quantity=66),
+OrderItem(product=Product(category=FOOD, name=BnameFhG, description=BdescriptionFhG), quantity=8),
+OrderItem(product=Product(category=COMPUTER, name=CnameFhG, description=CdescriptionFhG), quantity=35),
+OrderItem(product=Product(category=BOOK, name=DnameFhG, description=DdescriptionFhG), quantity=89)],
 customer=Customer(firstName=firstNameFhG, lastName=lastNameFhG, birthDate=1975-05-06),
 shippingAddress=Address(zip=96874, city=S-cityFhG, street=S-streetFhG, number=315),
 billingAddress=Address(zip=32924, city=B-cityFhG, street=B-streetFhG, number=120))
 Order(
 orderItems=[
-OrderItem(product=Product(category=MAGIC_EQUIPMENT, name=A-namerwk, description=A-descriptionrwk), quantity=1),
-OrderItem(product=Product(category=MAGIC_EQUIPMENT, name=B-namerwk, description=B-descriptionrwk), quantity=69),
-OrderItem(product=Product(category=COMPUTER, name=C-namerwk, description=C-descriptionrwk), quantity=85)],
+OrderItem(product=Product(category=MAGIC_EQUIPMENT, name=Anamerwk, description=Adescriptionrwk), quantity=1),
+OrderItem(product=Product(category=MAGIC_EQUIPMENT, name=Bnamerwk, description=Bdescriptionrwk), quantity=69),
+OrderItem(product=Product(category=COMPUTER, name=Cnamerwk, description=Cdescriptionrwk), quantity=85)],
 customer=Customer(firstName=firstNamerwk, lastName=lastNamerwk, birthDate=2002-06-08),
 shippingAddress=Address(zip=08583, city=cityrwk, street=streetrwk, number=86),
 billingAddress=Address(zip=08583, city=cityrwk, street=streetrwk, number=86))
 Order(
 orderItems=[
-OrderItem(product=Product(category=COMPUTER, name=A-namekwh, description=A-descriptionkwh), quantity=73)],
+OrderItem(product=Product(category=COMPUTER, name=Anamekwh, description=Adescriptionkwh), quantity=73)],
 customer=Customer(firstName=firstNamekwh, lastName=lastNamekwh, birthDate=1929-08-23),
 shippingAddress=Address(zip=81571, city=S-citykwh, street=S-streetkwh, number=174),
 billingAddress=Address(zip=71331, city=B-citykwh, street=B-streetkwh, number=169))
@@ -220,7 +220,7 @@ different number of order items, and e.g., the shipping and billing addresses ha
 random zip codes or house numbers.
 
 Last but not least, note the second aspect of string *decoration*. The products in the order items have an additional
-prefix in their string properties (e.g., 'A-', 'B-', ...). This is required to
+prefix in their string properties (e.g., 'A', 'B', ...). This is required to
 differentiate multiple objects of the same kind. The same applies to the shipping and billing addresses. They have
 different prefixes, if they differ ('S-' vs. 'B-'), but no prefix, if they are the
 same.
@@ -257,13 +257,20 @@ public final class OrderTestDataFactory {
 
     public static OrderBuilder createOrderBuilder(ValueProvider values) {
         OrderBuilder builder = Order.builder()
-                .customer(createCustomer(values));
-        setAddress(builder, values);
-        addItems(builder, values);
+                .customer(createCustomer(values))
+                .orderItems(createItems(values));
+        setAddresses(builder, values);
         return builder;
     }
 
-    private static void setAddress(OrderBuilder builder, ValueProvider values) {
+    private static List<OrderItem> createItems(ValueProvider values) {
+        return values.collection()
+                .numElements(1, 5)
+                .replacePrefixVia(i -> format("%c", (char) ('A' + i)))
+                .listOf(OrderItemTestDataFactory::createOrderItem);
+    }
+
+    private static void setAddresses(OrderBuilder builder, ValueProvider values) {
         boolean useDifferentBillingAddress = values.booleanValue();
         if (useDifferentBillingAddress) {
             builder
@@ -273,15 +280,6 @@ public final class OrderTestDataFactory {
         } else {
             builder
                     .shippingAddress(createAddress(values));
-        }
-    }
-
-    private static void addItems(OrderBuilder builder, ValueProvider values) {
-        int numOrderItems = values.intNumber(1, 5);
-        for (int i = 0; i < numOrderItems; i++) {
-            char prefix = (char) ('A' + i);
-            ValueProvider prefixedProvider = values.copyWithChangedPrefix(prefix + "-");
-            builder.orderItem(createOrderItem(prefixedProvider));
         }
     }
 }
@@ -297,7 +295,7 @@ public final class OrderTestDataFactory {
     // ...
     public static OrderBuilder createOrderBuilder(ValueProvider values) {
         OrderBuilder builder = Order.builder()
-                .customer(createCustomer(values));
+                .customer(createCustomer(values))
         // ...
         return builder;
     }
@@ -305,18 +303,22 @@ public final class OrderTestDataFactory {
 }
 ```
 
-If you need multiple objects of the same type, add a prefix, like for the order item:
+If you need multiple objects of the same type, e.g. different shipping and billing addresses,
+you can achieve different string properties via a prefix:
 
 ```java
 // ...
 public final class OrderTestDataFactory {
     // ...
-    private static void addItems(OrderBuilder builder, ValueProvider values) {
-        int numOrderItems = values.intNumber(1, 5);
-        for (int i = 0; i < numOrderItems; i++) {
-            char prefix = (char) ('A' + i);
-            ValueProvider prefixedProvider = values.copyWithChangedPrefix(prefix + "-");
-            builder.orderItem(createOrderItem(prefixedProvider));
+    private static void setAddresses(OrderBuilder builder, ValueProvider values) {
+        boolean useDifferentBillingAddress = values.booleanValue();
+        if (useDifferentBillingAddress) {
+            builder
+                    .shippingAddress(createAddress(values.copyWithChangedPrefix("S-")))
+                    .billingAddress(createAddress(values.copyWithChangedPrefix("B-")));
+        } else {
+            builder
+                    .shippingAddress(createAddress(values));
         }
     }
     // ...
@@ -325,11 +327,36 @@ public final class OrderTestDataFactory {
 
 The `copyWithChangedPrefix()` method takes the suffix of
 the [ValueProvider](core/src/main/java/com/tngtech/valueprovider/ValueProvider.java) for which it is called, and creates
-a new instance with the passed
-prefix. Like the suffix, the prefix remains the same for the lifetime of
+a new instance with the passed prefix. Like the suffix, the prefix remains the same for the lifetime of
 the [ValueProvider](core/src/main/java/com/tngtech/valueprovider/ValueProvider.java).
 
-A final aspect that is related to using lombok:
+If you need a collection of objects of the same type, e.g. the order items, start with the `collection()` method.
+The returned [CollectionGenerator](core/src/main/java/com/tngtech/valueprovider/CollectionGenerator.java)
+provides a fluent API to specify the details of the collection:
+
+```java
+// ...
+public final class OrderTestDataFactory {
+    // ...
+    private static List<OrderItem> createItems(ValueProvider values) {
+        return values.collection()
+                .numElements(1, 5)
+                .replacePrefixVia(i -> format("%c", (char) ('A' + i)))
+                .listOf(OrderItemTestDataFactory::createOrderItem);
+    }
+    // ...
+}
+```
+
+In addition to the number of elements, the generation of the prefix for each collection element based on the element index can be controlled.
+The [CollectionGenerator](core/src/main/java/com/tngtech/valueprovider/CollectionGenerator.java)
+supports replacing any previously set prefix as in the example above. Alternatively, appending to the previously set prefix is possible as well.
+This will yield unique string properties for nested collections.
+Finally, the `listOf()` method creates the desired list of order items via the passed element generator function.
+The [CollectionGenerator](core/src/main/java/com/tngtech/valueprovider/CollectionGenerator.java)
+also provides a `setOf()` method for creating sets.
+
+A final aspect that is related to the use of lombok for the example objects:
 As opposed to a [Product](example/src/main/java/com/tngtech/valueprovider/example/Product.java), creating
 an [Order](example/src/main/java/com/tngtech/valueprovider/example/Order.java) is done via a
 builder rather than via a factory method.
@@ -417,9 +444,9 @@ class MyOrderTest {
 }
 ```
 
-If your test class is __derived__ from a base class, 
+If your test class is __derived__ from a base class,
 the [ValueProviderExtension](junit5/src/main/java/com/tngtech/valueprovider/ValueProviderExtension.java)
-may be specified in the __base class__ of the inheritance hierarchy, 
+may be specified in the __base class__ of the inheritance hierarchy,
 so that it need not be specified in every derived test class.
 
 ###### JUnit 5 @TestInstance Lifecycle

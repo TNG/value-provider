@@ -31,7 +31,7 @@ public final class OrderTestDataFactory {
         OrderBuilder builder = Order.builder()
                 .customer(createCustomer(values))
                 .orderItems(createItems(values));
-        setAddress(builder, values);
+        setAddresses(builder, values);
         return builder;
     }
 
@@ -42,7 +42,7 @@ public final class OrderTestDataFactory {
                 .listOf(OrderItemTestDataFactory::createOrderItem);
     }
 
-    private static void setAddress(OrderBuilder builder, ValueProvider values) {
+    private static void setAddresses(OrderBuilder builder, ValueProvider values) {
         boolean useDifferentBillingAddress = values.booleanValue();
         if (useDifferentBillingAddress) {
             builder
