@@ -6,7 +6,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.github.jk1:gradle-license-report:2.4'
+        classpath 'com.github.jk1:gradle-license-report:2.9'
     }
 }
 
