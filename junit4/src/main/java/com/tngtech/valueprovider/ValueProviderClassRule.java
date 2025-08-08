@@ -1,7 +1,5 @@
 package com.tngtech.valueprovider;
 
-import javax.annotation.Nonnull;
-
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 import org.slf4j.Logger;
@@ -29,7 +27,7 @@ public class ValueProviderClassRule extends TestWatcher {
     }
 
     @Override
-    protected void starting(@Nonnull Description description) {
+    protected void starting(Description description) {
         if (testCycle != null) {
             logger.debug("starting {}, first execution after loading test class",
                     description.getTestClass().getSimpleName());
@@ -51,7 +49,7 @@ public class ValueProviderClassRule extends TestWatcher {
     }
 
     @Override
-    protected void finished(@Nonnull Description description) {
+    protected void finished(Description description) {
         logger.debug("finished {}", description.getTestClass().getSimpleName());
         resetToDefaultVpiCreator();
     }

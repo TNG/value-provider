@@ -3,8 +3,6 @@ package com.tngtech.valueprovider;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Nonnull;
-
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.MultipleFailureException;
@@ -31,8 +29,8 @@ public class ValueProviderRule implements TestRule {
         startTestMethodCycle();
     }
 
-    public @Nonnull
-    Statement apply(@Nonnull final Statement base, @Nonnull final Description description) {
+    public
+    Statement apply(final Statement base, final Description description) {
         return new Statement() {
             @Override
             public void evaluate() throws Throwable {
