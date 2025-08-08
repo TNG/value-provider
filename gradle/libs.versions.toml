@@ -1,6 +1,6 @@
 [versions]
 dataprovider = "2.10"
-junit5 = "5.10.2"
+junit5 = "5.13.4"
 
 [libraries]
 apache_commons = { group = "org.apache.commons", name = "commons-lang3", version = "3.14.0" }
