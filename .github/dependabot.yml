@@ -4,6 +4,10 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
+    groups:
+      junit:
+        patterns:
+          - "org.junit*"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
