@@ -2,7 +2,7 @@
 apache_commons = { group = "org.apache.commons", name = "commons-lang3", version = "3.14.0" }
 guava = { group = "com.google.guava", name = "guava", version = "33.0.0-jre" }
 slf4j_api = { group = "org.slf4j", name = "slf4j-api", version = "2.0.16" }
-lombok = { group = "org.projectlombok", name = "lombok", version = "1.18.30" }
+lombok = { group = "org.projectlombok", name = "lombok", version = "1.18.38" }
 
 junit4 = { group = "junit", name = "junit", version = "4.13.2" }
 junit4_dataprovider = { group = "com.tngtech.junit.dataprovider", name = "junit4-dataprovider", version = "2.10" }
