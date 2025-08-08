@@ -1,11 +1,11 @@
 dependencies {
-    implementation dependency.junit4
+    implementation libs.junit4
 
     implementation project(':core')
 
     testImplementation project(path: ':core', configuration: 'tests')
-    testImplementation dependency.junit4_dataprovider
-    testRuntimeOnly dependency.junit4_engine
+    testImplementation libs.junit4.dataprovider
+    testRuntimeOnly libs.junit4.engine
 }
 test {
     // set via -DrandomFailureForDataProviderTests=true on the gradle commandline to provoke random failures

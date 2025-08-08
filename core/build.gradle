@@ -1,9 +1,9 @@
 dependencies {
-    testImplementation dependency.junit_jupiter_api
-    testCompileOnly dependency.lombok
-    testAnnotationProcessor dependency.lombok
+    testImplementation libs.junit.jupiter.api
+    testCompileOnly libs.lombok
+    testAnnotationProcessor libs.lombok
 
-    testRuntimeOnly dependency.junit_jupiter_engine
+    testRuntimeOnly libs.junit.jupiter.engine
 }
 
 task testJar(type: Jar) {
