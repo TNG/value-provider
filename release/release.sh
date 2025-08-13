@@ -2,31 +2,24 @@
 
 set -e
 
+function parse_all_gradle_properties() {
+    # make sure output_target is an array variable
+    [[ "$(declare -p $1 2>/dev/null)" =~ "declare -a" ]] || return 11
+    local -n output_target=$1
+    for command_line_argument in "$@"; do
+        # restrict to Gradle property syntax
+        if [[ "${command_line_argument}" =~ ^-P.*=.* ]];then
+          output_target+=("${command_line_argument}")
+        fi
+    done
+}
+
 echo "Beginning"
-while [[ -n "${1-}" ]] ; do
-  case "${1}" in
-    --repository-username*)
-      SONATYPE_USERNAME=${1#*=}
-      ;;
-    --repository-password*)
-      SONATYPE_PASSWORD=${1#*=}
-      ;;
-    --signing-key*)
-      GPG_SIGNING_KEY=${1#*=}
-      ;;
-    --signing-password*)
-      GPG_SIGNING_PASSWORD=${1#*=}
-      ;;
-    *)
-      echo "Unknown option '${1}'"
-      exit 1
-      ;;
-  esac
-  shift
-done
+declare -a GRADLE_PROPERTIES
+parse_all_gradle_properties GRADLE_PROPERTIES "$@"
 
 echo Building and testing...
-./gradlew build
+./gradlew clean build
 
-echo Publishing to Sonatype, closing repository, checking uploaded artifacts and releasing repository...
-./gradlew publishToSonatype closeSonatypeStagingRepository releaseSonatypeStagingRepository --no-parallel -PsonatypeUsername="$SONATYPE_USERNAME" -PsonatypePassword="$SONATYPE_PASSWORD" -PsigningKey="$GPG_SIGNING_KEY" -PsigningPassword="$GPG_SIGNING_PASSWORD"
+echo Publishing...
+./gradlew --no-parallel -Prelease publishAllPublicationsToMavenCentralRepository "${GRADLE_PROPERTIES[@]}"
