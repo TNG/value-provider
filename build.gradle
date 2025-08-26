@@ -87,10 +87,10 @@ subprojects {
     targetCompatibility = '1.8'
 
     dependencies {
-        implementation libs.apache.commons
         implementation libs.guava
         implementation libs.slf4j.api
 
+        testImplementation libs.apache.commons
         testImplementation libs.assertj.core
         testImplementation libs.junit4
         testImplementation libs.junit.jupiter.api
