@@ -64,6 +64,8 @@ allprojects {
     version = '1.4.3-SNAPSHOT'
 
     repositories {
+        // FIXME just for local testing -> remove before pushing
+        mavenLocal()
         mavenCentral()
     }
 }
@@ -97,6 +99,7 @@ subprojects {
 
         // hint: activate (debug) logging via system property -Dorg.slf4j.simpleLogger.defaultLogLevel=debug
         testRuntimeOnly libs.slf4j.simple
+        testRuntimeOnly libs.junit.platform.launcher
     }
 
     repositories {
