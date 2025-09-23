@@ -13,7 +13,7 @@ lombok = { group = "org.projectlombok", name = "lombok", version = "1.18.40" }
 junit4 = { group = "junit", name = "junit", version = "4.13.2" }
 junit4_dataprovider = { group = "com.tngtech.junit.dataprovider", name = "junit4-dataprovider", version.ref = "dataprovider" }
 junit5_dataprovider = { group = "com.tngtech.junit.dataprovider", name = "junit-jupiter-dataprovider", version.ref = "dataprovider" }
-assertj_core = { group = "org.assertj", name = "assertj-core", version = "3.27.4" }
+assertj_core = { group = "org.assertj", name = "assertj-core", version = "3.27.6" }
 slf4j_simple = { group = "org.slf4j", name = "slf4j-simple", version = "2.0.17" }
 
 junit4_engine = { group = "org.junit.vintage", name = "junit-vintage-engine", version.ref = "junit5" }
