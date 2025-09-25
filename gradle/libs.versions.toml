@@ -6,7 +6,7 @@ junit5_testkit = "1.11.4"
 
 [libraries]
 apache_commons = { group = "org.apache.commons", name = "commons-lang3", version = "3.18.0" }
-guava = { group = "com.google.guava", name = "guava", version = "33.4.8-jre" }
+guava = { group = "com.google.guava", name = "guava", version = "33.5.0-jre" }
 slf4j_api = { group = "org.slf4j", name = "slf4j-api", version = "2.0.17" }
 lombok = { group = "org.projectlombok", name = "lombok", version = "1.18.42" }
 
