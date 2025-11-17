@@ -68,10 +68,6 @@ allprojects {
     }
 }
 
-task showJdkVersion {
-    println "Configured JDK: ${JavaVersion.current()}"
-}
-
 task clean {
     doLast {
         project.buildDir.deleteDir()
@@ -80,6 +76,13 @@ task clean {
 
 subprojects {
     apply plugin: 'java-library'
+    java {
+        toolchain {
+            if (project.hasProperty('javaVersion')) {
+                languageVersion = JavaLanguageVersion.of(project.property('javaVersion').toString())
+            }
+        }
+    }
     compileJava { options.encoding = "UTF-8" }
     compileTestJava { options.encoding = "UTF-8" }
 
