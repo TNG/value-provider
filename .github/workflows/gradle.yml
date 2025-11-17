@@ -26,11 +26,11 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v5
         with:
-          java-version: ${{ matrix.java }}
+          java-version: 21
           distribution: 'temurin'
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v5
         with:
           gradle-version: "8.5"
       - name: Build with Gradle
-        run: ./gradlew clean build
+        run: ./gradlew clean build -PjavaVersion=${{ matrix.java }}
