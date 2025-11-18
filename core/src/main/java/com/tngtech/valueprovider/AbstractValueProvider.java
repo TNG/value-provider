@@ -1371,10 +1371,9 @@ public abstract class AbstractValueProvider<VP extends AbstractValueProvider<VP>
      * @return the generated address.
      */
     public String ipV4Address() {
-        DecimalFormat threeDigits = new DecimalFormat("000");
         List<String> parts = new ArrayList<>();
         for (int i = 0; i < 4; i++) {
-            parts.add(threeDigits.format(intNumber(1, 255)));
+            parts.add(String.valueOf(intNumber(1, 255)));
         }
         return parts.stream()
                 .map(String::toString)
