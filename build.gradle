@@ -10,7 +10,7 @@ buildscript {
         // com.vanniktech.maven.publish plugin is not compatible with Java 8,
         // so the standard 'plugins {...}' approach can't be used, but the dependency must be controlled via a build property
         if (project.hasProperty('release')) {
-            classpath "com.vanniktech.maven.publish:com.vanniktech.maven.publish.gradle.plugin:0.34.0"
+            classpath "com.vanniktech.maven.publish:com.vanniktech.maven.publish.gradle.plugin:0.35.0"
         }
 
     }
