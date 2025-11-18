@@ -6,7 +6,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.github.jk1:gradle-license-report:2.9'
+        classpath 'com.github.jk1:gradle-license-report:3.0.1'
         // com.vanniktech.maven.publish plugin is not compatible with Java 8,
         // so the standard 'plugins {...}' approach can't be used, but the dependency must be controlled via a build property
         if (project.hasProperty('release')) {
