@@ -30,7 +30,5 @@ jobs:
           distribution: 'temurin'
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v5
-        with:
-          gradle-version: "8.5"
       - name: Build with Gradle
         run: ./gradlew clean build -PjavaVersion=${{ matrix.java }}
