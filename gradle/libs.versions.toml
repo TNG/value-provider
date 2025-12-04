@@ -2,8 +2,8 @@
 # FIXME just for local testing -> switch to release version when available
 dataprovider = "2.11-SNAPSHOT"
 # must be changed together
-junit5 = "5.13.4"
-junit5_platform = "1.13.4"
+junit5 = "5.14.1"
+junit5_platform = "1.14.1"
 
 [libraries]
 apache_commons = { group = "org.apache.commons", name = "commons-lang3", version = "3.20.0" }
