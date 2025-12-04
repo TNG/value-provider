@@ -133,22 +133,18 @@ if (isReleaseBuild) {
         }
 
         project(":core") {
-            archivesBaseName = 'value-provider-core'
             description = app.description
         }
 
         project(":junit4") {
-            archivesBaseName = 'value-provider-junit4'
             description = 'JUnit 4 test infrastructure to reproduce random test data in case of test failures.'
         }
 
         project(":junit5") {
-            archivesBaseName = 'value-provider-junit5'
             description = 'JUnit 5 test infrastructure to reproduce random test data in case of test failures.'
         }
 
         project(":example") {
-            archivesBaseName = 'value-provider-example'
             description = 'Examples for test data factories using the value-provider library.'
         }
 
@@ -158,9 +154,12 @@ if (isReleaseBuild) {
                 into("META-INF")
             }
 
+            archiveBaseName = 'value-provider-' + project.name
+
             manifest {
-                def title = project.archivesBaseName
-                def now = java.time.LocalDate.now()
+                def title = archiveBaseName.get()
+                def now = LocalDate.now()
+                //noinspection UnnecessaryQualifiedReference -> false positive
                 def today = now.format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd"))
                 def companyName = company.name
                 def copyright = "${now.year} ${companyName}"
@@ -168,7 +167,7 @@ if (isReleaseBuild) {
                 attributes(
                         'Built-By': "Gradle ${gradle.gradleVersion}",
                         'Built-Date': today,
-                        'Specification-Title': project.archivesBaseName,
+                        'Specification-Title': title,
                         'Specification-Version': archiveVersion,
                         'Specification-Vendor': companyName,
                         'Implementation-Title': title,
@@ -197,13 +196,13 @@ if (isReleaseBuild) {
             signAllPublications()
 
             coordinates(
-                    project.group,
-                    project.archivesBaseName,
+                    project.group.toString(),
+                    'value-provider-' + project.name,
                     project.version.toString()
             )
 
             pom {
-                name = project.archivesBaseName
+                name = 'value-provider-' + project.name
                 packaging = "jar"
                 description = project.description
                 url = app.urls.entry
