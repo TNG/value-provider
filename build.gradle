@@ -66,12 +66,6 @@ allprojects {
     }
 }
 
-task clean {
-    doLast {
-        project.buildDir.deleteDir()
-    }
-}
-
 subprojects {
     apply plugin: 'java-library'
     java {
@@ -118,21 +112,21 @@ if (isReleaseBuild) {
         apply plugin: 'com.vanniktech.maven.publish'
         apply plugin: 'signing'
 
-        tasks.withType(GenerateModuleMetadata) {
+        tasks.withType(GenerateModuleMetadata).configureEach {
             enabled = false // the meta-data does not match the way the Maven artifacts are composed and thus is broken
         }
 
         // fix for broken java doc generation when using html tags in javadoc
         if (JavaVersion.current().isJava8Compatible()) {
             allprojects {
-                tasks.withType(Javadoc) {
+                tasks.withType(Javadoc).configureEach {
                     options.addStringOption('Xdoclint:none', '-quiet')
                 }
             }
         }
         if (JavaVersion.current().isJava9Compatible()) {
             allprojects {
-                tasks.withType(Javadoc) {
+                tasks.withType(Javadoc).configureEach {
                     options.addBooleanOption('html5', true)
                 }
             }
@@ -158,7 +152,7 @@ if (isReleaseBuild) {
             description = 'Examples for test data factories using the value-provider library.'
         }
 
-        tasks.withType(Jar) {
+        tasks.withType(Jar).configureEach {
             from(rootProject.rootDir) {
                 include("LICENSE", "NOTICE")
                 into("META-INF")
@@ -187,10 +181,10 @@ if (isReleaseBuild) {
                 )
             }
         }
-        tasks.withType(AbstractPublishToMaven) {
+        tasks.withType(AbstractPublishToMaven).configureEach {
             it.dependsOn(build)
         }
-        tasks.withType(PublishToMavenRepository) {
+        tasks.withType(PublishToMavenRepository).configureEach {
             it.doFirst {
                 assert !gradle.startParameter.isParallelProjectExecutionEnabled():
                         'uploading archives with parallel execution seems to lead to broken uploads in Maven Central'
