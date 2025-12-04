@@ -4,6 +4,7 @@ dependencies {
     testAnnotationProcessor libs.lombok
 
     testRuntimeOnly libs.junit.jupiter.engine
+    testRuntimeOnly libs.junit.platform.launcher
 }
 
 task testJar(type: Jar) {
