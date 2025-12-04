@@ -2,7 +2,7 @@
 dataprovider = "2.10"
 # must be changed together
 junit5 = "5.11.4"
-junit5_testkit = "1.11.4"
+junit5_platform = "1.11.4"
 
 [libraries]
 apache_commons = { group = "org.apache.commons", name = "commons-lang3", version = "3.20.0" }
@@ -20,4 +20,5 @@ junit4_engine = { group = "org.junit.vintage", name = "junit-vintage-engine", ve
 junit_jupiter_api = { group = "org.junit.jupiter", name = "junit-jupiter-api", version.ref = "junit5" }
 junit_jupiter_engine = { group = "org.junit.jupiter", name = "junit-jupiter-engine", version.ref = "junit5" }
 junit_jupiter_params = { group = "org.junit.jupiter", name = "junit-jupiter-params", version.ref = "junit5" }
-junit_jupiter_testkit = { group = "org.junit.platform", name = "junit-platform-testkit", version.ref = "junit5_testkit" }
+junit_jupiter_testkit = { group = "org.junit.platform", name = "junit-platform-testkit", version.ref = "junit5_platform" }
+junit_platform_launcher = { group = "org.junit.platform", name = "junit-platform-launcher", version.ref = "junit5_platform" }
