@@ -1,7 +1,7 @@
 buildscript {
     repositories {
         maven {
-            url 'https://plugins.gradle.org/m2/'
+            url = 'https://plugins.gradle.org/m2/'
         }
     }
 
@@ -66,12 +66,6 @@ allprojects {
     }
 }
 
-task clean {
-    doLast {
-        project.buildDir.deleteDir()
-    }
-}
-
 subprojects {
     apply plugin: 'java-library'
     java {
@@ -80,12 +74,11 @@ subprojects {
                 languageVersion = JavaLanguageVersion.of(project.property('javaVersion').toString())
             }
         }
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
     compileJava { options.encoding = "UTF-8" }
     compileTestJava { options.encoding = "UTF-8" }
-
-    sourceCompatibility = '1.8'
-    targetCompatibility = '1.8'
 
     dependencies {
         implementation libs.guava
@@ -119,55 +112,54 @@ if (isReleaseBuild) {
         apply plugin: 'com.vanniktech.maven.publish'
         apply plugin: 'signing'
 
-        tasks.withType(GenerateModuleMetadata) {
+        tasks.withType(GenerateModuleMetadata).configureEach {
             enabled = false // the meta-data does not match the way the Maven artifacts are composed and thus is broken
         }
 
         // fix for broken java doc generation when using html tags in javadoc
         if (JavaVersion.current().isJava8Compatible()) {
             allprojects {
-                tasks.withType(Javadoc) {
+                tasks.withType(Javadoc).configureEach {
                     options.addStringOption('Xdoclint:none', '-quiet')
                 }
             }
         }
         if (JavaVersion.current().isJava9Compatible()) {
             allprojects {
-                tasks.withType(Javadoc) {
+                tasks.withType(Javadoc).configureEach {
                     options.addBooleanOption('html5', true)
                 }
             }
         }
 
         project(":core") {
-            archivesBaseName = 'value-provider-core'
             description = app.description
         }
 
         project(":junit4") {
-            archivesBaseName = 'value-provider-junit4'
             description = 'JUnit 4 test infrastructure to reproduce random test data in case of test failures.'
         }
 
         project(":junit5") {
-            archivesBaseName = 'value-provider-junit5'
             description = 'JUnit 5 test infrastructure to reproduce random test data in case of test failures.'
         }
 
         project(":example") {
-            archivesBaseName = 'value-provider-example'
             description = 'Examples for test data factories using the value-provider library.'
         }
 
-        tasks.withType(Jar) {
+        tasks.withType(Jar).configureEach {
             from(rootProject.rootDir) {
                 include("LICENSE", "NOTICE")
                 into("META-INF")
             }
 
+            archiveBaseName = 'value-provider-' + project.name
+
             manifest {
-                def title = project.archivesBaseName
-                def now = java.time.LocalDate.now()
+                def title = archiveBaseName.get()
+                def now = LocalDate.now()
+                //noinspection UnnecessaryQualifiedReference -> false positive
                 def today = now.format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd"))
                 def companyName = company.name
                 def copyright = "${now.year} ${companyName}"
@@ -175,7 +167,7 @@ if (isReleaseBuild) {
                 attributes(
                         'Built-By': "Gradle ${gradle.gradleVersion}",
                         'Built-Date': today,
-                        'Specification-Title': project.archivesBaseName,
+                        'Specification-Title': title,
                         'Specification-Version': archiveVersion,
                         'Specification-Vendor': companyName,
                         'Implementation-Title': title,
@@ -188,10 +180,10 @@ if (isReleaseBuild) {
                 )
             }
         }
-        tasks.withType(AbstractPublishToMaven) {
+        tasks.withType(AbstractPublishToMaven).configureEach {
             it.dependsOn(build)
         }
-        tasks.withType(PublishToMavenRepository) {
+        tasks.withType(PublishToMavenRepository).configureEach {
             it.doFirst {
                 assert !gradle.startParameter.isParallelProjectExecutionEnabled():
                         'uploading archives with parallel execution seems to lead to broken uploads in Maven Central'
@@ -204,13 +196,13 @@ if (isReleaseBuild) {
             signAllPublications()
 
             coordinates(
-                    project.group,
-                    project.archivesBaseName,
+                    project.group.toString(),
+                    'value-provider-' + project.name,
                     project.version.toString()
             )
 
             pom {
-                name = project.archivesBaseName
+                name = 'value-provider-' + project.name
                 packaging = "jar"
                 description = project.description
                 url = app.urls.entry
@@ -251,9 +243,8 @@ if (isReleaseBuild) {
 
         signing {
             // requires gradle.properties, see http://www.gradle.org/docs/current/userguide/signing_plugin.html
-            required {
-                isReleaseVersion
-            }
+            required = isReleaseVersion
+
             def signingKey = findProperty("signingKey")
             def signingPassword = findProperty("signingPassword")
             useInMemoryPgpKeys(signingKey, signingPassword)
