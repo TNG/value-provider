@@ -37,12 +37,6 @@ ext {
             url : 'https://www.tngtech.com/'
     ]
 
-    postfixedJar = { File jarFile, String postfix ->
-        new File(jarFile.parentFile, jarFile.name.replaceAll(/\.jar$/, "-${postfix}.jar"))
-    }
-
-    tempJar = { File jarFile -> postfixedJar(jarFile, 'tmp') }
-
     productionProjects = [
             project(':core'),
             project(':example'),
@@ -77,8 +71,10 @@ subprojects {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
-    compileJava { options.encoding = "UTF-8" }
-    compileTestJava { options.encoding = "UTF-8" }
+
+    tasks.withType(JavaCompile).configureEach {
+        options.encoding = 'UTF-8'
+    }
 
     dependencies {
         implementation libs.guava
