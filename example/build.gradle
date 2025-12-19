@@ -3,9 +3,9 @@ dependencies {
     annotationProcessor libs.lombok
     implementation project(':core')
 
-    testImplementation libs.junit.jupiter.api
+    testImplementation rootProject.ext.junitJupiterApiVersion
     testImplementation project(':junit5')
 
-    testRuntimeOnly libs.junit.jupiter.engine
-    testRuntimeOnly libs.junit.platform.launcher
+    testRuntimeOnly rootProject.ext.junitJupiterEngineVersion
+    testRuntimeOnly rootProject.ext.junitJupiterLauncherVersion
 }

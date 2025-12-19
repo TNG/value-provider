@@ -1,13 +1,13 @@
 dependencies {
-    implementation libs.junit.jupiter.api
+    implementation rootProject.ext.junitJupiterApiVersion
 
     implementation project(':core')
 
     testImplementation project(path: ':core', configuration: 'tests')
     testImplementation libs.junit5.dataprovider
-    testImplementation libs.junit.jupiter.params
-    testImplementation libs.junit.jupiter.testkit
+    testImplementation rootProject.ext.junitJupiterParamsVersion
+    testImplementation rootProject.ext.junitJupiterTestkitVersion
 
-    testRuntimeOnly libs.junit.jupiter.engine
-    testRuntimeOnly libs.junit.platform.launcher
+    testRuntimeOnly rootProject.ext.junitJupiterEngineVersion
+    testRuntimeOnly rootProject.ext.junitJupiterLauncherVersion
 }
