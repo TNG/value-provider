@@ -1,10 +1,10 @@
 dependencies {
-    testImplementation libs.junit.jupiter.api
+    testImplementation rootProject.ext.junitJupiterApiVersion
     testCompileOnly libs.lombok
     testAnnotationProcessor libs.lombok
 
-    testRuntimeOnly libs.junit.jupiter.engine
-    testRuntimeOnly libs.junit.platform.launcher
+    testRuntimeOnly rootProject.ext.junitJupiterEngineVersion
+    testRuntimeOnly rootProject.ext.junitJupiterLauncherVersion
 }
 
 tasks.register('testJar', Jar) {
