@@ -1,7 +1,10 @@
+import com.vanniktech.maven.publish.JavaLibrary
+import com.vanniktech.maven.publish.JavadocJar
+
 buildscript {
     repositories {
         maven {
-            url 'https://plugins.gradle.org/m2/'
+            url = 'https://plugins.gradle.org/m2/'
         }
     }
 
@@ -15,6 +18,10 @@ plugins {
 }
 
 def appAndSourceUrl = 'https://github.com/TNG/value-provider'
+def javaVersionString = project.hasProperty('javaVersion')
+        ? project.property('javaVersion').toString()
+        : '21'
+def javaLanguageVersion = JavaLanguageVersion.of(javaVersionString)
 
 ext {
     app = [
@@ -36,12 +43,6 @@ ext {
             name: 'TNG Technology Consulting GmbH',
             url : 'https://www.tngtech.com/'
     ]
-
-    postfixedJar = { File jarFile, String postfix ->
-        new File(jarFile.parentFile, jarFile.name.replaceAll(/\.jar$/, "-${postfix}.jar"))
-    }
-
-    tempJar = { File jarFile -> postfixedJar(jarFile, 'tmp') }
 
     productionProjects = [
             project(':core'),
@@ -66,26 +67,25 @@ allprojects {
     }
 }
 
-task clean {
-    doLast {
-        project.buildDir.deleteDir()
-    }
-}
-
 subprojects {
     apply plugin: 'java-library'
     java {
         toolchain {
-            if (project.hasProperty('javaVersion')) {
-                languageVersion = JavaLanguageVersion.of(project.property('javaVersion').toString())
-            }
+            languageVersion = javaLanguageVersion
+        }
+
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+
+        if (releaseProjects.contains(project)) {
+            withJavadocJar()
+            withSourcesJar()
         }
     }
-    compileJava { options.encoding = "UTF-8" }
-    compileTestJava { options.encoding = "UTF-8" }
 
-    sourceCompatibility = '1.8'
-    targetCompatibility = '1.8'
+    tasks.withType(JavaCompile).configureEach {
+        options.encoding = 'UTF-8'
+    }
 
     dependencies {
         implementation libs.guava
@@ -114,84 +114,76 @@ ext.isReleaseVersion = !project.version.endsWith("-SNAPSHOT")
 // duplication seems inevitable, as buildscript {...} does not support variables
 def isReleaseBuild = project.hasProperty('release')
 
-if (isReleaseBuild) {
-    releaseProjects*.with {
+releaseProjects*.with {
+    tasks.withType(GenerateModuleMetadata).configureEach {
+        enabled = false // the meta-data does not match the way the Maven artifacts are composed and thus is broken
+    }
+
+    tasks.withType(Javadoc).configureEach {
+        options.addStringOption('Xdoclint:none', '-quiet')
+        // html tags are only supported in Java 9+ Javadoc
+        if (javaLanguageVersion.canCompileOrRun(9)) {
+            options.addBooleanOption('html5', true)
+        }
+    }
+
+    project(":core") {
+        description = app.description
+    }
+
+    project(":junit4") {
+        description = 'JUnit 4 test infrastructure to reproduce random test data in case of test failures.'
+    }
+
+    project(":junit5") {
+        description = 'JUnit 5 test infrastructure to reproduce random test data in case of test failures.'
+    }
+
+    project(":example") {
+        description = 'Examples for test data factories using the value-provider library.'
+    }
+
+    tasks.withType(Jar).configureEach {
+        from(rootProject.rootDir) {
+            include("LICENSE", "NOTICE")
+            into("META-INF")
+        }
+
+        archiveBaseName = 'value-provider-' + project.name
+
+        manifest {
+            def title = archiveBaseName.get()
+            def now = LocalDate.now()
+            //noinspection UnnecessaryQualifiedReference -> false positive
+            def today = now.format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+            def companyName = company.name
+            def copyright = "${now.year} ${companyName}"
+
+            attributes(
+                    'Built-By': "Gradle ${gradle.gradleVersion}",
+                    'Built-Date': today,
+                    'Specification-Title': title,
+                    'Specification-Version': archiveVersion,
+                    'Specification-Vendor': companyName,
+                    'Implementation-Title': title,
+                    'Implementation-Version': archiveVersion,
+                    'Implementation-Vendor': company.name,
+                    'Issue-Tracker': "https://github.com/TNG/value-provider/issues",
+                    'Documentation-URL': "https://github.com/TNG/value-provider",
+                    'Copyright': copyright,
+                    'License': app.license.name,
+            )
+        }
+    }
+
+    if (isReleaseBuild) {
         apply plugin: 'com.vanniktech.maven.publish'
         apply plugin: 'signing'
 
-        tasks.withType(GenerateModuleMetadata) {
-            enabled = false // the meta-data does not match the way the Maven artifacts are composed and thus is broken
-        }
-
-        // fix for broken java doc generation when using html tags in javadoc
-        if (JavaVersion.current().isJava8Compatible()) {
-            allprojects {
-                tasks.withType(Javadoc) {
-                    options.addStringOption('Xdoclint:none', '-quiet')
-                }
-            }
-        }
-        if (JavaVersion.current().isJava9Compatible()) {
-            allprojects {
-                tasks.withType(Javadoc) {
-                    options.addBooleanOption('html5', true)
-                }
-            }
-        }
-
-        project(":core") {
-            archivesBaseName = 'value-provider-core'
-            description = app.description
-        }
-
-        project(":junit4") {
-            archivesBaseName = 'value-provider-junit4'
-            description = 'JUnit 4 test infrastructure to reproduce random test data in case of test failures.'
-        }
-
-        project(":junit5") {
-            archivesBaseName = 'value-provider-junit5'
-            description = 'JUnit 5 test infrastructure to reproduce random test data in case of test failures.'
-        }
-
-        project(":example") {
-            archivesBaseName = 'value-provider-example'
-            description = 'Examples for test data factories using the value-provider library.'
-        }
-
-        tasks.withType(Jar) {
-            from(rootProject.rootDir) {
-                include("LICENSE", "NOTICE")
-                into("META-INF")
-            }
-
-            manifest {
-                def title = project.archivesBaseName
-                def now = java.time.LocalDate.now()
-                def today = now.format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-                def companyName = company.name
-                def copyright = "${now.year} ${companyName}"
-
-                attributes(
-                        'Built-By': "Gradle ${gradle.gradleVersion}",
-                        'Built-Date': today,
-                        'Specification-Title': project.archivesBaseName,
-                        'Specification-Version': archiveVersion,
-                        'Specification-Vendor': companyName,
-                        'Implementation-Title': title,
-                        'Implementation-Version': archiveVersion,
-                        'Implementation-Vendor': company.name,
-                        'Issue-Tracker': "https://github.com/TNG/value-provider/issues",
-                        'Documentation-URL': "https://github.com/TNG/value-provider",
-                        'Copyright': copyright,
-                        'License': app.license.name,
-                )
-            }
-        }
-        tasks.withType(AbstractPublishToMaven) {
+        tasks.withType(AbstractPublishToMaven).configureEach {
             it.dependsOn(build)
         }
-        tasks.withType(PublishToMavenRepository) {
+        tasks.withType(PublishToMavenRepository).configureEach {
             it.doFirst {
                 assert !gradle.startParameter.isParallelProjectExecutionEnabled():
                         'uploading archives with parallel execution seems to lead to broken uploads in Maven Central'
@@ -199,18 +191,21 @@ if (isReleaseBuild) {
         }
 
         mavenPublishing {
+            // None -> do NOT create Javadoc jar, but publish the one created via standard withJavadocJar()' instead
+            // true -> publish sources jar
+            configure(new JavaLibrary(new JavadocJar.None(), true))
             // true -> automatically publish after uploading
             publishToMavenCentral(true)
             signAllPublications()
 
             coordinates(
-                    project.group,
-                    project.archivesBaseName,
+                    project.group.toString(),
+                    'value-provider-' + project.name,
                     project.version.toString()
             )
 
             pom {
-                name = project.archivesBaseName
+                name = 'value-provider-' + project.name
                 packaging = "jar"
                 description = project.description
                 url = app.urls.entry
@@ -251,9 +246,8 @@ if (isReleaseBuild) {
 
         signing {
             // requires gradle.properties, see http://www.gradle.org/docs/current/userguide/signing_plugin.html
-            required {
-                isReleaseVersion
-            }
+            required = isReleaseVersion
+
             def signingKey = findProperty("signingKey")
             def signingPassword = findProperty("signingPassword")
             useInMemoryPgpKeys(signingKey, signingPassword)

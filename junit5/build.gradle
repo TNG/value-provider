@@ -9,4 +9,5 @@ dependencies {
     testImplementation libs.junit.jupiter.testkit
 
     testRuntimeOnly libs.junit.jupiter.engine
+    testRuntimeOnly libs.junit.platform.launcher
 }

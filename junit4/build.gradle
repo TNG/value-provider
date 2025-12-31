@@ -5,7 +5,9 @@ dependencies {
 
     testImplementation project(path: ':core', configuration: 'tests')
     testImplementation libs.junit4.dataprovider
+
     testRuntimeOnly libs.junit4.engine
+    testRuntimeOnly libs.junit.platform.launcher
 }
 test {
     // set via -DrandomFailureForDataProviderTests=true on the gradle commandline to provoke random failures

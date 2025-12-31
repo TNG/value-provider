@@ -4,9 +4,10 @@ dependencies {
     testAnnotationProcessor libs.lombok
 
     testRuntimeOnly libs.junit.jupiter.engine
+    testRuntimeOnly libs.junit.platform.launcher
 }
 
-task testJar(type: Jar) {
+tasks.register('testJar', Jar) {
     archiveClassifier = 'tests'
     from sourceSets.test.output
 }
