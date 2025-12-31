@@ -127,7 +127,6 @@ subprojects {
 
 ext.isReleaseVersion = !project.version.endsWith("-SNAPSHOT")
 
-// duplication seems inevitable, as buildscript {...} does not support variables
 def isReleaseBuild = project.hasProperty('release')
 
 releaseProjects*.with {
