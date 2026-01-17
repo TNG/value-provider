@@ -1,9 +1,6 @@
 package com.tngtech.valueprovider;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.IntStream;
 
@@ -54,6 +51,9 @@ public class CollectionGenerator<VP extends AbstractValueProvider<VP>> {
      * @param maxNumElements the maximum number (inclusive) of collection elements to create.
      *
      * @return this generator instance for further method invocation.
+     *
+     * @throws IllegalArgumentException if {@code minNumElements} &gt; {@code maxNumElements}.
+     * @throws IllegalArgumentException for negative values of {@code minNumElements} (number chosen via {@link AbstractValueProvider#intNumber(int, int)} to be exact).
      *
      * @see #numElements(int)
      * @see #listOf(Function)
@@ -160,16 +160,16 @@ public class CollectionGenerator<VP extends AbstractValueProvider<VP>> {
      *         vp.collection()
      *           .numElements(2)
      *           .replacePrefixVia(i -> String.format("%c", (char) ('A' + i)))
-     *           .setOf(MyBeanTestDataFactory::myBean); // -> Set[myBean_generated_prefix_1-, myBean_generated_prefix_2-]
+     *           .setOf(MyBeanTestDataFactory::myBean); // -> Set[myBean_generated_prefix_A, myBean_generated_prefix_B]
      * </pre>
      * </p>
      *
      * @param elementGenerator a generator {@link Function} to generate T given an implementation of {@link AbstractValueProvider}.
-     * @param <T>              the type of list elements.
+     * @param <T>              the type of set elements.
      *
      * @return the created {@link Set}.
      *
-     * @throws IllegalArgumentException if creating enough different (wrt. {@link #equals(Object)} of type &lt;T&gt;) elements fails
+     * @throws IllegalArgumentException if creating enough different elements fails (wrt. {@link #equals(Object)} of type &lt;T&gt;).
      */
     public <T> Set<T> setOf(Function<VP, T> elementGenerator) {
         int i = 0;
@@ -187,6 +187,98 @@ public class CollectionGenerator<VP extends AbstractValueProvider<VP>> {
                     numElements, numRetriesToCreateDifferentElement);
             throw new IllegalArgumentException(message);
         }
+        return result;
+    }
+
+    /**
+     * Convenience class for {@link Map} entries, i.e. key/value pairs.
+     * @param <K> key type
+     * @param <V> value type
+     */
+    public static class MapEntry<K, V> {
+        private final K key;
+        private final V value;
+
+        /**
+         * Factory method for key/value pair.
+         * @return a {@link MapEntry} containing the provided {@code key} and {@code value}.
+         * @param <K> key type, must not be {@code null}.
+         * @param <V> value type
+         * @throws IllegalArgumentException for {@code null} value for {@code key}
+         */
+        public static <K, V> MapEntry<K, V> entryOf(K key, V value) {
+            checkArgument(key != null, "key must not be null");
+            return new MapEntry<>(key, value);
+        }
+
+        private MapEntry(K key, V value) {
+            this.key = key;
+            this.value = value;
+        }
+
+        void putInto(Map<K, V> map) {
+            map.put(this.key, this.value);
+        }
+
+        /**
+         * A {@link Map} of the required size can only be ensured by providing a respective number of different keys.
+         * The method therefore only considers the key, and ignores the value.
+         */
+        @Override
+        public int hashCode() {
+            return key.hashCode();
+        }
+
+        /**
+         * @see #hashCode()
+         */
+        @Override
+        public boolean equals(Object o) {
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            MapEntry<?, ?> mapEntry = (MapEntry<?, ?>) o;
+            return Objects.equals(key, mapEntry.key);
+        }
+    }
+
+    /**
+     * Creates a {@link Map} of &lt;K&gt;/&lt;V&gt; pairs (by means of {@code elementGenerator}).
+     * <p>
+     * Example:
+     * <pre>
+     *          static class MyBeanTestDataFactory {
+     *              public static MyBean myBean(ValueProvider valueProvider) {
+     *                  // builds and returns your bean
+     *              }
+     *          }
+     *
+     *         ValueProvider vp = ValueProviderFactory.createRandomValueProvider();
+     *         vp.collection()
+     *           .numElements(2)
+     *           .replacePrefixVia(i -> String.format("%c", (char) ('A' + i)))
+     *           .mapOf(vp -> {
+     *             String key = vp.fixedDecoratedString("key");
+     *             MyBean value = MyBeanTestDataFactory.myBean(vp);
+     *             return MapEntry.entryOf(key, value);
+     *           }); // -> Map[Akey -> myBean_generated_prefix_A, Bkey -> myBean_generated_prefix_B]
+     * </pre>
+     * </p>
+     *
+     * @param elementGenerator a generator {@link Function} to generate a {@link MapEntry} given an implementation of {@link AbstractValueProvider}.
+     * @param <K> the key type of the generated {@link MapEntry} and created  {@link Map}.
+     * @param <V> the value type of the generated {@link MapEntry} and created  {@link Map}.
+     *
+     * @return the created {@link Map}.
+     *
+     * @see MapEntry
+     *
+     * @throws IllegalArgumentException if creating enough different keys fails (wrt. {@link #equals(Object)} of type &lt;K&gt;).
+     */
+    public <K, V> Map<K, V> mapOf(Function<VP, MapEntry<K, V>> elementGenerator) {
+        Set<MapEntry<K, V>> elements = setOf(elementGenerator);
+        Map<K, V> result = new HashMap<>();
+        elements.forEach(entry -> entry.putInto(result));
         return result;
     }
 
