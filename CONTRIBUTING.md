@@ -47,4 +47,6 @@ consistently, in particular lay out your imports
 * all other imports
 * all static imports
 
-and don't use any * imports at any time.
+Use * imports for
+* 3 or more classes in the same package
+* 5 or more names in static imports for the same class.
