@@ -224,14 +224,16 @@ public class CollectionGenerator<VP extends AbstractValueProvider<VP>> {
          * A {@link Map} of the required size can only be ensured by providing a respective number of different keys.
          * The method therefore only considers the key, and ignores the value.
          */
-        @Override public int hashCode() {
+        @Override
+        public int hashCode() {
             return key.hashCode();
         }
 
         /**
          * @see #hashCode()
          */
-        @Override public boolean equals(Object o) {
+        @Override
+        public boolean equals(Object o) {
             if (o == null || getClass() != o.getClass()) {
                 return false;
             }
