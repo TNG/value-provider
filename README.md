@@ -25,20 +25,20 @@ sequence diagrams in the `doc` directory helpful.
 value-provider has the following prerequisites:
 
 * Java 8 and above
-* JUnit 5.5 and above for the JUnit5 infrastructure
+* JUnit 5.5 and above or JUnit 6.0 and above for the JUnit5 infrastructure
 * JUnit 4.12 and above for the JUnit4 infrastructure
 
 ### Gradle
 
 ```groovy
 // core library
-testImplementation 'com.tngtech.valueprovider:value-provider-core:1.4.3'
+testImplementation 'com.tngtech.valueprovider:value-provider-core:1.5.0'
 
 // infrastructure
 // for JUnit 5
-testImplementation 'com.tngtech.valueprovider:value-provider-junit5:1.4.3'
+testImplementation 'com.tngtech.valueprovider:value-provider-junit5:1.5.0'
 // additionally/alternatively, for JUnit 4
-testImplementation 'com.tngtech.valueprovider:value-provider-junit4:1.4.3'
+testImplementation 'com.tngtech.valueprovider:value-provider-junit4:1.5.0'
 ```
 
 ### Maven
@@ -52,7 +52,7 @@ testImplementation 'com.tngtech.valueprovider:value-provider-junit4:1.4.3'
     <dependency>
         <groupId>com.tngtech.valueprovider</groupId>
         <artifactId>value-provider-core</artifactId>
-        <version>1.4.3</version>
+        <version>1.5.0</version>
         <scope>test</scope>
     </dependency>
 
@@ -61,14 +61,14 @@ testImplementation 'com.tngtech.valueprovider:value-provider-junit4:1.4.3'
     <dependency>
         <groupId>com.tngtech.valueprovider</groupId>
         <artifactId>value-provider-junit5</artifactId>
-        <version>1.4.3</version>
+        <version>1.5.0</version>
         <scope>test</scope>
     </dependency>
     <!-- additionally/alternatively, for JUnit 4 -->
     <dependency>
         <groupId>com.tngtech.valueprovider</groupId>
         <artifactId>value-provider-junit4</artifactId>
-        <version>1.4.3</version>
+        <version>1.5.0</version>
         <scope>test</scope>
     </dependency>
 
