@@ -22,6 +22,8 @@ def javaVersionString = project.hasProperty('javaVersion')
         ? project.property('javaVersion').toString()
         : '21'
 def javaLanguageVersion = JavaLanguageVersion.of(javaVersionString)
+// to allow verifying compatibility for JUnit 5 and 6, controllable via commandline property (-PverifyJUnit6)
+def verifyJUnit6 = hasProperty('verifyJUnit6')
 
 ext {
     app = [
@@ -56,6 +58,19 @@ ext {
     createModuleDescription = { description, proj -> "${description} - Module '${proj.name}'" }
 
     currentScriptRootOf = { it.buildscript.sourceFile.parentFile }
+
+    junitJupiterApiVersion = libs.junit.jupiter.api
+    junitJupiterParamsVersion = libs.junit.jupiter.params
+    junitJupiterTestkitVersion = libs.junit.jupiter.testkit
+    junitJupiterEngineVersion = libs.junit.jupiter.engine
+    junitJupiterLauncherVersion = libs.junit.jupiter.launcher
+    if (verifyJUnit6) {
+        junitJupiterApiVersion = libs.junit6.jupiter.api
+        junitJupiterParamsVersion = libs.junit6.jupiter.params
+        junitJupiterTestkitVersion = libs.junit6.jupiter.testkit
+        junitJupiterEngineVersion = libs.junit6.jupiter.engine
+        junitJupiterLauncherVersion = libs.junit6.jupiter.launcher
+    }
 }
 
 allprojects {
@@ -76,6 +91,9 @@ subprojects {
 
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
+        if (verifyJUnit6) {
+            targetCompatibility = JavaVersion.VERSION_17
+        }
 
         if (releaseProjects.contains(project)) {
             withJavadocJar()
@@ -93,8 +111,6 @@ subprojects {
 
         testImplementation libs.apache.commons
         testImplementation libs.assertj.core
-        testImplementation libs.junit4
-        testImplementation libs.junit.jupiter.api
 
         // hint: activate (debug) logging via system property -Dorg.slf4j.simpleLogger.defaultLogLevel=debug
         testRuntimeOnly libs.slf4j.simple
@@ -111,7 +127,6 @@ subprojects {
 
 ext.isReleaseVersion = !project.version.endsWith("-SNAPSHOT")
 
-// duplication seems inevitable, as buildscript {...} does not support variables
 def isReleaseBuild = project.hasProperty('release')
 
 releaseProjects*.with {
