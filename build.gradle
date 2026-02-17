@@ -9,7 +9,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.github.jk1:gradle-license-report:3.0.1'
+        classpath 'com.github.jk1:gradle-license-report:3.1.0'
     }
 }
 
