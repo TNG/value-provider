@@ -8,6 +8,10 @@ updates:
       junit:
         patterns:
           - "org.junit*"
+    ignore:
+      - dependency-name: "org.junit*"
+        update-types:
+          - "version-update:semver-major"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
